@@ -15,12 +15,10 @@ export const actions = {
             publisher: data.get("publisher"), num_pages: data.get("num_pages")
         });
     }, update: async function ({request}) {
-        const {type, title, author, isbn, publisher, num_pages} = await request.json();
-        if (type === 'delete') {
-            await Book.findOneAndDelete({isbn})
-        } else if (type === 'update') {
-            await Book.findOneAndUpdate({isbn}, {title, author, publisher, num_pages})
-        }
-
-    },
+        const {title, author, isbn, publisher, num_pages} = await request.json();
+        await Book.findOneAndUpdate({isbn}, {title, author, publisher, num_pages})
+    }, delete: async function({request}) {
+        const {isbn} = await request.json();
+        await Book.findOneAndDelete({isbn});
+    }
 };

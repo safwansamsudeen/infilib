@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { DB_URI } from "$env/static/private";
-mongoose.connect(DB_URI);
+await mongoose.connect(DB_URI);
 const { Schema, SchemaTypes, model } = mongoose;
 
 const memberSchema = new Schema({
@@ -21,6 +21,7 @@ const transactionSchema = new Schema({
   book: { type: SchemaTypes.ObjectId, ref: "Book", required: true },
   member: { type: SchemaTypes.ObjectId, ref: "Member", required: true },
   borrowed: Date,
+  due_on: Date,
   returned: Date,
   comments: String,
 });

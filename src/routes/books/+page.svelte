@@ -4,15 +4,15 @@
 
 <script>
     export let data;
-    import { enhance } from '$app/forms';
+    import {enhance} from '$app/forms';
 </script>
-<div class="text-column">
+<div class="text-column text-center">
     <h1>View, edit, and manage your books</h1>
 </div>
 
 <body>
 <div class="container">
-    <form action="?/create" method="post">
+    <form action="?/create" method="post" use:enhance>
         <div class="mb-3">
             <label for="title">Title</label>
             <input
@@ -51,11 +51,12 @@
             <th>ISBN</th>
             <th>Publisher</th>
             <th>No. of pages</th>
+            <th>Actions</th>
         </tr>
         </thead>
         <tbody>
         {#each data.books as {title, author, isbn, publisher, num_pages}}
-            <tr>
+            <tr id="{isbn}-data">
                 <td>
                     <input
                             class="form-control"
@@ -90,32 +91,35 @@
                     />
                 </td>
                 <td>
-                    <button class="btn btn-outline-danger delete-button" on:click={() => {
-                        document.getElementById(`${isbn}-type`).value = 'delete';
-                        let btn = document.getElementById(`${isbn}-confirm`);
-                        btn.classList.replace("btn-dark", "btn-danger");
-                        btn.textContent = "DELETE";
-                    }}>❌</button>
-                </td>
-                <td>
-                    <input id="{isbn}-type" name="{isbn}-type" value="update" hidden/>
-                    <button class="btn btn-dark" id="{isbn}-confirm" on:click={() => {
-                        let type = document.getElementById(`${isbn}-type`).value
-                      fetch('?/update', {
-                        method: 'POST',
-                        body: JSON.stringify({
-                          isbn,
-                          type,
-                          name: document.getElementById(`${isbn}-name`).value,
-                          "class_": document.getElementById(`${isbn}-class`).value,
-                        })
-                      }).then(() => {
-                        if (type === 'delete') {
-                          location.reload();
-                        }
-                      });
-                    }}>Confirm
-                    </button>
+                    <div class="btn-group dropend">
+                        <a href="/borrows/{isbn}/borrow" class="btn btn-outline-success">Borrow</a>
+                        <button type="button" class="btn btn-outline-success dropdown-toggle dropdown-toggle-split"
+                                data-bs-toggle="dropdown" aria-expanded="false"></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" class="dropdown-item" on:click={() => {
+                                fetch('?/update', {
+                                    method: 'POST',
+                                    body: JSON.stringify({
+                                      isbn,
+                                      title: document.getElementById(`${isbn}-title`).value,
+                                      author: document.getElementById(`${isbn}-author`).value,
+                                      publisher: document.getElementById(`${isbn}-publisher`).value,
+                                      num_pages: document.getElementById(`${isbn}-num_pages`).value,
+                                    })
+                                  })
+                                }}>Confirm edits</a>
+                            </li>
+                            <li><a href="#" class="dropdown-item text-danger" on:click={() => {
+                                fetch('?/delete', {
+                                    method: 'POST',
+                                    body: JSON.stringify({ isbn })
+                                  }).then(() => {
+                                    document.getElementById(`${isbn}-data`).remove()
+                                  })
+                                }}>Delete</a>
+                            </li>
+                        </ul>
+                    </div>
                 </td>
             </tr>
         {/each}

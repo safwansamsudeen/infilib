@@ -17,14 +17,10 @@ export const actions = {
         });
     }, update: async function ({request}) {
 
-        const {type, roll_no, name, class_} = await request.json();
-        if (type === 'delete') {
-            await Member.findOneAndDelete({roll_no})
-        } else if (type === 'update') {
-            await Member.findOneAndUpdate({roll_no}, {
-                name, class: class_
-            })
-        }
-
-    },
+        const {roll_no, name, class_} = await request.json();
+        await Member.findOneAndUpdate({roll_no}, {name, class: class_})
+    }, delete: async function ({request}) {
+        const {roll_no } = await request.json();
+        await Member.findOneAndDelete({roll_no})
+    }
 };
