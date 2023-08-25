@@ -24,69 +24,95 @@
             />
         </div>
         <div class="mb-3">
-            <label for="roll_no">Roll Number</label>
-            <input class="form-control" type="integer" id="roll_no" name="roll_no"/>
+            <label for="admn_no">Admission Number</label>
+            <input class="form-control" type="number" id="admn_no" name="admn_no"/>
         </div>
         <div class="mb-3">
-            <label for="class">Class</label>
-            <input class="form-control" type="string" id="class" name="class"/>
+            <label for="grade">Grade</label>
+            <input class="form-control" type="text" id="grade" name="grade"/>
         </div>
-        <input class="form-control" name="type" value="create" hidden/>
+        <div class="mb-3">
+            <label for="section">Section</label>
+            <input class="form-control" type="text" id="section" name="section"/>
+        </div>
         <div class="d-grid gap-2 my-3">
             <input class="btn btn-outline-success" type="submit" value="Add"/>
         </div>
     </form>
+    {#each data.members as {admn_no}}
+    <form method="POST" action="?/update" id="form-{admn_no}" use:enhance={() => {
+    return async ({ update }) => {
+      update({ reset: false });
+    };
+  }}></form>
+    {/each}
     <table class="table">
         <thead>
         <tr>
             <th>Name</th>
-            <th>Joined</th>
-            <th>Roll Number</th>
+            <th>Admission Number</th>
+            <th>Grade</th>
+            <th>Section</th>
         </tr>
         </thead>
         <tbody>
-        {#each data.members as {name, roll_no, class_}}
-            <tr id="{roll_no}-data">
+        {#each data.members as {name, admn_no, grade, section}}
+            <tr id="{admn_no}-data">
                 <td>
                     <input
                             class="form-control"
                             type="text"
                             value="{name}"
-                            id="{roll_no}-name"
+                            id="{admn_no}-name"
+                            name="name"
+                            form="form-{admn_no}"
                     />
                 </td>
                 <td>
                     <input
                             class="form-control"
                             type="text"
-                            value="{class_}"
-                            id="{roll_no}-class"
+                            value="{admn_no}"
+                            name="admn_no"
+                            form="form-{admn_no}"
+                            readonly
                     />
                 </td>
-                <td>{roll_no}</td>
+                <td>
+                    <input
+                            class="form-control"
+                            type="text"
+                            value="{grade}"
+                            id="{admn_no}-grade"
+                            name="grade"
+                            form="form-{admn_no}"
+                    />
+                </td>
+                <td>
+                    <input
+                            class="form-control"
+                            type="text"
+                            value="{section}"
+                            id="{admn_no}-section"
+                            name="section"
+                            form="form-{admn_no}"
+                    />
+                </td>
                 <td>
                     <div class="btn-group dropdown">
                         <button type="button" class="btn btn-outline-success dropdown-toggle"
                                 data-bs-toggle="dropdown" aria-expanded="false">Actions
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a href="#" class="dropdown-item" on:click={() => {
-                                fetch('?/update', {
-                        method: 'POST',
-                        body: JSON.stringify({
-                          roll_no,
-                          name: document.getElementById(`${roll_no}-name`).value,
-                          "class_": document.getElementById(`${roll_no}-class`).value,
-                        })
-                      })
-                                }}>Confirm edits</a>
+                            <li>
+                                <button class="dropdown-item" type="submit" form="form-{admn_no}">Confirm</button>
                             </li>
                             <li><a href="#" class="dropdown-item text-danger" on:click={() => {
                                 fetch('?/delete', {
                                     method: 'POST',
-                                    body: JSON.stringify({ roll_no })
+                                    body: JSON.stringify({ admn_no })
                                   }).then(() => {
-                                    document.getElementById(`${roll_no}-data`).remove()
+                                    document.getElementById(`${admn_no}-data`).remove()
                                   })
                                 }}>Delete</a>
                             </li>
