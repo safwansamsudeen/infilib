@@ -2,7 +2,7 @@ import {Book} from "$lib/db.js";
 import {pojoData, find, listifyData} from "$lib/helpers.js";
 
 export async function load() {
-    const books = find(Book, {});
+    const books = await find(Book);
     return {books};
 }
 
@@ -12,11 +12,11 @@ export const actions = {
         listifyData(data, ["authors", "subjects", "languages"])
         await Book.create(data);
     }, update: async function ({request}) {
-        let {acc_no, ...updatedData} = await pojoData(request);
+        let {_id, ...updatedData} = await pojoData(request);
         listifyData(updatedData, ["authors", "subjects", "languages"])
-        await Book.findOneAndUpdate({acc_no: +acc_no}, updatedData)
+        await Book.findOneAndUpdate({_id}, updatedData)
     }, delete: async function({request}) {
-        const {acc_no} = await request.json();
-        await Book.findOneAndDelete({acc_no: +acc_no});
+        const {_id} = await request.json();
+        await Book.findOneAndDelete({_id});
     }
 };

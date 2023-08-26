@@ -4,24 +4,19 @@ await mongoose.connect(DB_URI);
 
 console.log("Connected to database", DB_URI)
 const { Schema, SchemaTypes, model } = mongoose;
-// Create schema for publisher
-const publisherSchema = new Schema({
-    name: String,
-    address: String,
-})
 
 const memberSchema = new Schema({
+  _id: Number,
   name: String,
   grade: String,
   section: String,
-  admn_no: Number,
   gender: String,
 });
 
 const bookSchema = new Schema({
+  _id: Number,
   title: String,
   subtitle: String,
-  acc_no: Number,
   authors: [String],
   subjects: [String],
   level: String,
@@ -41,8 +36,8 @@ const bookSchema = new Schema({
 });
 
 const transactionSchema = new Schema({
-  book: { type: SchemaTypes.ObjectId, ref: "Book", required: true },
-  member: { type: SchemaTypes.ObjectId, ref: "Member", required: true },
+  book: { type: SchemaTypes.Number, ref: "Book", required: true },
+  member: { type: SchemaTypes.Number, ref: "Member", required: true },
   borrowed: Date,
   due_on: Date,
   returned: Date,

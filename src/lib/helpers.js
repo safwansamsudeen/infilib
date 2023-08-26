@@ -1,8 +1,7 @@
 // Have a function that takes in all the parameters and returns a POJO version of querying that DB model
-export async function find(model, params) {
-    let res = await model.find(params).lean().exec();
-    // Convert _id to string
-    return res.map(({_id, ...r}) => ({...r, _id:  _id.toString()}));
+export function find(model, params = {}, {populate=[], one = false}={}) {
+    let pms = one ? model.findOne(params) : model.find(params)
+    return pms.populate(populate).lean().exec();
 }
 
 export async function pojoData(request){

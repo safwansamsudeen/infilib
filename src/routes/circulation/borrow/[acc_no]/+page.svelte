@@ -6,7 +6,6 @@
 <svelte:head>
     <title>Borrow {data.book.title}</title>
 </svelte:head>
-
 <div class="text-column text-center">
     <h1>Borrowing <em>{data.book.title}</em></h1>
 </div>
@@ -22,14 +21,14 @@
                     id="title"
                     name="title"
                     value="{data.book.title}"
-                    readonly
+                    disabled
             />
         </div>
         <div class="mb-3">
             <label for="member">Member</label>
             <select class="form-select" id="member" name="member">
-                {#each data.members as {roll_no, name}}
-                    <option value="{roll_no}">{roll_no} {name}</option>
+                {#each data.members as {_id, name, grade, section}}
+                    <option value="{_id}">{_id} {name} {grade}{section}</option>
                 {/each}
             </select>
         </div>
@@ -44,7 +43,7 @@
         </div>
         <div class="mb-3">
             <label for="comments">Comments</label>
-            <textarea class="form-control" id="comments" name="comments" />
+            <textarea class="form-control" id="comments" name="comments"></textarea>
         </div>
         <div class="d-grid gap-2 my-3">
             <input class="btn btn-outline-success" type="submit" value="Submit"/>
@@ -55,7 +54,7 @@
     // Set borrowed date to today
     document.getElementById('borrowed').valueAsDate = new Date();
     // Add 7 days to borrowed date
-    document.getElementById('due_on').valueAsDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    document.getElementById('due_on').valueAsDate = new Date(Date.now() + 4 * 24 * 60 * 60 * 1000);
 </script>
 </body>
 

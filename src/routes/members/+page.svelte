@@ -24,8 +24,8 @@
             />
         </div>
         <div class="mb-3">
-            <label for="admn_no">Admission Number</label>
-            <input class="form-control" type="number" id="admn_no" name="admn_no"/>
+            <label for="_id">Admission Number</label>
+            <input class="form-control" type="number" id="_id" name="_id"/>
         </div>
         <div class="mb-3">
             <label for="grade">Grade</label>
@@ -39,8 +39,8 @@
             <input class="btn btn-outline-success" type="submit" value="Add"/>
         </div>
     </form>
-    {#each data.members as {admn_no}}
-    <form method="POST" action="?/update" id="form-{admn_no}" use:enhance={() => {
+    {#each data.members as {_id}}
+    <form method="POST" action="?/update" id="form-{_id}" use:enhance={() => {
     return async ({ update }) => {
       update({ reset: false });
     };
@@ -56,15 +56,15 @@
         </tr>
         </thead>
         <tbody>
-        {#each data.members as {name, admn_no, grade, section}}
-            <tr id="{admn_no}-data">
+        {#each data.members as {name, _id, grade, section}}
+            <tr id="{_id}-data">
                 <td>
                     <input
                             class="form-control-plaintext"
                             type="text"
-                            value="{admn_no}"
-                            name="admn_no"
-                            form="form-{admn_no}"
+                            value="{_id}"
+                            name="_id"
+                            form="form-{_id}"
                             readonly
                     />
                 </td>
@@ -73,9 +73,9 @@
                             class="form-control"
                             type="text"
                             value="{name}"
-                            id="{admn_no}-name"
+                            id="{_id}-name"
                             name="name"
-                            form="form-{admn_no}"
+                            form="form-{_id}"
                     />
                 </td>
                 <td>
@@ -83,9 +83,9 @@
                             class="form-control"
                             type="text"
                             value="{grade}"
-                            id="{admn_no}-grade"
+                            id="{_id}-grade"
                             name="grade"
-                            form="form-{admn_no}"
+                            form="form-{_id}"
                     />
                 </td>
                 <td>
@@ -93,9 +93,9 @@
                             class="form-control"
                             type="text"
                             value="{section}"
-                            id="{admn_no}-section"
+                            id="{_id}-section"
                             name="section"
-                            form="form-{admn_no}"
+                            form="form-{_id}"
                     />
                 </td>
                 <td>
@@ -105,14 +105,14 @@
                         </button>
                         <ul class="dropdown-menu">
                             <li>
-                                <button class="dropdown-item" type="submit" form="form-{admn_no}">Confirm</button>
+                                <button class="dropdown-item" type="submit" form="form-{_id}">Confirm</button>
                             </li>
                             <li><a href="#" class="dropdown-item text-danger" on:click={() => {
                                 fetch('?/delete', {
                                     method: 'POST',
-                                    body: JSON.stringify({ admn_no })
+                                    body: JSON.stringify({ _id })
                                   }).then(() => {
-                                    document.getElementById(`${admn_no}-data`).remove()
+                                    document.getElementById(`${_id}-data`).remove()
                                   })
                                 }}>Delete</a>
                             </li>

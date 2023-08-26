@@ -46,12 +46,12 @@
                     />
                 </div>
                 <div class="col-md-6">
-                    <label for="acc_no">Accession Number</label>
+                    <label for="_id">Accession Number</label>
                     <input
                             class="form-control"
                             type="number"
-                            id="acc_no"
-                            name="acc_no"
+                            id="_id"
+                            name="_id"
                     />
                 </div>
 
@@ -192,8 +192,8 @@
             </div>
         </form>
     {/if}
-    {#each data.books as {acc_no}}
-        <form method="POST" action="?/update" id="form-{acc_no}" use:enhance={() => {
+    {#each data.books as {_id}}
+        <form method="POST" action="?/update" id="form-{_id}" use:enhance={() => {
         return async ({ update }) => {
           update({ reset: false });
         };
@@ -212,14 +212,14 @@
         </tr>
         </thead>
         <tbody>
-        {#each data.books as {title, authors, subjects, publication_year, edition, acc_no}}
-            <tr id="{acc_no}-data">
+        {#each data.books as {title, authors, subjects, publication_year, edition, _id}}
+            <tr id="{_id}-data">
                 <td><input
                             class="form-control-plaintext"
                             type="text"
-                            value="{acc_no}"
-                            name="acc_no"
-                            form="form-{acc_no}"
+                            value="{_id}"
+                            name="_id"
+                            form="form-{_id}"
                             readonly
                     /></td>
                 <td>
@@ -227,9 +227,9 @@
                             class="form-control"
                             type="text"
                             value="{title}"
-                            id="{acc_no}-title"
+                            id="{_id}-title"
                             name="title"
-                            form="form-{acc_no}"
+                            form="form-{_id}"
                     />
                 </td>
                 <td>
@@ -237,9 +237,9 @@
                             class="form-control"
                             type="text"
                             value="{authors.join(', ')}"
-                            id="{acc_no}-authors"
+                            id="{_id}-authors"
                             name="authors"
-                            form="form-{acc_no}"
+                            form="form-{_id}"
                     />
                 </td>
                 <td>
@@ -247,9 +247,9 @@
                             class="form-control"
                             type="text"
                             value="{subjects.join(', ')}"
-                            id="{acc_no}-subjects"
+                            id="{_id}-subjects"
                             name="subjects"
-                            form="form-{acc_no}"
+                            form="form-{_id}"
                     />
                 </td>
                 <td>
@@ -257,9 +257,9 @@
                             class="form-control"
                             type="text"
                             value="{publication_year}"
-                            id="{acc_no}-publication_year"
+                            id="{_id}-publication_year"
                             name="publication_year"
-                            form="form-{acc_no}"
+                            form="form-{_id}"
                     />
                 </td>
                 <td>
@@ -267,26 +267,26 @@
                             class="form-control"
                             type="text"
                             value="{edition}"
-                            id="{acc_no}-edition"
+                            id="{_id}-edition"
                             name="edition"
-                            form="form-{acc_no}"
+                            form="form-{_id}"
                     />
                 </td>
                 <td>
                     <div class="btn-group dropend">
-                        <a href="/borrows/{acc_no}/borrow" class="btn btn-outline-success">Borrow</a>
+                        <a href="/circulation/borrow/{_id}/" class="btn btn-outline-success">Borrow</a>
                         <button type="button" class="btn btn-outline-success dropdown-toggle dropdown-toggle-split"
                                 data-bs-toggle="dropdown" aria-expanded="false"></button>
                         <ul class="dropdown-menu">
                             <li>
-                                <button class="dropdown-item" type="submit" form="form-{acc_no}">Confirm Edits</button>
+                                <button class="dropdown-item" type="submit" form="form-{_id}">Confirm Edits</button>
                             </li>
                             <li><a href="#" class="dropdown-item text-danger" on:click={() => {
                                 fetch('?/delete', {
                                     method: 'POST',
-                                    body: JSON.stringify({ acc_no })
+                                    body: JSON.stringify({ _id })
                                   }).then(() => {
-                                    document.getElementById(`${acc_no}-data`).remove()
+                                    document.getElementById(`${_id}-data`).remove()
                                   })
                                 }}>Delete</a>
                             </li>
