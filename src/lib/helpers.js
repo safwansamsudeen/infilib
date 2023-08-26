@@ -5,3 +5,14 @@ export async function find(model, params) {
     return res.map(({_id, ...r}) => ({...r, _id:  _id.toString()}));
 }
 
+export async function pojoData(request){
+    return Object.fromEntries(await request.formData())
+}
+
+export async function listifyData(data, keys){
+    keys.forEach(key => {
+        if (key in data) {
+            data[key] = data[key].split(",").map(x => x.trim());
+        }
+    });
+}

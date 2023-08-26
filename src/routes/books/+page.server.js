@@ -1,24 +1,22 @@
 import {Book} from "$lib/db.js";
+import {pojoData, find, listifyData} from "$lib/helpers.js";
 
 export async function load() {
-    const books = await Book.find({}).exec();
-    return {
-        books: books.map(({title, author, isbn, publisher, num_pages}) => ({title, author, isbn, publisher, num_pages})),
-    };
+    const books = find(Book, {});
+    return {books};
 }
 
 export const actions = {
     create: async function ({request}) {
-        const data = await request.formData();
-        await Book.create({
-            title: data.get("title"), author: data.get("author"), isbn: data.get("isbn"),
-            publisher: data.get("publisher"), num_pages: data.get("num_pages")
-        });
+        const data = await pojoData(request);
+        listifyData(data, ["authors", "subjects", "languages"])
+        await Book.create(data);
     }, update: async function ({request}) {
-        const {title, author, isbn, publisher, num_pages} = await request.json();
-        await Book.findOneAndUpdate({isbn}, {title, author, publisher, num_pages})
+        let {acc_no, ...updatedData} = await pojoData(request);
+        listifyData(updatedData, ["authors", "subjects", "languages"])
+        await Book.findOneAndUpdate({acc_no: +acc_no}, updatedData)
     }, delete: async function({request}) {
-        const {isbn} = await request.json();
-        await Book.findOneAndDelete({isbn});
+        const {acc_no} = await request.json();
+        await Book.findOneAndDelete({acc_no: +acc_no});
     }
 };

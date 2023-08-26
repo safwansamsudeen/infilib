@@ -1,13 +1,13 @@
 import {Book, Member, Transaction} from "$lib/db.js";
 import {redirect} from "@sveltejs/kit";
+import {find} from "$lib/helpers.js"
 
 export async function load({params}) {
     const book = await Book.findOne({isbn: params.isbn}).lean().exec();
-    const members = await Member.find({}).lean().exec();
-    book._id = book._id.toString();
+    const members = await find(Member, {})
     return {
-        book: book,
-        members: members.map(({roll_no, name}) => ({roll_no, name}))
+        book,
+        members
     };
 }
 
@@ -19,9 +19,9 @@ export const actions = {
         const member = await Member.findOne({roll_no: data.get("member")}).exec();
         console.log(data.get("borrowed"), data.get("comments"))
         await Transaction.create({
-            book: book._id,
-            member: member._id,
-            borrowed: data.get("borrowed"),
+            book: book.acc_no,
+            member: member.admn_no,
+            borrow_date: data.get("borrow_date"),
             due_on: data.get("due_on"),
             comments: data.get("comments")
         });

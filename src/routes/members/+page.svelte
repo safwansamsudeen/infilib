@@ -49,8 +49,8 @@
     <table class="table">
         <thead>
         <tr>
-            <th>Name</th>
             <th>Admission Number</th>
+            <th>Name</th>
             <th>Grade</th>
             <th>Section</th>
         </tr>
@@ -60,22 +60,22 @@
             <tr id="{admn_no}-data">
                 <td>
                     <input
-                            class="form-control"
+                            class="form-control-plaintext"
                             type="text"
-                            value="{name}"
-                            id="{admn_no}-name"
-                            name="name"
+                            value="{admn_no}"
+                            name="admn_no"
                             form="form-{admn_no}"
+                            readonly
                     />
                 </td>
                 <td>
                     <input
                             class="form-control"
                             type="text"
-                            value="{admn_no}"
-                            name="admn_no"
+                            value="{name}"
+                            id="{admn_no}-name"
+                            name="name"
                             form="form-{admn_no}"
-                            readonly
                     />
                 </td>
                 <td>

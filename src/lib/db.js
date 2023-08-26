@@ -14,27 +14,30 @@ const memberSchema = new Schema({
   name: String,
   grade: String,
   section: String,
-  admn_no: String,
+  admn_no: Number,
   gender: String,
 });
 
 const bookSchema = new Schema({
   title: String,
-  subject: String,
+  subtitle: String,
+  acc_no: Number,
+  authors: [String],
+  subjects: [String],
+  level: String,
   publication_year: String,
-  author: String,
   edition: String,
   isbn: String,
   call_no: Number,
-  acc_no: Number,
-  reference: Boolean,
+  no_of_pages: Number,
   purchase_price: Number,
   purchase_details: String,
-  publisher: { type: SchemaTypes.ObjectId, ref: "Publisher", required: true },
-  no_of_pages: Number,
+  publisher_name: String,
+  publisher_address: String,
   languages: [String],
   remarks: String,
-  level: String,
+  reference: Boolean,
+  cd_available: Boolean,
 });
 
 const transactionSchema = new Schema({
@@ -47,6 +50,5 @@ const transactionSchema = new Schema({
 });
 
 export const Member = model("Member", memberSchema);
-export const Publisher = model("Publisher", publisherSchema);
 export const Book = model("Book", bookSchema);
 export const Transaction = model("Transaction", transactionSchema);
