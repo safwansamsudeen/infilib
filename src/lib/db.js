@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { DB_URI } from "$env/static/private";
 await mongoose.connect(DB_URI);
 
-console.log("Connected to database", DB_URI)
+console.log("Connected to database", DB_URI);
 const { Schema, SchemaTypes, model } = mongoose;
 
 const memberSchema = new Schema({

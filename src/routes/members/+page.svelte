@@ -1,128 +1,207 @@
-<svelte:head>
-    <title>Members</title>
-    <meta name="description" content="About this app"/>
-</svelte:head>
-
 <script>
-    export let data;
-    import {enhance} from '$app/forms';
+  export let data;
+  import { enhance } from "$app/forms";
+  import { DataHandler, Datatable, Th } from "@vincjo/datatables";
+
+  const handler = new DataHandler(data.members, { rowsPerPage: 10 });
+  const members = handler.getRows();
+  $: data, handler.setRows(data.members);
+
+  let addFormVisible = false;
 </script>
+
+<svelte:head>
+  <title>Members</title>
+  <meta name="description" content="View members " />
+</svelte:head>
 <div class="text-column text-center">
-    <h1>About this app</h1>
+  <h1>Manage members</h1>
 </div>
 
 <body>
-<div class="container">
-    <form action="?/create" method="post" use:enhance>
+  <div class="container">
+    <div class="form-check form-switch">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        role="switch"
+        id="flexSwitchCheckDefault"
+        bind:checked={addFormVisible}
+      />
+      <label class="form-check-label" for="flexSwitchCheckDefault"
+        >Add member</label
+      >
+    </div>
+    {#if addFormVisible}
+      <form
+        action="?/create"
+        method="post"
+        use:enhance={() => {
+          return async ({ update }) => {
+            update({ reset: false });
+          };
+        }}
+      >
         <div class="mb-3">
-            <label for="name">Name</label>
-            <input
-                    class="form-control"
-                    type="text"
-                    id="name"
-                    name="name"
-            />
+          <label for="name">Name</label>
+          <input
+            class="form-control"
+            type="text"
+            id="name"
+            name="name"
+            required
+          />
         </div>
         <div class="mb-3">
-            <label for="_id">Admission Number</label>
-            <input class="form-control" type="number" id="_id" name="_id"/>
+          <label for="_id">Admission Number</label>
+          <input
+            class="form-control"
+            type="number"
+            id="_id"
+            name="_id"
+            required
+          />
         </div>
         <div class="mb-3">
-            <label for="grade">Grade</label>
-            <input class="form-control" type="text" id="grade" name="grade"/>
+          <label for="grade">Grade</label>
+          <input
+            class="form-control"
+            type="text"
+            id="grade"
+            name="grade"
+            required
+          />
         </div>
         <div class="mb-3">
-            <label for="section">Section</label>
-            <input class="form-control" type="text" id="section" name="section"/>
+          <label for="section">Section</label>
+          <input
+            class="form-control"
+            type="text"
+            id="section"
+            name="section"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="gender">Gender</label>
+          <select class="form-select" name="gender" id="gender" required>
+            <option value="">Select</option>
+            <option value="F">Female</option>
+            <option value="M">Male</option>
+          </select>
         </div>
         <div class="d-grid gap-2 my-3">
-            <input class="btn btn-outline-success" type="submit" value="Add"/>
+          <input class="btn btn-outline-success" type="submit" value="Add" />
         </div>
-    </form>
-    {#each data.members as {_id}}
-    <form method="POST" action="?/update" id="form-{_id}" use:enhance={() => {
-    return async ({ update }) => {
-      update({ reset: false });
-    };
-  }}></form>
+      </form>
+    {/if}
+    {#each data.members as { _id }}
+      <form
+        method="POST"
+        action="?/update"
+        id="form-{_id}"
+        use:enhance={() => {
+          return async ({ update }) => {
+            update({ reset: false });
+          };
+        }}
+      ></form>
     {/each}
-    <table class="table">
+    <Datatable {handler}>
+      <table class="table">
         <thead>
-        <tr>
-            <th>Admission Number</th>
-            <th>Name</th>
-            <th>Grade</th>
-            <th>Section</th>
-        </tr>
+          <tr>
+            <Th {handler} orderBy="_id">Admission Number</Th>
+            <Th {handler} orderBy="name">Name</Th>
+            <Th {handler} orderBy="grade">Grade</Th>
+            <Th {handler} orderBy="section">Section</Th>
+            <Th {handler} orderBy="section">Gender</Th>
+          </tr>
         </thead>
         <tbody>
-        {#each data.members as {name, _id, grade, section}}
+          {#each $members as { name, _id, grade, section, gender }}
             <tr id="{_id}-data">
-                <td>
-                    <input
-                            class="form-control-plaintext"
-                            type="text"
-                            value="{_id}"
-                            name="_id"
-                            form="form-{_id}"
-                            readonly
-                    />
-                </td>
-                <td>
-                    <input
-                            class="form-control"
-                            type="text"
-                            value="{name}"
-                            id="{_id}-name"
-                            name="name"
-                            form="form-{_id}"
-                    />
-                </td>
-                <td>
-                    <input
-                            class="form-control"
-                            type="text"
-                            value="{grade}"
-                            id="{_id}-grade"
-                            name="grade"
-                            form="form-{_id}"
-                    />
-                </td>
-                <td>
-                    <input
-                            class="form-control"
-                            type="text"
-                            value="{section}"
-                            id="{_id}-section"
-                            name="section"
-                            form="form-{_id}"
-                    />
-                </td>
-                <td>
-                    <div class="btn-group dropdown">
-                        <button type="button" class="btn btn-outline-success dropdown-toggle"
-                                data-bs-toggle="dropdown" aria-expanded="false">Actions
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <button class="dropdown-item" type="submit" form="form-{_id}">Confirm</button>
-                            </li>
-                            <li><a href="#" class="dropdown-item text-danger" on:click={() => {
-                                fetch('?/delete', {
-                                    method: 'POST',
-                                    body: JSON.stringify({ _id })
-                                  }).then(() => {
-                                    document.getElementById(`${_id}-data`).remove()
-                                  })
-                                }}>Delete</a>
-                            </li>
-                        </ul>
-                    </div>
-                </td>
+              <td>
+                <input
+                  class="form-control-plaintext"
+                  type="text"
+                  value={_id}
+                  name="_id"
+                  form="form-{_id}"
+                  readonly
+                />
+              </td>
+              <td>
+                <input
+                  class="form-control"
+                  type="text"
+                  value={name}
+                  name="name"
+                  form="form-{_id}"
+                />
+              </td>
+              <td>
+                <input
+                  class="form-control"
+                  type="text"
+                  value={grade}
+                  name="grade"
+                  form="form-{_id}"
+                />
+              </td>
+              <td>
+                <input
+                  class="form-control"
+                  type="text"
+                  value={section}
+                  name="section"
+                  form="form-{_id}"
+                />
+              </td>
+              <td>
+                <select class="form-select" name="gender" form="form-{_id}">
+                  <option value="F" selected={gender === "F"}>Female</option>
+                  <option value="M" selected={gender === "M"}>Male</option>
+                </select>
+              </td>
+              <td>
+                <div class="btn-group dropdown">
+                  <button
+                    type="button"
+                    class="btn btn-outline-success dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    >Actions
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <button
+                        class="dropdown-item"
+                        type="submit"
+                        form="form-{_id}">Confirm</button
+                      >
+                    </li>
+                    <li>
+                      <a
+                        href="#"
+                        class="dropdown-item text-danger"
+                        on:click={() => {
+                          fetch("?/delete", {
+                            method: "POST",
+                            body: JSON.stringify({ _id }),
+                          }).then(() => {
+                            document.getElementById(`${_id}-data`).remove();
+                          });
+                        }}>Delete</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+              </td>
             </tr>
-        {/each}
+          {/each}
         </tbody>
-    </table>
-</div>
+      </table>
+    </Datatable>
+  </div>
 </body>
-
