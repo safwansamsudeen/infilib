@@ -15,3 +15,7 @@ export async function listifyData(data, keys) {
     }
   });
 }
+
+export function setFormField (id, value) {
+    document.getElementById(id).value = value || '';
+}
