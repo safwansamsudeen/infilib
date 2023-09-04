@@ -11,7 +11,6 @@ export const actions = {
   },
   update: async function ({ request }) {
     const { _id, ...updatedData } = await pojoData(request);
-    console.log(updatedData);
     await Member.findOneAndUpdate({ _id }, updatedData);
   },
   delete: async function ({ request }) {

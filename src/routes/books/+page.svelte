@@ -2,7 +2,7 @@
   export let data;
   import { DataHandler, Datatable, Th } from "@vincjo/datatables";
   import { enhance } from "$app/forms";
-  import {setFormField} from '$lib/helpers.js'
+  import { setFormField } from "$lib/helpers.js";
 
   let addFormVisible = false;
   let scannerElement = null;
@@ -12,31 +12,36 @@
   $: data, handler.setRows(data.books);
   let scanner;
   $: if (addFormVisible) {
-      scanner = new Html5QrcodeScanner("reader", {fps: 10, qrbox: {width: 250, height: 250}}, true)
-      async function getBookDetails(decodedText, decodedResult) {
-        scanner.pause()
-        let res = await fetch("https://www.googleapis.com/books/v1/volumes?q=isbn:"+decodedText)
-        let item = (await res.json()).items[0]
-        let volumeInfo = item.volumeInfo;
-        //   Populate form fields with request data
-        setFormField("title", volumeInfo.title)
-        setFormField("subtitle", volumeInfo.subtitle)
-        setFormField("authors", volumeInfo.authors?.join(', '))
-        setFormField("no_of_pages", volumeInfo.pageCount)
-        setFormField("publisher_name", volumeInfo.publisher)
-        setFormField("publication_year", volumeInfo.publishedDate?.split('-')[0])
-        setFormField("languages", volumeInfo.language)
-        setFormField("subjects", volumeInfo.categories?.join(', '))
-        setFormField("purchase_price", item.saleInfo.listPrice?.amount)
-        setFormField("purchase_details", item.saleInfo.listPrice?.buyLink)
-        setFormField("isbn", decodedText)
-      };
-      scanner.render(getBookDetails, () => {});
+    scanner = new Html5QrcodeScanner(
+      "reader",
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      true,
+    );
+    async function getBookDetails(decodedText, decodedResult) {
+      scanner.pause();
+      let res = await fetch(
+        "https://www.googleapis.com/books/v1/volumes?q=isbn:" + decodedText,
+      );
+      let item = (await res.json()).items[0];
+      let volumeInfo = item.volumeInfo;
+      //   Populate form fields with request data
+      setFormField("title", volumeInfo.title);
+      setFormField("subtitle", volumeInfo.subtitle);
+      setFormField("authors", volumeInfo.authors?.join(", "));
+      setFormField("no_of_pages", volumeInfo.pageCount);
+      setFormField("publisher_name", volumeInfo.publisher);
+      setFormField("publication_year", volumeInfo.publishedDate?.split("-")[0]);
+      setFormField("languages", volumeInfo.language);
+      setFormField("subjects", volumeInfo.categories?.join(", "));
+      setFormField("purchase_price", item.saleInfo.listPrice?.amount);
+      setFormField("purchase_details", item.saleInfo.listPrice?.buyLink);
+      setFormField("isbn", decodedText);
+    }
+    scanner.render(getBookDetails, () => {});
   } else {
-      scanner?.pause()
-      if (scannerElement) scannerElement.getElementById("reader").innerHTML = ""
+    scanner?.pause();
+    if (scannerElement) scannerElement.getElementById("reader").innerHTML = "";
   }
-
 </script>
 
 <svelte:head>
@@ -137,7 +142,8 @@
             <label for="call_no">Call Number</label>
             <input
               class="form-control"
-              type="number" step="0.01"
+              type="number"
+              step="0.01"
               id="call_no"
               name="call_no"
               required
@@ -331,6 +337,10 @@
               </td>
               <td>
                 <div class="btn-group dropend">
+                  <a
+                    href="/books/{_id}/"
+                    class="btn btn-outline-success">Detail</a
+                  >
                   <a
                     href="/circulation/borrow/{_id}/"
                     class="btn btn-outline-success">Borrow</a

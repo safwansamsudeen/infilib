@@ -1,128 +1,57 @@
 <script>
   export let data;
-  import { DataHandler, Datatable, Th, ThFilter } from "@vincjo/datatables";
-  import { invalidateAll } from "$app/navigation";
+  import { DataHandler } from "@vincjo/datatables";
   import { enhance } from "$app/forms";
+  import { page } from "$app/stores";
 
   const handler = new DataHandler(data.transactions, { rowsPerPage: 10 });
   const transactions = handler.getRows();
   $: data, handler.setRows(data.transactions);
+
+  import BorrowTable from "$lib/BorrowTable.svelte";
 </script>
 
 <svelte:head>
   <title>Status</title>
 </svelte:head>
-<div class="text-column text-center">
-  <h1>Status of Borrows</h1>
-</div>
-{#each data.transactions as { _id, returned }}
-  {#if !returned}
-    <form method="POST" action="?/update" id="form-{_id}" use:enhance>
-      <input type="hidden" value={_id} name="_id" />
-    </form>
-  {/if}
-{/each}
-<body>
-  <div class="container">
-    <Datatable {handler}>
-      <table class="table">
-        <thead>
-          <tr>
-            <Th
-              style="text-align: -webkit-match-parent;"
-              {handler}
-              orderBy="student">Student</Th
-            >
-            <Th {handler} orderBy="book">Book</Th>
-            <Th {handler} orderBy="borrowed">Borrowed</Th>
-            <Th {handler} orderBy="due_on">Due on</Th>
-            <Th {handler} orderBy="returned_on">Returned on</Th>
-            <Th {handler} orderBy="comments">Comments</Th>
-            <th>Actions</th>
-          </tr>
-          <tr>
-            <ThFilter {handler} filterBy="student" />
-            <ThFilter {handler} filterBy="book" />
-            <ThFilter {handler} filterBy="borrowed" />
-            <ThFilter {handler} filterBy="due_on" />
-            <ThFilter {handler} filterBy="returned_on" />
-            <ThFilter {handler} filterBy="comments" />
-          </tr>
-        </thead>
-        <tbody>
-          {#each $transactions as { _id, book, member, borrowed, due_on, returned, comments }}
-            <tr class="{_id}-data">
-              <td><a href="/members/{member._id}">{member.name}</a></td>
-              <td><a href="/books/{book._id}">{book.title} ({book._id})</a></td>
-              <td>{borrowed.toDateString()}</td>
-              <td>{due_on.toDateString()}</td>
-              <td>{returned?.toDateString() || "NA"}</td>
-              <td>
-                {#if !returned}
-                  <label for="comments"></label><input
-                    type="text"
-                    id="comments"
-                    name="comments"
-                    value={comments}
-                    form="form-{_id}"
-                  />
-                {:else}
-                  {comments}
-                {/if}
-              </td>
 
-              <td>
-                {#if !returned}
-                  <div class="btn-group dropend">
-                    <button
-                      type="submit"
-                      form="form-{_id}"
-                      class="btn btn-outline-success"
-                    >
-                      Return</button
-                    >
-                    <button
-                      type="button"
-                      class="btn btn-outline-success dropdown-toggle dropdown-toggle-split"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    ></button>
-                    <ul class="dropdown-menu">
-                      <li>
-                        <a
-                          href="#"
-                          class="dropdown-item text-danger"
-                          on:click={() => {
-                            fetch("?/delete", {
-                              method: "POST",
-                              body: JSON.stringify({ _id }),
-                            }).then(() => {
-                              invalidateAll();
-                            });
-                          }}>Delete</a
-                        >
-                      </li>
-                    </ul>
-                  </div>
-                {:else}
-                  <button
-                    class="btn btn-danger"
-                    on:click={() => {
-                      fetch("?/delete", {
-                        method: "POST",
-                        body: JSON.stringify({ _id }),
-                      }).then(() => {
-                        invalidateAll();
-                      });
-                    }}
-                    >Delete
-                  </button>
-                {/if}
-              </td>
-            </tr>
-          {/each}
-        </tbody>
-      </table>
-    </Datatable>
+<body>
+  <div class="text-column text-center">
+    <h1>Status of Borrows</h1>
+    {#each $page.url.searchParams as [param, value]}
+      <span class="badge bg-secondary mx-4"
+        ><span class="text-capitalize">{param.replace("_", " ")}</span>: {value}</span
+      >
+    {/each}
+  </div>
+  <div class="grid px-0 my-3">
+    <div class="row align-items-start">
+      <div class="col-md-3">
+        <div class="btn-group-vertical" role="group">
+          <a
+            class="btn btn-outline-dark px-5"
+            class:active={$page.url.searchParams.size === 0}
+            href="?">All Circulation</a
+          >
+          <a
+            class="btn btn-outline-dark"
+            class:active={$page.url.searchParams.has("due")}
+            href="?due=today">Due Today</a
+          >
+          <a class="btn btn-outline-dark">Blank</a>
+          <a class="btn btn-outline-dark">Blank</a>
+        </div>
+        {#each data.transactions as { _id, returned }}
+          {#if !returned}
+            <form method="POST" action="?/return" id="form-{_id}" use:enhance>
+              <input type="hidden" value={_id} name="_id" />
+            </form>
+          {/if}
+        {/each}
+      </div>
+      <div class="col-md-9">
+        <BorrowTable {handler} borrows={transactions} />
+      </div>
+    </div>
   </div>
 </body>

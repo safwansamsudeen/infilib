@@ -33,15 +33,7 @@
       >
     </div>
     {#if addFormVisible}
-      <form
-        action="?/create"
-        method="post"
-        use:enhance={() => {
-          return async ({ update }) => {
-            update({ reset: false });
-          };
-        }}
-      >
+      <form action="?/create" method="post" use:enhance>
         <div class="mb-3">
           <label for="name">Name</label>
           <input
@@ -166,13 +158,16 @@
               </td>
               <td>
                 <div class="btn-group dropdown">
+                  <a
+                    href="/members/{_id}/"
+                    class="btn btn-outline-success">Detail</a
+                  >
                   <button
                     type="button"
-                    class="btn btn-outline-success dropdown-toggle"
+                    class="btn btn-outline-success dropdown-toggle dropdown-toggle-split"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
-                    >Actions
-                  </button>
+                    ></button>
                   <ul class="dropdown-menu">
                     <li>
                       <button

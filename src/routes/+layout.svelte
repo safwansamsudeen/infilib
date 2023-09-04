@@ -4,8 +4,7 @@
 
 <div class="app">
   <Header />
-
-  <main>
+  <main style="max-width: 85%">
     <slot />
   </main>
 </div>

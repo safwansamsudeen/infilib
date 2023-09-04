@@ -5,25 +5,32 @@
 <header>
   <nav>
     <ul>
-      <li aria-current={$page.url.pathname === "/" ? "page" : undefined}>
+      <li
+        class="mx-3 mx-md-4"
+        aria-current={$page.url.pathname === "/" ? "page" : undefined}
+      >
         <a href="/">Home</a>
       </li>
-      <li aria-current={$page.url.pathname === "/members" ? "page" : undefined}>
+      <li
+        class="mx-2 mx-md-4"
+        aria-current={$page.url.pathname === "/members" ? "page" : undefined}
+      >
         <a href="/members">Members</a>
       </li>
       <li
+        class="mx-2 mx-md-4"
         aria-current={$page.url.pathname.startsWith("/books")
           ? "page"
           : undefined}
       >
-        <a href="/books">Books</a>
+        <a class="mx-2 mx-md-4" href="/books">Books</a>
       </li>
       <li
         aria-current={$page.url.pathname.startsWith("/circulation")
           ? "page"
           : undefined}
       >
-        <a href="/circulation">Circulation</a>
+        <a href="/circulation">Circulate</a>
       </li>
     </ul>
   </nav>
@@ -74,7 +81,6 @@
     display: flex;
     height: 100%;
     align-items: center;
-    padding: 0 1.75rem;
     color: black;
     font-weight: 700;
     font-size: 0.8rem;
