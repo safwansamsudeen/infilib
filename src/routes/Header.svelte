@@ -1,96 +1,98 @@
 <script>
-  import { page } from "$app/stores";
+    import {page} from "$app/stores";
 </script>
 
 <header>
-  <nav>
-    <ul>
-      <li
-        class="mx-3 mx-md-4"
-        aria-current={$page.url.pathname === "/" ? "page" : undefined}
-      >
-        <a href="/">Home</a>
-      </li>
-      <li
-        class="mx-2 mx-md-4"
-        aria-current={$page.url.pathname === "/members" ? "page" : undefined}
-      >
-        <a href="/members">Members</a>
-      </li>
-      <li
-        class="mx-2 mx-md-4"
-        aria-current={$page.url.pathname.startsWith("/books")
+    <nav>
+        <ul>
+            <li
+                    aria-current={$page.url.pathname === "/" ? "page" : undefined}
+                    class="mx-3 mx-md-4"
+            >
+                <a href="/">Home</a>
+            </li>
+            <li
+                    aria-current={$page.url.pathname === "/users" ? "page" : undefined}
+                    class="mx-2 mx-md-4"
+            >
+                <a href="/users">Users</a>
+            </li>
+            <li
+                    aria-current={$page.url.pathname.startsWith("/books")
           ? "page"
           : undefined}
-      >
-        <a class="mx-2 mx-md-4" href="/books">Books</a>
-      </li>
-      <li
-        aria-current={$page.url.pathname.startsWith("/circulation")
+                    class="mx-2 mx-md-4"
+            >
+                <a class="mx-2 mx-md-4" href="/books">Books</a>
+            </li>
+            <li
+                    aria-current={$page.url.pathname.startsWith("/circulation")
           ? "page"
           : undefined}
-      >
-        <a href="/circulation">Circulate</a>
-      </li>
-    </ul>
-  </nav>
+            >
+                <a href="/circulation">Circulate</a>
+            </li>
+        </ul>
+    </nav>
 </header>
 
 <style>
-  header {
-    display: flex;
-    justify-content: space-between;
-  }
-  nav {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    --background: rgba(255, 255, 255, 0.7);
-  }
-  ul {
-    position: relative;
-    padding: 0;
-    margin: 0;
-    height: 3em;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    list-style: none;
-    background: var(--background);
-    background-size: contain;
-  }
+    header {
+        display: flex;
+        justify-content: space-between;
+    }
 
-  li {
-    position: relative;
-    height: 100%;
-  }
+    nav {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        --background: rgba(255, 255, 255, 0.7);
+    }
 
-  li[aria-current="page"]::before {
-    --size: 6px;
-    content: "";
-    width: 0;
-    height: 0;
-    position: absolute;
-    top: 0;
-    left: calc(50% - var(--size));
-    border: var(--size) solid transparent;
-    border-top: var(--size) solid black;
-  }
+    ul {
+        position: relative;
+        padding: 0;
+        margin: 0;
+        height: 3em;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        list-style: none;
+        background: var(--background);
+        background-size: contain;
+    }
 
-  nav a {
-    display: flex;
-    height: 100%;
-    align-items: center;
-    color: black;
-    font-weight: 700;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    text-decoration: none;
-    transition: color 0.2s linear;
-  }
+    li {
+        position: relative;
+        height: 100%;
+    }
 
-  a:hover {
-    text-decoration: underline;
-  }
+    li[aria-current="page"]::before {
+        --size: 6px;
+        content: "";
+        width: 0;
+        height: 0;
+        position: absolute;
+        top: 0;
+        left: calc(50% - var(--size));
+        border: var(--size) solid transparent;
+        border-top: var(--size) solid black;
+    }
+
+    nav a {
+        display: flex;
+        height: 100%;
+        align-items: center;
+        color: black;
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        text-decoration: none;
+        transition: color 0.2s linear;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
 </style>

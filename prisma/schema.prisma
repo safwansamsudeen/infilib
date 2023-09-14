@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// People
+model User {
+  id            Int           @id
+  name          String
+  gender        String
+  email_address String
+  password      String
+  details       String?
+  is_admin      Boolean
+  transactions  Transaction[]
+  marks         Mark[]
+}
+
+// Book records
+model Author {
+  id    Int    @id @default(autoincrement())
+  name  String
+  books Book[]
+}
+
+model Category {
+  id          Int          @id @default(autoincrement())
+  name        String
+  borrowables Borrowable[]
+}
+
+model Publisher {
+  id          Int          @id @default(autoincrement())
+  name        String
+  address     String?
+  borrowables Borrowable[]
+}
+
+model Language {
+  code        String       @id
+  name        String
+  borrowables Borrowable[]
+}
+
+model Cd {
+  id          Int          @id @default(autoincrement())
+  name        String
+  borrowables Borrowable[]
+}
+
+model Periodical {
+  id   Int      @id @default(autoincrement())
+  name String
+  date DateTime
+}
+
+model Book {
+  acc_no           Int        @id
+  subtitle         String?
+  authors          Author[]
+  publication_year Int
+  edition          String?
+  isbn             String
+  borrowable       Borrowable @relation(fields: [acc_no], references: [acc_no])
+}
+
+model Magazine {
+  acc_no     Int        @id
+  sc_no      Int
+  volume     String
+  issue      String
+  from       DateTime
+  to         DateTime
+  borrowable Borrowable @relation(fields: [acc_no], references: [acc_no])
+}
+
+model Borrowable {
+  acc_no           Int           @id
+  title            String
+  status           String
+  publisher_id     Int
+  publisher        Publisher     @relation(fields: [publisher_id], references: [id])
+  languages        Language[]
+  categories       Category[]
+  reference        Boolean
+  call_no          String
+  no_of_pages      Int
+  purchase_price   Int
+  purchase_details String?
+  level            String?
+  remarks          String?
+  book             Book?
+  magazine         Magazine?
+  transactions     Transaction[]
+  mark             Mark?
+  Cd               Cd?           @relation(fields: [cdId], references: [id])
+  cdId             Int?
+}
+
+// Transactions
+model Transaction {
+  id            Int        @id @default(autoincrement())
+  user_id       Int
+  borrowable_id Int
+  user          User       @relation(fields: [user_id], references: [id])
+  borrowable    Borrowable @relation(fields: [borrowable_id], references: [acc_no])
+  issued_at     DateTime
+  due_at        DateTime
+  returned_at   DateTime?
+}
+
+model Mark {
+  id          Int        @id @default(autoincrement())
+  acc_no      Int        @unique
+  user_id     Int
+  user        User       @relation(fields: [user_id], references: [id])
+  borrowable  Borrowable @relation(fields: [acc_no], references: [acc_no])
+  borrow_time DateTime
+}
