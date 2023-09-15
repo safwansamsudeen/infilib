@@ -3,15 +3,14 @@ import { pojoData, find, listifyData } from '$lib/helpers.js';
 
 export async function load({ params }) {
 	// Get book based on acc_no (_id)
-	const book = await find(Book, { _id: params.acc_no }, { one: true });
-	console.log(book);
+	const member = await find(Member, { _id: params.admn_no }, { one: true });
 	const borrows = await find(
 		Transaction,
-		{ book: params.acc_no },
+		{ member: params.admn_no },
 		{ populate: ['member', 'book'] }
 	);
 	return {
-		book,
+		member,
 		borrows: borrows.map((t) => ({ ...t, _id: t._id.toString() }))
 	};
 }
@@ -19,11 +18,10 @@ export async function load({ params }) {
 export const actions = {
 	update: async function ({ request }) {
 		let { _id, ...updatedData } = await pojoData(request);
-		listifyData(updatedData, ['authors', 'subjects', 'languages']);
-		await Book.findOneAndUpdate({ _id }, updatedData);
+		await Member.findOneAndUpdate({ _id }, updatedData);
 	},
 	delete: async function ({ request }) {
 		const { _id } = await request.json();
-		await Book.findOneAndDelete({ _id });
+		await Member.findOneAndDelete({ _id });
 	}
 };
