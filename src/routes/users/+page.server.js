@@ -33,15 +33,5 @@ export const actions = {
 		await user.create({
 			data: { ...data, id: +data.id, is_admin: false, password: data.id + data.name }
 		});
-	},
-	update: async function ({ request }) {
-		const { id, property, value } = await pojoData(request);
-		let data = {};
-		data[property] = value;
-		await user.update({ where: { id: +id }, data });
-	},
-	delete: async function ({ request }) {
-		const { id } = await pojoData(request);
-		await user.delete({ where: { id: +id } });
 	}
 };

@@ -24,35 +24,35 @@
                 // called when cell value is set
                 async setValue(value) {
                     input.value = value;
-                    const body = new FormData()
-                    body.append('id', row[1].content)
+                    let body = {id: row[1].content}
                     let response;
                     if (value === "") {
                         if (confirm("Are you sure you want to delete this member")) {
-                            response = await fetch("?/delete", {
-                                method: 'POST',
-                                body
+                            response = await fetch("?/", {
+                                method: 'DELETE',
+                                body: JSON.stringify(body),
+                                type: 'json'
                             });
+                        } else {
+                            await window.location.reload()
                         }
                     } else {
-                        body.append('property', column.id)
-                        body.append('value', value)
-                        response = await fetch("?/update", {
-                            method: 'POST',
-                            body
+                        response = await fetch("?/", {
+                            method: 'PATCH',
+                            body: JSON.stringify({...body, value, property: column.id}),
+                            type: 'json'
                         });
+
                     }
 
-
-                    const result = deserialize(await response.text());
-
-                    if (result.type === 'success') {
+                    let res = await response.json();
+                    if (res.type === 'success') {
                         await invalidateAll()
                         datatable.showToastMessage("Updated!", 2)
                     } else {
                         datatable.showToastMessage("Error!", 2)
-                        await window.reload()
                     }
+
                 },
                 getValue() {
                     return input.value;
