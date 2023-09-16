@@ -1,6 +1,3 @@
-// Have a function that takes in all the parameters and returns a POJO version of querying that DB model
-import { user } from '$lib/db.js';
-
 export function find(model, params = {}, { select = [], one = false } = {}) {
 	console.log(model, params);
 	let pms = one ? model.findUnique({ where: params }) : model.findMany({ where: params });
@@ -13,7 +10,7 @@ export async function pojoData(request) {
 
 export async function response(func) {
 	try {
-		func();
+		await func();
 		return new Response(JSON.stringify({ type: 'success' }), { status: 200 });
 	} catch (error) {
 		console.log(error);

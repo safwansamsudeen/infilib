@@ -13,7 +13,8 @@
             target: document.getElementById('users'),
             props: {
                 columns: data.columns,
-                data: data.users
+                data: data.users,
+                id: 'users'
             }
         });
 

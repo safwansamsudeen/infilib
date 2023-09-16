@@ -67,7 +67,7 @@ model Book {
   publication_year Int
   edition          String?
   isbn             String
-  borrowable       Borrowable @relation(fields: [acc_no], references: [acc_no])
+  borrowable       Borrowable @relation(fields: [acc_no], references: [acc_no], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Magazine {
@@ -77,7 +77,7 @@ model Magazine {
   issue      String
   from       DateTime
   to         DateTime
-  borrowable Borrowable @relation(fields: [acc_no], references: [acc_no])
+  borrowable Borrowable @relation(fields: [acc_no], references: [acc_no], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Borrowable {

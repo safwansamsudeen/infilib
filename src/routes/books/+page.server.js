@@ -1,17 +1,84 @@
-import prisma from '$lib/db.js';
+import { borrowable, publisher, author, category, language } from '$lib/db.js';
 import { pojoData, parseData, listifyData } from '$lib/helpers.js';
 
-const { borrowable, publisher, author, category, language } = prisma;
-
 export async function load() {
-	const books = await borrowable.findMany();
+	let borrowables = await borrowable.findMany({
+		include: {
+			publisher: true,
+			book: {
+				include: { authors: true }
+			},
+			magazine: true,
+			categories: true,
+			languages: true
+		}
+	});
 	const publishers = await publisher.findMany();
 	const authors = await author.findMany();
 	const categories = await category.findMany();
 	const languages = await language.findMany();
-
+	const columns = [
+		{ name: 'acc_no', label: 'Acc. No.', type: 'number' },
+		{ name: 'title' },
+		{ name: 'subtitle' },
+		{ name: 'call_no' },
+		{ name: 'authors' },
+		{ name: 'status' },
+		{ name: 'isbn' },
+		{ name: 'publisher' },
+		{ name: 'publication_year' },
+		{ name: 'languages' },
+		{ name: 'categories' },
+		{ name: 'edition' },
+		{ name: 'no_of_pages' },
+		{ name: 'purchase_price' },
+		{ name: 'purchase_details' },
+		{ name: 'reference' },
+		{ name: 'level' },
+		{ name: 'remarks' }
+	];
+	console.log(borrowables[0]);
+	borrowables = borrowables.map(
+		({
+			acc_no,
+			title,
+			status,
+			publisher,
+			languages,
+			categories,
+			reference,
+			call_no,
+			no_of_pages,
+			purchase_price,
+			purchase_details,
+			level,
+			remarks,
+			book,
+			magazine
+		}) => [
+			acc_no,
+			title,
+			book.subtitle,
+			call_no,
+			book.authors.map((obj) => obj.name).join(', '),
+			status,
+			book.isbn,
+			publisher.name,
+			book.publication_year,
+			languages.map((obj) => obj.name).join(', '),
+			categories.map((obj) => obj.name).join(', '),
+			book.edition,
+			no_of_pages,
+			purchase_price,
+			purchase_details,
+			reference,
+			level,
+			remarks
+		]
+	);
 	return {
-		books,
+		columns,
+		borrowables,
 		authors,
 		categories,
 		languages,
