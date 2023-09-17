@@ -6,7 +6,7 @@
     import AddForm from "./AddForm.svelte";
     import DataTable from "$lib/components/DataTable.svelte";
 
-    let addFormVisible = data.addFormVisible || false;
+    let addFormVisible = data.addFormVisible || true;
     let datatable;
     onMount(() => {
         datatable = new DataTable({

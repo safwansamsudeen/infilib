@@ -22,9 +22,6 @@ export function parseData(data, keys) {
 	keys.forEach((key) => {
 		if (key in data) {
 			data[key] = JSON.parse(data[key] || '[]');
-			if (Array.isArray(data[key])) {
-				data[key] = data[key].map();
-			}
 		}
 	});
 }
