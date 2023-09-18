@@ -1,13 +1,15 @@
 <script>
     import {onMount} from "svelte";
+    import {enhance} from "$app/forms";
 
     export let data;
     import Scanner from "./Scanner.svelte";
-    import AddForm from "./AddForm.svelte";
     import DataTable from "$lib/components/DataTable.svelte";
+    import Input from "$lib/components/Input.svelte";
 
-    let addFormVisible = data.addFormVisible || true;
-    let datatable;
+
+    let addFormVisible = data.addFormVisible || false
+    let datatable = null;
     onMount(() => {
         datatable = new DataTable({
             target: document.getElementById('borrowables'),
@@ -48,7 +50,16 @@
     </div>
     {#if addFormVisible}
         <!--        <Scanner/>-->
-        <AddForm {...data}/>
+        <form action="?/create" method="post" use:enhance>
+            <div class="row g-3">
+                {#each data.columns as {name, label, type, values}}
+                    <Input {name} {label} {type} {values}/>
+                {/each}
+            </div>
+            <div class="d-grid gap-2 my-3 my-3">
+                <input class="btn btn-outline-success" type="submit" value="Add"/>
+            </div>
+        </form>
     {/if}
     <div id="borrowables"></div>
 </div>

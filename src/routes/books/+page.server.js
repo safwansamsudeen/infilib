@@ -2,27 +2,6 @@ import { borrowable, publisher, author, category, language } from '$lib/db.js';
 import { pojoData, parseData } from '$lib/helpers.js';
 import { fail } from '@sveltejs/kit';
 
-const columns = [
-	{ name: 'acc_no', label: 'Acc. No.', type: 'number' },
-	{ name: 'title' },
-	{ name: 'subtitle' },
-	{ name: 'call_no' },
-	{ name: 'authors' },
-	{ name: 'status' },
-	{ name: 'isbn' },
-	{ name: 'publisher' },
-	{ name: 'publication_year' },
-	{ name: 'languages' },
-	{ name: 'categories' },
-	{ name: 'edition' },
-	{ name: 'no_of_pages' },
-	{ name: 'purchase_price' },
-	{ name: 'purchase_details' },
-	{ name: 'reference' },
-	{ name: 'level' },
-	{ name: 'remarks' }
-];
-
 export async function load() {
 	let borrowables = await borrowable.findMany({
 		include: {
@@ -78,6 +57,44 @@ export async function load() {
 			remarks
 		]
 	);
+	let columns = [
+		{ name: 'acc_no', label: 'Acc. No.', type: 'number' },
+		{ name: 'title' },
+		{ name: 'subtitle' },
+		{ name: 'call_no', type: 'number', opts: { step: 0.01 } },
+		{
+			name: 'authors',
+			type: 'custom-select',
+			values: authors.map(({ id, name }) => ({ value: id, label: name }))
+		},
+		{ name: 'isbn', type: 'number', label: 'ISBN' },
+		{
+			name: 'publisher',
+			type: 'custom-select',
+			values: publishers.map(({ id, name, address }) => ({
+				value: id,
+				label: name + ',\n' + address
+			}))
+		},
+		{ name: 'publication_year', label: 'Year of Publication' },
+		{
+			name: 'languages',
+			type: 'custom-select',
+			values: languages.map(({ code, name }) => ({ value: code, label: name + ', ' + code }))
+		},
+		{
+			name: 'categories',
+			type: 'custom-select',
+			values: categories.map(({ id, name }) => ({ value: id, label: name }))
+		},
+		{ name: 'edition' },
+		{ name: 'no_of_pages', type: 'number' },
+		{ name: 'purchase_price', type: 'number' },
+		{ name: 'purchase_details' },
+		{ name: 'reference', type: 'check' },
+		{ name: 'level' },
+		{ name: 'remarks' }
+	];
 	return {
 		columns,
 		borrowables,
@@ -97,7 +114,7 @@ export const actions = {
 			const data = await pojoData(request);
 			console.log(data);
 			parseData(data, [
-				'publisher',
+				'publisher_obj',
 				'languages',
 				'categories',
 				'no_of_pages',
@@ -111,7 +128,7 @@ export const actions = {
 				acc_no,
 				title,
 				subtitle,
-				publisher,
+				publisher_obj,
 				languages,
 				categories,
 				reference,
@@ -131,14 +148,14 @@ export const actions = {
 				languages_id = [],
 				categories_id = [],
 				authors_id = [];
-			if (publisher.value === publisher.label) {
-				let [name, ...address] = label.split(',');
-				name = name.join(',').trim();
-				address = code.trim();
+			if (publisher_obj.value === publisher_obj.label) {
+				let [name, ...address] = publisher_obj.label.split(',');
+				name = name.trim();
+				address = address.join(', ').trim();
 				tmp = await publisher.create({ data: { name, address } });
 				publisher_id = tmp.id;
 			} else {
-				publisher_id = publisher.value;
+				publisher_id = publisher_obj.value;
 			}
 			for (let { value, label } of languages) {
 				if (value === label) {

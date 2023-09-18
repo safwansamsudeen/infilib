@@ -50,10 +50,11 @@
     </div>
     {#if addFormVisible}
         <form action="?/create" method="post" use:enhance>
-            {#each data.columns as {name, label, type, values}}
-                <Input {name} {label} {type} {values}/>
-            {/each}
-
+            <div class="row g-3">
+                {#each data.columns as {name, label, type, values}}
+                    <Input {name} {label} {type} {values}/>
+                {/each}
+            </div>
             <div class="d-grid gap-2 my-3">
                 <input id="submit-btn" class="btn btn-outline-success" type="submit" value="Add"/>
             </div>

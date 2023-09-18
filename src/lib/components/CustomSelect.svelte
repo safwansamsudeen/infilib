@@ -22,8 +22,7 @@
     }
 </script>
 <div class="col-md-6">
-
-    <label for="{name}">{label}</label>
+    <label for={name}>{label}</label>
     <Select
             --item-height="auto"
             --item-line-height="auto"

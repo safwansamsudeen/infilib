@@ -1,4 +1,6 @@
 <script>
+    import {capitalize} from "$lib/helpers.js";
+
     export let columns, data, id;
     import "frappe-datatable/dist/frappe-datatable.min.css";
     import DataTable from "frappe-datatable";
@@ -8,7 +10,7 @@
     $: data, datatable = new DataTable("#" + id, {
         columns: columns.map(({name, label}) => ({
             id: name,
-            name: label || name[0].toUpperCase() + name.slice(1)
+            name: label || capitalize(name)
         })),
         data,
         getEditor(colIndex, rowIndex, value, parent, column, row) {
@@ -49,8 +51,8 @@
                         datatable.showToastMessage("Updated!", 2)
                     } else {
                         datatable.showToastMessage("Error!", 2)
+                        window.location.reload();
                     }
-
                 },
                 getValue() {
                     return input.value;
