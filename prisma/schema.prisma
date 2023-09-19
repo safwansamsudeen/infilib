@@ -113,6 +113,7 @@ model Transaction {
   issued_at     DateTime
   due_at        DateTime
   returned_at   DateTime?
+  comments      String?
 }
 
 model Mark {

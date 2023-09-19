@@ -1,22 +1,29 @@
-import prisma from '$lib/db.js';
+import { borrowable, user, transaction } from '$lib/db.js';
 import { redirect } from '@sveltejs/kit';
-import { find, pojoData } from '$lib/helpers.js';
+import { find, parseData, pojoData } from '$lib/helpers.js';
 
 export async function load({ params }) {
-	const members = await find(Member);
-	const book = await find(Book, { _id: params.acc_no }, { populate: [], one: true });
+	const borrowable_ = await borrowable.findUnique({
+		where: { acc_no: +params.acc_no }
+	});
+	const users = await user.findMany();
 	return {
-		book,
-		members
+		borrowable: borrowable_,
+		users: users.map(({ id, name }) => ({ value: id, label: name }))
 	};
 }
 
 export const actions = {
 	borrow: async function ({ request, params }) {
-		const data = await pojoData(request);
-		await Transaction.create({
-			...data,
-			book: params.acc_no
+		let { issued_at, due_at, comments, user_id } = await pojoData(request);
+		await transaction.create({
+			data: {
+				borrowable_id: +params.acc_no,
+				user_id: JSON.parse(user_id).value,
+				issued_at: new Date(issued_at),
+				due_at: new Date(due_at),
+				comments
+			}
 		});
 		throw redirect(303, '/circulation/');
 	}

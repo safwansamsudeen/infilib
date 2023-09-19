@@ -1,7 +1,7 @@
 <script>
     import Select from "svelte-select";
 
-    export let name, label, items = [], multiple = false;
+    export let name, label, items = [], multiple = false, creatable = false, required = true;
     let value = null;
     let filterText = '';
 
@@ -21,8 +21,7 @@
         });
     }
 </script>
-<div class="col-md-6">
-    <label for={name}>{label}</label>
+{#if creatable}
     <Select
             --item-height="auto"
             --item-line-height="auto"
@@ -31,6 +30,7 @@
             id="{name}"
             {items}
             {multiple}
+            {required}
             name="{name}"
             on:change={handleChange} on:filter={handleFilter}
     >
@@ -39,8 +39,9 @@
             {item.label}
         </div>
     </Select>
-</div>
-
+{:else}
+    <Select {name} {multiple} {required} {items} bind:value/>
+{/if}
 <style>
     .item {
         min-height: 12px;

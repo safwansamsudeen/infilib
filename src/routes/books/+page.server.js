@@ -1,5 +1,5 @@
 import { borrowable, publisher, author, category, language } from '$lib/db.js';
-import { pojoData, parseData } from '$lib/helpers.js';
+import { pojoData, parseData, capitalize } from '$lib/helpers.js';
 import { fail } from '@sveltejs/kit';
 
 export async function load() {
@@ -58,53 +58,46 @@ export async function load() {
 		]
 	);
 	let columns = [
-		{ name: 'acc_no', label: 'Acc. No.', type: 'number' },
-		{ name: 'title' },
-		{ name: 'subtitle' },
-		{ name: 'call_no', type: 'number', opts: { step: 0.01 } },
+		{ id: 'acc_no', name: 'Acc. No.', type: 'number' },
+		{ id: 'title' },
+		{ id: 'subtitle', hidden: true },
+		{ id: 'call_no', type: 'number', opts: { step: 0.01 } },
 		{
-			name: 'authors',
-			type: 'custom-select',
-			values: authors.map(({ id, name }) => ({ value: id, label: name }))
+			id: 'authors',
+			type: 'select',
+			values: authors.map(({ id, name }) => ({ id, label: name }))
 		},
-		{ name: 'isbn', type: 'number', label: 'ISBN' },
+		{ id: 'isbn', type: 'number', name: 'ISBN' },
 		{
-			name: 'publisher',
-			type: 'custom-select',
+			id: 'publisher',
+			type: 'select',
 			values: publishers.map(({ id, name, address }) => ({
-				value: id,
+				id,
 				label: name + ',\n' + address
 			}))
 		},
-		{ name: 'publication_year', label: 'Year of Publication' },
+		{ id: 'publication_year', name: 'Year of Publication' },
 		{
-			name: 'languages',
-			type: 'custom-select',
-			values: languages.map(({ code, name }) => ({ value: code, label: name + ', ' + code }))
+			id: 'languages',
+			type: 'select',
+			values: languages.map(({ code, name }) => ({ id: code, label: name + ', ' + code }))
 		},
 		{
-			name: 'categories',
-			type: 'custom-select',
-			values: categories.map(({ id, name }) => ({ value: id, label: name }))
+			id: 'categories',
+			type: 'select',
+			values: categories.map(({ id, name }) => ({ id, label: name }))
 		},
-		{ name: 'edition' },
-		{ name: 'no_of_pages', type: 'number' },
-		{ name: 'purchase_price', type: 'number' },
-		{ name: 'purchase_details' },
-		{ name: 'reference', type: 'check' },
-		{ name: 'level' },
-		{ name: 'remarks' }
+		{ id: 'edition', hidden: true },
+		{ id: 'no_of_pages', type: 'number', hidden: true },
+		{ id: 'purchase_price', type: 'number', hidden: true },
+		{ id: 'purchase_details', hidden: true },
+		{ id: 'reference', type: 'check', hidden: true },
+		{ id: 'level', hidden: true },
+		{ id: 'remarks' }
 	];
 	return {
-		columns,
-		borrowables,
-		authors: authors.map(({ id, name }) => ({ value: id, label: name })),
-		categories: categories.map(({ id, name }) => ({ value: id, label: name })),
-		languages: languages.map(({ code, name }) => ({ value: code, label: name + ', ' + code })),
-		publishers: publishers.map(({ id, name, address }) => ({
-			value: id,
-			label: name + ',\n' + address
-		}))
+		columns: columns.map((data) => ({ ...data, name: data.name || capitalize(data.id) })),
+		borrowables
 	};
 }
 

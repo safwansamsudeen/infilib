@@ -4,26 +4,9 @@
     export let data;
     import {enhance} from "$app/forms";
     import Input from "$lib/components/Input.svelte";
-    import DataTable from "$lib/components/DataTable.svelte";
+    import Grid from "gridjs-svelte";
 
     let addFormVisible = data.addFormVisible || false;
-    let datatable;
-    onMount(() => {
-        datatable = new DataTable({
-            target: document.getElementById('users'),
-            props: {
-                columns: data.columns,
-                data: data.users,
-                id: 'users'
-            }
-        });
-
-    })
-
-    $: data, datatable?.$set({
-        columns: data.columns,
-        data: data.users
-    });
 </script>
 
 <svelte:head>
@@ -51,8 +34,8 @@
     {#if addFormVisible}
         <form action="?/create" method="post" use:enhance>
             <div class="row g-3">
-                {#each data.columns as {name, label, type, values}}
-                    <Input {name} {label} {type} {values}/>
+                {#each data.columns as {name, label, type, values, creatable}}
+                    <Input {name} {label} {type} {values} {creatable}/>
                 {/each}
             </div>
             <div class="d-grid gap-2 my-3">
@@ -60,6 +43,10 @@
             </div>
         </form>
     {/if}
-    <div id="users"></div>
+    <Grid columns={data.columns} data={data.users} search sort/>
 </div>
 </body>
+
+<style global>
+    @import "https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css";
+</style>

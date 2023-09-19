@@ -1,23 +1,48 @@
-import prisma from '$lib/db.js';
-import { find, pojoData } from '$lib/helpers.js';
+import { transaction } from '$lib/db.js';
+import { capitalize, pojoData } from '$lib/helpers.js';
 
 export async function load({ url }) {
-	let params = {};
-	for (let [key, val] of url.searchParams.entries()) {
-		if (key === 'due') {
-			if (val === 'today') {
-				params.due_on = { $lte: new Date() };
-			}
-			// else params["due_on"] = {$lte: new Date() , $gte: new Date(val)}
-		} else if (val) {
-			params[key] = val;
+	// let params = {};
+	// for (let [key, val] of url.searchParams.entries()) {
+	// 	if (key === 'due') {
+	// 		if (val === 'today') {
+	// 			params.due_on = { $lte: new Date() };
+	// 		}
+	// 		// else params["due_on"] = {$lte: new Date() , $gte: new Date(val)}
+	// 	} else if (val) {
+	// 		params[key] = val;
+	// 	}
+	// }
+	let transactions = await transaction.findMany({
+		select: {
+			borrowable: true,
+			user: true,
+			comments: true,
+			due_at: true,
+			issued_at: true,
+			returned_at: true
 		}
-	}
-	let transactions = await find(Transaction, params, {
-		populate: ['book', 'member']
 	});
+	let columns = [
+		{ id: 'user' },
+		{ id: 'book' },
+		{ id: 'issued_at' },
+		{ id: 'due_at' },
+		{ id: 'returned_at' },
+		{ id: 'comments' }
+	];
 	return {
-		transactions: transactions.map((t) => ({ ...t, _id: t._id.toString() }))
+		columns: columns.map(({ id }) => ({ id, name: capitalize(id) })),
+		transactions: transactions.map(
+			({ borrowable, user, comments, due_at, issued_at, returned_at }) => [
+				`${user.id} ${user.name}`,
+				`${borrowable.acc_no} ${borrowable.title}`,
+				issued_at.toDateString(),
+				due_at.toDateString(),
+				returned_at?.toDateString() || 'NA',
+				comments
+			]
+		)
 	};
 }
 

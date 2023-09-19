@@ -4,29 +4,12 @@
 
     export let data;
     import Scanner from "./Scanner.svelte";
-    import DataTable from "$lib/components/DataTable.svelte";
+    import Grid from "gridjs-svelte";
+    import {h} from 'gridjs'
     import Input from "$lib/components/Input.svelte";
 
 
     let addFormVisible = data.addFormVisible || false
-    let datatable = null;
-    onMount(() => {
-        datatable = new DataTable({
-            target: document.getElementById('borrowables'),
-            props: {
-                columns: data.columns,
-                data: data.borrowables,
-                id: 'borrowables',
-            },
-        });
-    })
-
-    $: data, datatable?.$set({
-        columns: data.columns,
-        data: data.borrowables,
-        id: 'borrowables',
-    });
-
 </script>
 
 <svelte:head>
@@ -61,6 +44,20 @@
             </div>
         </form>
     {/if}
-    <div id="borrowables"></div>
+    <Grid columns={data.columns.concat([{
+        name: 'Actions',
+        id: 'actions',
+         formatter: (cell, row) => {
+          return h('a', {
+            className: 'btn btn-primary',
+            href: '/circulation/borrow/' + row.cells[0].data,
+    }, 'Borrow');
+        }
+      }])} data={data.borrowables.map(data => [...data, null])} search sort/>
+
 </div>
 </body>
+
+<style global>
+    @import "https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css";
+</style>
