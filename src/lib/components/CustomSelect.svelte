@@ -1,7 +1,7 @@
 <script>
     import Select from "svelte-select";
 
-    export let name, label, items = [], multiple = false, creatable = false, required = true;
+    export let id, label, items = [], multiple = false, creatable = false, required = true;
     let value = null;
     let filterText = '';
 
@@ -27,20 +27,20 @@
             --item-line-height="auto"
             bind:filterText
             bind:value
-            id="{name}"
+            id="{id}"
             {items}
             {multiple}
             {required}
-            name="{name}"
+            name="{id}"
             on:change={handleChange} on:filter={handleFilter}
     >
         <div class="item" let:item slot="item">
-            {item.created ? `Add new ${name}: ` : ''}
+            {item.created ? `Add new ${id}: ` : ''}
             {item.label}
         </div>
     </Select>
 {:else}
-    <Select {name} {multiple} {required} {items} bind:value/>
+    <Select {id} {multiple} {required} {items} bind:value/>
 {/if}
 <style>
     .item {

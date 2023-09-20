@@ -32,11 +32,11 @@
         <label class="form-check-label" for="add-form">Add</label>
     </div>
     {#if addFormVisible}
-        <!--        <Scanner/>-->
+        <Scanner/>
         <form action="?/create" method="post" use:enhance>
             <div class="row g-3">
-                {#each data.columns as {name, label, type, values}}
-                    <Input {name} {label} {type} {values}/>
+                {#each data.columns as {id, name, type, values}}
+                    <Input {id} {name} {type} {values}/>
                 {/each}
             </div>
             <div class="d-grid gap-2 my-3 my-3">

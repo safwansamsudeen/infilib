@@ -2,10 +2,10 @@
     import CustomSelect from '$lib/components/CustomSelect.svelte';
     import {capitalize} from "$lib/helpers.js";
 
-    export let name,
+    export let id,
         important = false,
         type = 'text',
-        label = capitalize(name),
+        name = capitalize(name),
         values = [],
         opts = {},
         required = true,
@@ -14,9 +14,9 @@
 {#if type === 'custom-select'}
 {:else}
     <div class="col-md-6">
-        <label for={name}>{label}</label>
+        <label for={id}>{name}</label>
         {#if type !== 'select'}
-            <input class="form-control" id={name} {name} {required} {type} {...opts}/>
+            <input class="form-control" {id} name="{id}" {required} {type} {...opts}/>
         {:else}
             <CustomSelect items={values} {name} {creatable}/>
         {/if}
