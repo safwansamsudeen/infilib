@@ -1,26 +1,42 @@
 <script>
-    import {setFormField} from "$lib/helpers.js";
+    import {setFormField, setSelectField} from "$lib/helpers.js";
     import {onDestroy, onMount} from 'svelte';
+
+    export let publishers, authors, languages, categories;
 
     async function getBookDetails(decodedText, decodedResult) {
         scanner.pause();
         let res = await fetch(
             "https://www.googleapis.com/books/v1/volumes?q=isbn:" + decodedText,
         );
+        console.log(decodedText);
         let item = (await res.json()).items[0];
         let volumeInfo = item.volumeInfo;
         //   Populate form fields with request data
         setFormField("title", volumeInfo.title);
         setFormField("subtitle", volumeInfo.subtitle);
-        setFormField("authors", volumeInfo.authors?.join(", "));
         setFormField("no_of_pages", volumeInfo.pageCount);
-        setFormField("publisher_name", volumeInfo.publisher);
+        setFormField("remarks", volumeInfo.description);
         setFormField("publication_year", volumeInfo.publishedDate?.split("-")[0]);
-        setFormField("languages", volumeInfo.language);
-        setFormField("subjects", volumeInfo.categories?.join(", "));
         setFormField("purchase_price", item.saleInfo.listPrice?.amount);
         setFormField("purchase_details", item.saleInfo.listPrice?.buyLink);
         setFormField("isbn", decodedText);
+
+        setSelectField('publisher', publishers, volumeInfo.publisher);
+        setSelectField('authors', authors, volumeInfo.authors, true);
+        setSelectField('languages', languages, [volumeInfo.language], true);
+        setSelectField('categories', categories, volumeInfo.categories, true);
+        // publishers = [...publishers, {value: volumeInfo.publisher, label: volumeInfo.publisher}]
+        // console.log(publishers)
+        // document.querySelector('#publisher-div').innerHTML = "";
+        // const publisherSelect = new Input({
+        //     target: document.querySelector('#publisher-div'),
+        //     props: {id: "publisher", items: publishers, type: 'select', opts: {value: volumeInfo.publisher}}
+        // });
+        // setFormField("publisher_name", volumeInfo.publisher);
+        // setFormField("languages", volumeInfo.language);
+        // setFormField("subjects", volumeInfo.categories?.join(", "));
+
     }
 
 

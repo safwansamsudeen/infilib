@@ -66,7 +66,7 @@ export async function borrowableColumns(type) {
 			{ id: 'purchase_price', type: 'number', hidden: true },
 			{ id: 'purchase_details', hidden: true },
 			{ id: 'level', hidden: true },
-			{ id: 'remarks', hidden: true },
+			{ id: 'remarks', hidden: true, type: 'textarea' },
 			{ id: 'reference', type: 'check' }
 		];
 	} else if (type === 'book') {

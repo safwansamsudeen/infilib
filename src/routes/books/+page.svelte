@@ -6,6 +6,7 @@
     import Grid from "gridjs-svelte";
     import {html} from 'gridjs'
     import Input from "$lib/components/Input.svelte";
+    import {findValue} from "$lib/helpers.js";
 
 
     let addFormVisible = data.addFormVisible || false
@@ -32,7 +33,12 @@
         <label class="form-check-label" for="add-form">Add</label>
     </div>
     {#if addFormVisible}
-        <Scanner/>
+        {#if type === 'book'}
+            <Scanner publishers={findValue(data.borrowableColumns, 'publisher').items}
+                     authors={findValue(data.bookColumns, 'authors').items}
+                     categories={findValue(data.borrowableColumns, 'categories').items}
+                     languages={findValue(data.borrowableColumns, 'languages').items}/>
+        {/if}
         <form action="?/create" method="post" use:enhance>
             <div class="row g-3">
                 {#each data.borrowableColumns as column}
@@ -40,7 +46,6 @@
                 {/each}
             </div>
             <div class="row my-3 g-3">
-
                 <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
                     <input type="radio" class="btn-check" bind:group={type} id="book" value={"book"}>
                     <label class="btn btn-outline-primary" for="book">Book</label>
