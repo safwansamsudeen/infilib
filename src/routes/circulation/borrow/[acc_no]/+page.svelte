@@ -16,11 +16,11 @@
 <div class="container">
     <form action="?/borrow" method="post" use:enhance>
         <div class="row g-3">
-            <Input label="Borrowable"
+            <Input id="borrowable"
                    opts="{{disabled: true, value: `${data.borrowable.acc_no} ${data.borrowable.title}`}}"/>
-            <Input creatable={false} label="User" name="user_id" type="select" values="{data.users}"/>
-            <Input name="issued_at" type="date"/>
-            <Input name="due_at" type="date"/>
+            <Input creatable={false} id="user_id" items="{data.users}" name="User" type="select"/>
+            <Input id="issued_at" type="date"/>
+            <Input id="due_at" type="date"/>
         </div>
         <div class="mb-3">
             <label for="comments">Comments</label>

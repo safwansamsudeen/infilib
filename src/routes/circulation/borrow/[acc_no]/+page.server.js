@@ -1,14 +1,14 @@
 import { borrowable, user, transaction } from '$lib/db.js';
 import { redirect } from '@sveltejs/kit';
-import { find, parseData, pojoData } from '$lib/helpers.js';
+import { pojoData } from '$lib/serverHelpers.js';
 
 export async function load({ params }) {
-	const borrowable_ = await borrowable.findUnique({
+	const borrowable_obj = await borrowable.findUnique({
 		where: { acc_no: +params.acc_no }
 	});
 	const users = await user.findMany();
 	return {
-		borrowable: borrowable_,
+		borrowable: borrowable_obj,
 		users: users.map(({ id, name }) => ({ value: id, label: name }))
 	};
 }
@@ -16,6 +16,7 @@ export async function load({ params }) {
 export const actions = {
 	borrow: async function ({ request, params }) {
 		let { issued_at, due_at, comments, user_id } = await pojoData(request);
+		console.log(user_id);
 		await transaction.create({
 			data: {
 				borrowable_id: +params.acc_no,

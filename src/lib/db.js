@@ -6,6 +6,17 @@ console.log('Starting connection');
 await prisma.$connect();
 console.log('Connected');
 
-const { borrowable, publisher, author, category, language, user, mark, transaction } = prisma;
+const {
+	borrowable,
+	publisher,
+	author,
+	category,
+	language,
+	user,
+	mark,
+	transaction,
+	book,
+	magazine
+} = prisma;
 
 export { borrowable, publisher, author, category, language, user, mark, transaction };

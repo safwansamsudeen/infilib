@@ -3,22 +3,31 @@
     import {capitalize} from "$lib/helpers.js";
 
     export let id,
-        important = false,
+        name = capitalize(id),
         type = 'text',
-        name = capitalize(name),
-        values = [],
-        opts = {},
+        important = false,
         required = true,
+        opts = {},
+        // Select fields
+        multiple = false,
+        items = [],
         creatable = true;
 </script>
-{#if type === 'custom-select'}
-{:else}
-    <div class="col-md-6">
+<div class="col-md-{important ? '6' : '3'}">
+    {#if type === 'select'}
         <label for={id}>{name}</label>
-        {#if type !== 'select'}
-            <input class="form-control" {id} name="{id}" {required} {type} {...opts}/>
-        {:else}
-            <CustomSelect items={values} {name} {creatable}/>
-        {/if}
-    </div>
-{/if}
+        <CustomSelect {items} {multiple} {creatable} {id} {required} {...opts}/>
+    {:else if type === 'check'}
+        <div class="form-check">
+            <label for={id} class="form-control-check">{name}</label>
+            <input class="form-check-input" type="checkbox" value="" {id} name={id}>
+        </div>
+    {:else if type === 'date'}
+        <label for={id}>{name}</label>
+        <input class="form-control" {id} name="{id}" {required} type="date"
+               value="{opts.value}"/>
+    {:else}
+        <label for={id}>{name}</label>
+        <input class="form-control" {id} name="{id}" {required} {type} {...opts}/>
+    {/if}
+</div>

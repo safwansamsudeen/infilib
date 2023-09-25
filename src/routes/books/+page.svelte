@@ -1,22 +1,22 @@
 <script>
-    import {onMount} from "svelte";
     import {enhance} from "$app/forms";
 
     export let data;
     import Scanner from "./Scanner.svelte";
     import Grid from "gridjs-svelte";
-    import {h} from 'gridjs'
+    import {html} from 'gridjs'
     import Input from "$lib/components/Input.svelte";
 
 
     let addFormVisible = data.addFormVisible || false
+    let type = data.type || 'book';
 </script>
 
 <svelte:head>
-    <title>Books</title>
+    <title>Borrowables</title>
 </svelte:head>
 <div class="text-column text-center">
-    <h1>View, edit, and manage your books</h1>
+    <h1>View, edit, and manage your borrowables</h1>
 </div>
 
 <body>
@@ -35,25 +35,50 @@
         <Scanner/>
         <form action="?/create" method="post" use:enhance>
             <div class="row g-3">
-                {#each data.columns as {id, name, type, values}}
-                    <Input {id} {name} {type} {values}/>
+                {#each data.borrowableColumns as column}
+                    <Input {...column}/>
                 {/each}
+            </div>
+            <div class="row my-3 g-3">
+
+                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                    <input type="radio" class="btn-check" bind:group={type} id="book" value={"book"}>
+                    <label class="btn btn-outline-primary" for="book">Book</label>
+                    <input type="radio" class="btn-check" id="magazine" bind:group={type}
+                           value={"magazine"}
+                    >
+                    <label class="btn btn-outline-primary" for="magazine">Magazine</label>
+                    <input type="hidden" name="type" bind:value={type}>
+                </div>
+                {#if type === 'book'}
+                    <h3>Book</h3>
+                    {#each data.bookColumns as column}
+                        <Input {...column}/>
+                    {/each}
+                {:else}
+                    <h3>Magazine</h3>
+                    {#each data.magazineColumns as column}
+                        <Input {...column}/>
+                    {/each}
+                {/if}
             </div>
             <div class="d-grid gap-2 my-3 my-3">
                 <input class="btn btn-outline-success" type="submit" value="Add"/>
             </div>
         </form>
     {/if}
-    <Grid columns={data.columns.concat([{
-        name: 'Actions',
-        id: 'actions',
-         formatter: (cell, row) => {
-          return h('a', {
-            className: 'btn btn-primary',
-            href: '/circulation/borrow/' + row.cells[0].data,
-    }, 'Borrow');
-        }
-      }])} data={data.borrowables.map(data => [...data, null])} search sort/>
+    <Grid columns={[...data.borrowableColumns, {
+                name: 'Actions',
+                id: 'actions',
+                sort: false,
+                formatter: (cell, row) => {
+                    return html(`
+                    <div class="btn-group" role="group">
+                    <a class='btn btn-outline-primary' href='/circulation/borrow/${row.cells[0].data}'>Borrow</a>
+                    <a class='btn btn-outline-primary' href='/books/${row.cells[0].data}'>Edit</a>
+                    </div>`);
+                }
+            }]} data={data.borrowables.map(data => [...data, null])} search sort/>
 
 </div>
 </body>

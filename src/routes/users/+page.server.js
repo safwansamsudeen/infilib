@@ -1,5 +1,6 @@
 import { user } from '$lib/db.js';
-import { capitalize, pojoData } from '$lib/helpers.js';
+import { capitalize } from '$lib/helpers.js';
+import { pojoData } from '$lib/serverHelpers.js';
 
 export async function load() {
 	let users = await user.findMany({});
@@ -15,7 +16,7 @@ export async function load() {
 				{ value: 'M', name: 'Male' },
 				{ value: 'F', name: 'Female' }
 			],
-			creatable: false
+			opts: { creatable: false }
 		}
 	].map((data) => ({ ...data, name: data.name || capitalize(data.id) }));
 	users = users.map(({ id, name, email_address, details, gender }) => [

@@ -1,18 +1,18 @@
 import { transaction } from '$lib/db.js';
-import { capitalize, pojoData } from '$lib/helpers.js';
+import { capitalize } from '$lib/helpers.js';
+import { pojoData } from '$lib/serverHelpers.js';
 
 export async function load({ url }) {
-	// let params = {};
-	// for (let [key, val] of url.searchParams.entries()) {
-	// 	if (key === 'due') {
-	// 		if (val === 'today') {
-	// 			params.due_on = { $lte: new Date() };
-	// 		}
-	// 		// else params["due_on"] = {$lte: new Date() , $gte: new Date(val)}
-	// 	} else if (val) {
-	// 		params[key] = val;
-	// 	}
-	// }
+	let params = {};
+	for (let [key, val] of url.searchParams.entries()) {
+		if (key === 'due') {
+			if (val === 'today') {
+				params.due_at = { lte: new Date() };
+			} else params['due_at'] = { lte: new Date(), gte: new Date(val) };
+		} else if (val) {
+			params[key] = val;
+		}
+	}
 	let transactions = await transaction.findMany({
 		select: {
 			borrowable: true,
@@ -21,7 +21,8 @@ export async function load({ url }) {
 			due_at: true,
 			issued_at: true,
 			returned_at: true
-		}
+		},
+		where: params
 	});
 	let columns = [
 		{ id: 'user' },
