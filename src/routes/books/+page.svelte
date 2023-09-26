@@ -73,29 +73,26 @@
             </div>
         </form>
     {/if}
+    <div class="btn-group-vertical w-100 my-3" role="group">
+        <a
+                class="btn btn-outline-dark"
+                class:active={$page.url.searchParams.size === 0}
+                href="?">All Items</a
+        >
+        <a
+                class="btn btn-outline-dark"
+                class:active={$page.url.searchParams.get("show") === "book"}
+                href="?show=book">Books</a
+        >
+        <a
+                class="btn btn-outline-dark"
+                class:active={$page.url.searchParams.get("show") === "magazine"}
+                href="?show=magazine">Magazines</a
+        >
+        <a class="btn btn-outline-dark">Blank</a>
+    </div>
     <div class="row align-items-start">
-        <div class="col-md-3">
-            <div class="btn-group-vertical" role="group">
-                <a
-                        class="btn btn-outline-dark px-5"
-                        class:active={$page.url.searchParams.size === 0}
-                        href="?">All Items</a
-                >
-                <a
-                        class="btn btn-outline-dark"
-                        class:active={$page.url.searchParams.get("show") === "book"}
-                        href="?show=book">Books</a
-                >
-                <a
-                        class="btn btn-outline-dark"
-                        class:active={$page.url.searchParams.get("show") === "magazine"}
-                        href="?show=magazine">Magazines</a
-                >
-                <a class="btn btn-outline-dark">Blank</a>
-            </div>
-        </div>
-        <div class="col-md-9">
-            <Grid columns={[...data.columns, {
+        <Grid columns={[...data.columns, {
                 name: 'Actions',
                 id: 'actions',
                 formatter: (cell, row) => {
@@ -106,7 +103,6 @@
                     </div>`);
                 }
             }]} data={data.borrowables.map(data => [...data, null])} search sort/>
-        </div>
     </div>
 
 

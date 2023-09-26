@@ -34,8 +34,8 @@
     {#if addFormVisible}
         <form action="?/create" method="post" use:enhance>
             <div class="row g-3">
-                {#each data.columns as {name, label, type, values, creatable}}
-                    <Input {name} {label} {type} {values} {creatable}/>
+                {#each data.columns as column}
+                    <Input {...column}/>
                 {/each}
             </div>
             <div class="d-grid gap-2 my-3">

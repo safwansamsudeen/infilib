@@ -18,6 +18,8 @@
             return i;
         });
     }
+
+    console.log(items)
 </script>
 {#if creatable}
     <Select
@@ -35,7 +37,6 @@
             {item.label}
         </div>
     </Select>
-
 {:else}
     <Select {id} name={id} {multiple} {required} {items} bind:value/>
 {/if}

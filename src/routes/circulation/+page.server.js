@@ -8,6 +8,7 @@ export async function load({ url }) {
 		if (key === 'due') {
 			if (val === 'today') {
 				params.due_at = { lte: new Date() };
+				params.returned_at = { equals: null };
 			} else params['due_at'] = { lte: new Date(), gte: new Date(val) };
 		} else if (val) {
 			params[key] = val;
@@ -20,11 +21,13 @@ export async function load({ url }) {
 			comments: true,
 			due_at: true,
 			issued_at: true,
-			returned_at: true
+			returned_at: true,
+			id: true
 		},
 		where: params
 	});
 	let columns = [
+		{ id: 'id', name: 'ID', width: 80 },
 		{ id: 'user' },
 		{ id: 'book' },
 		{ id: 'issued_at' },
@@ -33,9 +36,10 @@ export async function load({ url }) {
 		{ id: 'comments' }
 	];
 	return {
-		columns: columns.map(({ id }) => ({ id, name: capitalize(id) })),
+		columns: columns.map(({ id, name, width }) => ({ id, name: name || capitalize(id), width })),
 		transactions: transactions.map(
-			({ borrowable, user, comments, due_at, issued_at, returned_at }) => [
+			({ id, borrowable, user, comments, due_at, issued_at, returned_at }) => [
+				id,
 				`${user.id} ${user.name}`,
 				`${borrowable.acc_no} ${borrowable.title}`,
 				issued_at.toDateString(),
@@ -52,8 +56,9 @@ export const actions = {
 		const { _id } = await request.json();
 		await Transaction.findOneAndDelete({ _id });
 	},
-	return: async function ({ request }) {
-		const { _id, comments } = await pojoData(request);
-		await Transaction.findOneAndUpdate({ _id }, { returned: new Date(), comments });
+	return: async function ({ request, url }) {
+		console.log(request);
+		const { id, comments } = await pojoData(request);
+		await transaction.update({ where: { id: +id }, data: { returned_at: new Date(), comments } });
 	}
 };
