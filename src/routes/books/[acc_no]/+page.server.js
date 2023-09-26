@@ -1,12 +1,14 @@
-import { author, borrowable, category, language, publisher, transaction } from '$lib/db.js';
+import { borrowable, transaction } from '$lib/db.js';
 import {
 	pojoData,
 	flattenBorrowables,
-	borrowableColumns,
+	columns,
 	parseBorrowable,
-	response
+	response,
+	pojofyColumns
 } from '$lib/serverHelpers.js';
 import { redirect } from '@sveltejs/kit';
+import { date } from '$lib/helpers.js';
 
 export async function load({ params }) {
 	let borrowable_obj = await borrowable.findUnique({
@@ -19,25 +21,35 @@ export async function load({ params }) {
 			languages: true
 		}
 	});
-	[borrowable_obj] = flattenBorrowables([borrowable_obj], true);
+	const isBook = Object.hasOwn(borrowable_obj, 'book');
+	let borrowableColumns = await columns('borrowable'),
+		bookColumns = isBook && (await columns('book')),
+		magazineColumns = !isBook && (await columns('magazine'));
+	[borrowable_obj] = await flattenBorrowables(
+		[borrowable_obj],
+		borrowableColumns,
+		bookColumns,
+		magazineColumns,
+		isBook ? 'book' : 'magazine',
+		false
+	);
 
 	const transactions = await transaction.findMany({
 		where: { borrowable_id: +params.acc_no },
 		include: { user: true }
 	});
 	return {
-		borrowableColumns: await borrowableColumns('borrowable'),
-		bookColumns: Object.hasOwn(borrowable_obj, 'authors') && (await borrowableColumns('book')),
-		magazineColumns:
-			Object.hasOwn(borrowable_obj, 'sc_no') && (await borrowableColumns('magazine')),
 		borrowable: borrowable_obj,
 		transactions: transactions.map(({ user, issued_at, due_at, returned_at, comments }) => [
 			user.name,
-			issued_at.toDateString(),
-			due_at.toDateString(),
-			returned_at?.toDateString() || 'NA',
+			date(issued_at),
+			date(due_at),
+			date(returned_at) || 'NA',
 			comments
-		])
+		]),
+		borrowableColumns: pojofyColumns(borrowableColumns),
+		bookColumns: pojofyColumns(bookColumns),
+		magazineColumns: pojofyColumns(magazineColumns)
 	};
 }
 
@@ -52,7 +64,6 @@ export const actions = {
 		return await response(
 			async () => {
 				const { confirmed } = await pojoData(request);
-				console.log(confirmed);
 				if (confirmed === 'true') {
 					await borrowable.delete({ where: { acc_no: +params.acc_no } });
 				}

@@ -1,16 +1,26 @@
 import { author, borrowable, category, language, publisher, book, magazine } from '$lib/db.js';
-import { capitalize } from '$lib/helpers.js';
+import { capitalize, date } from '$lib/helpers.js';
 import { fail } from '@sveltejs/kit';
-import dayjs from 'dayjs';
 
 export async function pojoData(request) {
 	return Object.fromEntries(await request.formData());
 }
 
-export async function response(func, return_val = { success: true }) {
+export async function pojofyColumns(columns) {
+	return columns?.map?.((column) => {
+		delete column.get;
+		delete column.getPlain;
+		return column;
+	});
+}
+
+export async function response(func, return_val) {
 	try {
-		await func();
-		return return_val;
+		let result = await func();
+		if (return_val === true) {
+			return result;
+		}
+		return return_val || { success: true };
 	} catch (error) {
 		console.log(error);
 		return fail(500, {});
@@ -29,7 +39,7 @@ export function parseData(data, keys) {
 	});
 }
 
-export async function borrowableColumns(type) {
+export async function columns(type) {
 	const publishers = await publisher.findMany();
 	const categories = await category.findMany();
 	const languages = await language.findMany();
@@ -39,19 +49,28 @@ export async function borrowableColumns(type) {
 			{ id: 'acc_no', name: 'Acc. No.', type: 'number', link: true, important: true },
 			{ id: 'call_no', type: 'number', opts: { step: 0.01 }, important: true },
 			{ id: 'title', important: true },
-			{ id: 'status', important: true },
+			{ id: 'status', important: true, type: 'hidden', opts: { value: 'IN' } },
 			{
 				id: 'publisher',
 				type: 'select',
 				items: publishers.map(({ id, name }) => ({
 					value: id,
 					label: name
-				}))
+				})),
+				get: ({ id, name }) => ({
+					value: id,
+					label: name
+				}),
+				getPlain: ({ name }) => name,
+				important: true
 			},
 			{
 				id: 'languages',
 				type: 'select',
 				items: languages.map(({ code, name }) => ({ value: code, label: name + ', ' + code })),
+				get: (languages) =>
+					languages.map(({ code, name }) => ({ value: code, label: name + ', ' + code })),
+				getPlain: (languages) => languages.map(({ code, name }) => name).join(', '),
 				multiple: true,
 				hidden: true
 			},
@@ -59,15 +78,17 @@ export async function borrowableColumns(type) {
 				id: 'categories',
 				type: 'select',
 				items: categories.map(({ id, name }) => ({ value: id, label: name })),
+				get: (categories) => categories.map(({ id, name }) => ({ value: id, label: name })),
+				getPlain: (categories) => categories.map(({ name }) => name).join(', '),
 				multiple: true,
 				hidden: true
 			},
 			{ id: 'no_of_pages', type: 'number', hidden: true },
-			{ id: 'purchase_price', type: 'number', hidden: true },
+			{ id: 'purchase_price', type: 'number', hidden: true, getPlain: (number) => String(number) },
 			{ id: 'purchase_details', hidden: true },
 			{ id: 'level', hidden: true },
 			{ id: 'remarks', hidden: true, type: 'textarea' },
-			{ id: 'reference', type: 'check' }
+			{ id: 'reference', type: 'check', getPlain: (ref) => (ref ? 'Y' : 'N'), hidden: true }
 		];
 	} else if (type === 'book') {
 		const authors = await author.findMany();
@@ -77,6 +98,8 @@ export async function borrowableColumns(type) {
 				id: 'authors',
 				type: 'select',
 				items: authors.map(({ id, name }) => ({ value: id, label: name })),
+				get: (authors) => authors?.map(({ id, name }) => ({ value: id, label: name })),
+				getPlain: (authors) => authors.map(({ name }) => name).join(', '),
 				multiple: true,
 				important: true
 			},
@@ -89,8 +112,8 @@ export async function borrowableColumns(type) {
 			{ id: 'issue', important: true },
 			{ id: 'volume', important: true },
 			{ id: 'sc_no', type: 'number', important: true },
-			{ id: 'from', type: 'date' },
-			{ id: 'to', type: 'date' }
+			{ id: 'from', type: 'date', getPlain: date },
+			{ id: 'to', type: 'date', getPlain: date }
 		];
 	}
 	return columns.map(({ name, ...data }) => ({
@@ -99,126 +122,52 @@ export async function borrowableColumns(type) {
 	}));
 }
 
-export function flattenBorrowables(borrowables, dict = false) {
-	return borrowables.map(
-		({
-			acc_no,
-			title,
-			status,
-			publisher,
-			languages,
-			categories,
-			reference,
-			call_no,
-			no_of_pages,
-			purchase_price,
-			purchase_details,
-			level,
-			remarks,
-			book,
-			magazine
-		}) => {
-			if (book) {
-				if (dict) {
-					return {
-						acc_no,
-						call_no,
-						title,
-						subtitle: book.subtitle,
-						authors: book.authors.map(({ id, name }) => ({ value: id, label: name })),
-						status,
-						isbn: book.isbn,
-						publisher: {
-							value: publisher.id,
-							label: publisher.name
-						},
-						publication_year: book.publication_year,
-						languages: languages.map(({ code, name }) => ({
-							value: code,
-							label: name + ', ' + code
-						})),
-						categories: categories.map(({ id, name }) => ({ value: id, label: name })),
-						edition: book.edition,
-						no_of_pages,
-						purchase_price,
-						purchase_details,
-						level,
-						remarks,
-						reference
-					};
-				}
-				return [
-					acc_no,
-					call_no,
-					title,
-					book.subtitle,
-					book.authors.map((obj) => obj.name).join(', '),
-					status,
-					book.isbn,
-					publisher.name,
-					book.publication_year,
-					languages.map((obj) => obj.name).join(', '),
-					categories.map((obj) => obj.name).join(', '),
-					book.edition,
-					no_of_pages,
-					purchase_price,
-					purchase_details,
-					level,
-					remarks,
-					reference
-				];
+export async function flattenBorrowables(
+	borrowables,
+	borrowableColumns,
+	bookColumns,
+	magazineColumns,
+	type,
+	getPlain = true
+) {
+	if (type === 'book') {
+		return borrowables.map(({ book, ...data }) => {
+			let borrowableData, bookData;
+			if (getPlain) {
+				borrowableData = borrowableColumns
+					// .filter(({ hidden }) => !hidden)
+					.map(({ id, getPlain }) => (getPlain ? getPlain(data[id]) : data[id]));
+				bookData = bookColumns
+					// .filter(({ hidden }) => !hidden)
+					.map(({ id, getPlain }) => (getPlain ? getPlain(book[id]) : book[id]));
 			} else {
-				if (dict) {
-					return {
-						acc_no,
-						call_no,
-						title,
-						issue: magazine.issue,
-						volume: magazine.volume,
-						status,
-						sc_no: magazine.sc_no,
-						publisher: {
-							value: publisher.id,
-							label: publisher.name
-						},
-						languages: languages.map(({ code, name }) => ({
-							value: code,
-							label: name + ', ' + code
-						})),
-						categories: categories.map(({ id, name }) => ({ value: id, label: name })),
-						from: dayjs(magazine.from).format('YYYY-MM-DD'),
-						to: dayjs(magazine.to).format('YYYY-MM-DD'),
-						no_of_pages,
-						purchase_price,
-						purchase_details,
-						reference,
-						level,
-						remarks
-					};
-				}
-				return [
-					acc_no,
-					call_no,
-					title,
-					magazine.issue,
-					magazine.volume,
-					status,
-					magazine.sc_no,
-					publisher.name,
-					languages.map((obj) => obj.name).join(', '),
-					categories.map((obj) => obj.name).join(', '),
-					magazine.from.toDateString(),
-					magazine.to.toDateString(),
-					no_of_pages,
-					purchase_price,
-					purchase_details,
-					reference,
-					level,
-					remarks
-				];
+				borrowableData = borrowableColumns.map(({ id, get }) => [
+					id,
+					get ? get(data[id]) : data[id]
+				]);
+				bookData = bookColumns.map(({ id, get }) => [id, get ? get(book[id]) : book[id]]);
 			}
-		}
-	);
+			return getPlain
+				? borrowableData.concat(bookData)
+				: Object.fromEntries(borrowableData.concat(bookData));
+		});
+	} else if (type === 'magazine') {
+		return borrowables.map(({ magazine, ...data }) => {
+			let borrowableData = borrowableColumns
+				// .filter(({ hidden }) => !hidden)
+				.map(({ id, getPlain }) => (getPlain ? getPlain(data[id]) : data[id]));
+			let magazineData = magazineColumns
+				// .filter(({ hidden }) => !hidden)
+				.map(({ id, getPlain }) => (getPlain ? getPlain(magazine[id]) : magazine[id]));
+			return borrowableData.concat(magazineData);
+		});
+	}
+	return borrowables.map(({ book, magazine, ...data }) => {
+		let borrowableData = borrowableColumns
+			// .filter(({ hidden }) => !hidden)
+			.map(({ id, getPlain }) => (getPlain ? getPlain(data[id]) : data[id]));
+		return borrowableData;
+	});
 }
 
 export async function parseBorrowable(borrowable_obj, create = true) {
@@ -342,6 +291,7 @@ export async function parseBorrowable(borrowable_obj, create = true) {
 			languages_id.push({ code: value });
 		}
 	}
+	console.log(languages_id);
 	for (let { value, label } of categories) {
 		if (value === label) {
 			tmp = await category.create({
@@ -359,10 +309,10 @@ export async function parseBorrowable(borrowable_obj, create = true) {
 		title,
 		publisher: { connect: { id: publisher_id } },
 		languages: {
-			connect: languages_id
+			set: languages_id
 		},
 		categories: {
-			connect: categories_id
+			set: categories_id
 		},
 		reference: reference === 'on' ? true : false,
 		call_no,
@@ -416,7 +366,7 @@ export async function parseBorrowable(borrowable_obj, create = true) {
 					...commonData,
 					book: {
 						update: {
-							authors: { connect: authors_id },
+							authors: { set: authors_id },
 							subtitle,
 							publication_year,
 							edition,

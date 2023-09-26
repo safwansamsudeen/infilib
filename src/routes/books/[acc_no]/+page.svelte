@@ -1,7 +1,6 @@
 <script>
     import {enhance} from "$app/forms";
     import Grid from "gridjs-svelte";
-    import {html} from "gridjs";
     import {capitalize} from "$lib/helpers.js";
     import Input from "$lib/components/Input.svelte";
 
@@ -36,6 +35,7 @@
                 {/each}
             </div>
             <div class="row g-3">
+                <input name="type" type="hidden" value={data.bookColumns ? 'book' : 'magazine'}>
                 {#if data.bookColumns}
                     <h3>Book</h3>
                     {#each data.bookColumns as {id, opts, ...column}}

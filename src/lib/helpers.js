@@ -13,7 +13,6 @@ export function setFormField(id, value) {
 
 export function findValue(array, key_value, key = 'id') {
 	for (let obj of array) {
-		// console.log(obj);
 		if (obj[key] === key_value) {
 			return obj;
 		}
@@ -59,4 +58,11 @@ export function setSelectField(id, items, newValue, multi = false) {
 			multiple: multi
 		}
 	});
+}
+
+export function date(value, to_str = true) {
+	if (to_str) {
+		return value?.toDateString();
+	}
+	return new Date(value);
 }

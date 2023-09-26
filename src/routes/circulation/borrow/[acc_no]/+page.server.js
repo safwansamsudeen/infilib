@@ -16,7 +16,6 @@ export async function load({ params }) {
 export const actions = {
 	borrow: async function ({ request, params }) {
 		let { issued_at, due_at, comments, user_id } = await pojoData(request);
-		console.log(user_id);
 		await transaction.create({
 			data: {
 				borrowable_id: +params.acc_no,
