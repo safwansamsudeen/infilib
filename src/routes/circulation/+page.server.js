@@ -16,7 +16,7 @@ export async function load({ url }) {
 	}
 	let transactions = await transaction.findMany({
 		select: {
-			borrowable: true,
+			item: true,
 			user: true,
 			comments: true,
 			due_at: true,
@@ -38,10 +38,10 @@ export async function load({ url }) {
 	return {
 		columns: columns.map(({ id, name, width }) => ({ id, name: name || capitalize(id), width })),
 		transactions: transactions.map(
-			({ id, borrowable, user, comments, due_at, issued_at, returned_at }) => [
+			({ id, item, user, comments, due_at, issued_at, returned_at }) => [
 				id,
 				`${user.id} ${user.name}`,
-				`${borrowable.acc_no} ${borrowable.title}`,
+				`${item.acc_no} ${item.title}`,
 				issued_at.toDateString(),
 				due_at.toDateString(),
 				returned_at?.toDateString() || 'NA',

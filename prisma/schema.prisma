@@ -30,28 +30,28 @@ model Author {
 }
 
 model Category {
-  id          Int          @id @default(autoincrement())
-  name        String
-  borrowables Borrowable[]
+  id    Int    @id @default(autoincrement())
+  name  String
+  items Item[]
 }
 
 model Publisher {
-  id          Int          @id @default(autoincrement())
-  name        String
-  address     String?
-  borrowables Borrowable[]
+  id      Int     @id @default(autoincrement())
+  name    String
+  address String?
+  items   Item[]
 }
 
 model Language {
-  code        String       @id
-  name        String
-  borrowables Borrowable[]
+  code  String @id
+  name  String
+  items Item[]
 }
 
 model Cd {
-  id          Int          @id @default(autoincrement())
-  name        String
-  borrowables Borrowable[]
+  id    Int    @id @default(autoincrement())
+  name  String
+  items Item[]
 }
 
 model Periodical {
@@ -61,26 +61,26 @@ model Periodical {
 }
 
 model Book {
-  acc_no           Int        @id
+  acc_no           Int      @id
   subtitle         String?
   authors          Author[]
   publication_year Int
   edition          String?
   isbn             String
-  borrowable       Borrowable @relation(fields: [acc_no], references: [acc_no], onDelete: Cascade, onUpdate: Cascade)
+  item             Item     @relation(fields: [acc_no], references: [acc_no], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Magazine {
-  acc_no     Int        @id
-  sc_no      Int
-  volume     String
-  issue      String
-  from       DateTime
-  to         DateTime
-  borrowable Borrowable @relation(fields: [acc_no], references: [acc_no], onDelete: Cascade, onUpdate: Cascade)
+  acc_no Int      @id
+  sc_no  Int
+  volume String
+  issue  String
+  from   DateTime
+  to     DateTime
+  item   Item     @relation(fields: [acc_no], references: [acc_no], onDelete: Cascade, onUpdate: Cascade)
 }
 
-model Borrowable {
+model Item {
   acc_no           Int           @id
   title            String
   status           String
@@ -105,22 +105,22 @@ model Borrowable {
 
 // Transactions
 model Transaction {
-  id            Int        @id @default(autoincrement())
-  user_id       Int
-  borrowable_id Int
-  user          User       @relation(fields: [user_id], references: [id])
-  borrowable    Borrowable @relation(fields: [borrowable_id], references: [acc_no])
-  issued_at     DateTime
-  due_at        DateTime
-  returned_at   DateTime?
-  comments      String?
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  item_id     Int
+  user        User      @relation(fields: [user_id], references: [id])
+  item        Item      @relation(fields: [item_id], references: [acc_no])
+  issued_at   DateTime
+  due_at      DateTime
+  returned_at DateTime?
+  comments    String?
 }
 
 model Mark {
-  id          Int        @id @default(autoincrement())
-  acc_no      Int        @unique
+  id          Int      @id @default(autoincrement())
+  acc_no      Int      @unique
   user_id     Int
-  user        User       @relation(fields: [user_id], references: [id])
-  borrowable  Borrowable @relation(fields: [acc_no], references: [acc_no])
+  user        User     @relation(fields: [user_id], references: [id])
+  item        Item     @relation(fields: [acc_no], references: [acc_no])
   borrow_time DateTime
 }

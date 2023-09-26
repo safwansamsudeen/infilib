@@ -1,9 +1,9 @@
-import { borrowable } from '$lib/db.js';
+import { item } from '$lib/db.js';
 import {
 	pojoData,
-	flattenBorrowables,
+	flattenItems,
 	columns,
-	parseBorrowable,
+	parseItem,
 	pojofyColumns,
 	response
 } from '$lib/serverHelpers.js';
@@ -17,10 +17,10 @@ export async function load({ url }) {
 			categories: true,
 			languages: true
 		};
-		let borrowableColumns = await columns('borrowable'),
+		let itemColumns = await columns('item'),
 			bookColumns = await columns('book'),
 			magazineColumns = await columns('magazine');
-		let allColumns = borrowableColumns;
+		let allColumns = itemColumns;
 		let type;
 		for (let [key, val] of url.searchParams.entries()) {
 			if (key === 'show') {
@@ -38,20 +38,14 @@ export async function load({ url }) {
 				params[key] = val;
 			}
 		}
-		let borrowables = await borrowable.findMany({
+		let items = await item.findMany({
 			include,
 			where: params
 		});
-		borrowables = flattenBorrowables(
-			borrowables,
-			borrowableColumns,
-			bookColumns,
-			magazineColumns,
-			type
-		);
+		items = flattenItems(items, itemColumns, bookColumns, magazineColumns, type);
 		return {
-			borrowables,
-			borrowableColumns: pojofyColumns(borrowableColumns),
+			items,
+			itemColumns: pojofyColumns(itemColumns),
 			bookColumns: pojofyColumns(bookColumns),
 			magazineColumns: pojofyColumns(magazineColumns),
 			columns: allColumns
@@ -63,7 +57,7 @@ export const actions = {
 	create: async function ({ request }) {
 		try {
 			const data = await pojoData(request);
-			await parseBorrowable(data);
+			await parseItem(data);
 		} catch (e) {
 			console.log(e);
 			return fail(500, {});

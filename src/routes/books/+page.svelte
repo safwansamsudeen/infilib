@@ -15,10 +15,10 @@
 </script>
 
 <svelte:head>
-    <title>Borrowables</title>
+    <title>Items</title>
 </svelte:head>
 <div class="text-column text-center">
-    <h1>View, edit, and manage your borrowables</h1>
+    <h1>View, edit, and manage your items</h1>
 </div>
 
 <body>
@@ -35,14 +35,14 @@
     </div>
     {#if addFormVisible}
         {#if type === 'book'}
-            <Scanner publishers={findValue(data.borrowableColumns, 'publisher').items}
+            <Scanner publishers={findValue(data.itemColumns, 'publisher').items}
                      authors={findValue(data.bookColumns, 'authors').items}
-                     categories={findValue(data.borrowableColumns, 'categories').items}
-                     languages={findValue(data.borrowableColumns, 'languages').items}/>
+                     categories={findValue(data.itemColumns, 'categories').items}
+                     languages={findValue(data.itemColumns, 'languages').items}/>
         {/if}
         <form action="?/create" method="post" use:enhance>
             <div class="row g-3">
-                {#each data.borrowableColumns as column}
+                {#each data.itemColumns as column}
                     <Input {...column}/>
                 {/each}
             </div>
@@ -102,7 +102,7 @@
                     <a class='btn btn-outline-primary' href='/books/${row.cells[0].data}'>Edit</a>
                     </div>`);
                 }
-            }]} data={data.borrowables.map(data => [...data, null])} search sort/>
+            }]} data={data.items.map(data => [...data, null])} search sort/>
     </div>
 
 

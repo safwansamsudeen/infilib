@@ -1,9 +1,9 @@
-import { borrowable, transaction } from '$lib/db.js';
+import { item, transaction } from '$lib/db.js';
 import {
 	pojoData,
-	flattenBorrowables,
+	flattenItems,
 	columns,
-	parseBorrowable,
+	parseItem,
 	response,
 	pojofyColumns
 } from '$lib/serverHelpers.js';
@@ -11,7 +11,7 @@ import { redirect } from '@sveltejs/kit';
 import { date } from '$lib/helpers.js';
 
 export async function load({ params }) {
-	let borrowable_obj = await borrowable.findUnique({
+	let item_obj = await item.findUnique({
 		where: { acc_no: +params.acc_no },
 		include: {
 			book: { include: { authors: true } },
@@ -21,13 +21,13 @@ export async function load({ params }) {
 			languages: true
 		}
 	});
-	const isBook = Object.hasOwn(borrowable_obj, 'book');
-	let borrowableColumns = await columns('borrowable'),
+	const isBook = Object.hasOwn(item_obj, 'book');
+	let itemColumns = await columns('item'),
 		bookColumns = isBook && (await columns('book')),
 		magazineColumns = !isBook && (await columns('magazine'));
-	[borrowable_obj] = await flattenBorrowables(
-		[borrowable_obj],
-		borrowableColumns,
+	[item_obj] = await flattenItems(
+		[item_obj],
+		itemColumns,
 		bookColumns,
 		magazineColumns,
 		isBook ? 'book' : 'magazine',
@@ -35,11 +35,11 @@ export async function load({ params }) {
 	);
 
 	const transactions = await transaction.findMany({
-		where: { borrowable_id: +params.acc_no },
+		where: { item_id: +params.acc_no },
 		include: { user: true }
 	});
 	return {
-		borrowable: borrowable_obj,
+		item: item_obj,
 		transactions: transactions.map(({ user, issued_at, due_at, returned_at, comments }) => [
 			user.name,
 			date(issued_at),
@@ -47,7 +47,7 @@ export async function load({ params }) {
 			date(returned_at) || 'NA',
 			comments
 		]),
-		borrowableColumns: pojofyColumns(borrowableColumns),
+		itemColumns: pojofyColumns(itemColumns),
 		bookColumns: pojofyColumns(bookColumns),
 		magazineColumns: pojofyColumns(magazineColumns)
 	};
@@ -57,7 +57,7 @@ export const actions = {
 	update: async ({ request }) => {
 		return await response(async () => {
 			const data = await pojoData(request);
-			await parseBorrowable(data, false);
+			await parseItem(data, false);
 		});
 	},
 	delete: async ({ request, params }) => {
@@ -65,7 +65,7 @@ export const actions = {
 			async () => {
 				const { confirmed } = await pojoData(request);
 				if (confirmed === 'true') {
-					await borrowable.delete({ where: { acc_no: +params.acc_no } });
+					await item.delete({ where: { acc_no: +params.acc_no } });
 				}
 			},
 			redirect('/books', 200)

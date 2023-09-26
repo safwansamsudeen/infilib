@@ -6,18 +6,18 @@
 </script>
 
 <svelte:head>
-    <title>Borrow {data.borrowable.title}</title>
+    <title>Borrow {data.item.title}</title>
 </svelte:head>
 <div class="text-column text-center">
-    <h1>Borrowing <em>{data.borrowable.title}</em></h1>
+    <h1>Borrowing <em>{data.item.title}</em></h1>
 </div>
 
 <body>
 <div class="container">
     <form action="?/borrow" method="post" use:enhance>
         <div class="row g-3">
-            <Input id="borrowable"
-                   opts="{{disabled: true, value: `${data.borrowable.acc_no} ${data.borrowable.title}`}}"/>
+            <Input id="item"
+                   opts="{{disabled: true, value: `${data.item.acc_no} ${data.item.title}`}}"/>
             <Input creatable={false} id="user_id" items="{data.users}" name="User" type="select"/>
             <Input id="issued_at" type="date"/>
             <Input id="due_at" type="date"/>

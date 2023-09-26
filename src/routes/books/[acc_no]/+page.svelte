@@ -9,17 +9,17 @@
 </script>
 
 <svelte:head>
-    <title>Manage: {data.borrowable.title}</title>
+    <title>Manage: {data.item.title}</title>
 </svelte:head>
 <div class="text-column text-center">
-    <h1>Manage: <em>{data.borrowable.title}</em></h1>
+    <h1>Manage: <em>{data.item.title}</em></h1>
 </div>
 <body>
 <div class="container">
     <div class="d-grid gap-2 my-4" role="group">
         <a
                 class="btn btn-outline-success"
-                href="/circulation/borrow/{data.borrowable.acc_no}">Borrow</a
+                href="/circulation/borrow/{data.item.acc_no}">Borrow</a
         >
         <form action="?/delete" method="POST">
             <input name="confirmed" type="hidden" value="{true}">
@@ -30,8 +30,8 @@
     <div class="row">
         <form action="?/update" method="post" use:enhance>
             <div class="row g-3">
-                {#each data.borrowableColumns as {id, opts, ...column}}
-                    <Input {id} {...column} opts={{...opts, value: data.borrowable[id]}}/>
+                {#each data.itemColumns as {id, opts, ...column}}
+                    <Input {id} {...column} opts={{...opts, value: data.item[id]}}/>
                 {/each}
             </div>
             <div class="row g-3">
@@ -39,12 +39,12 @@
                 {#if data.bookColumns}
                     <h3>Book</h3>
                     {#each data.bookColumns as {id, opts, ...column}}
-                        <Input {id} {...column} opts={{...opts, value: data.borrowable[id]}}/>
+                        <Input {id} {...column} opts={{...opts, value: data.item[id]}}/>
                     {/each}
                 {:else}
                     <h3>Magazine</h3>
                     {#each data.magazineColumns as {id, opts, ...column}}
-                        <Input {id} {...column} opts={{...opts, value: data.borrowable[id]}}/>
+                        <Input {id} {...column} opts={{...opts, value: data.item[id]}}/>
                     {/each}
                 {/if}
             </div>
