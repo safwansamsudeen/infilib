@@ -1,12 +1,13 @@
 <script>
     import {onMount} from "svelte";
+    import Table from '$lib/components/Table.svelte';
 
     export let data;
     import {enhance} from "$app/forms";
     import Input from "$lib/components/Input.svelte";
-    import Grid from "gridjs-svelte";
 
-    let addFormVisible = data.addFormVisible || false;
+    let addFormVisible = false;
+    console.log(data.columns)
 </script>
 
 <svelte:head>
@@ -43,10 +44,8 @@
             </div>
         </form>
     {/if}
-    <Grid columns={data.columns} data={data.users} search sort/>
+    <Table columns={data.columns} data={data.users}
+           url='users'/>
+
 </div>
 </body>
-
-<style global>
-    @import "https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css";
-</style>

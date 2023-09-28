@@ -32,6 +32,7 @@
   "type": "module",
   "dependencies": {
     "dayjs": "^1.11.10",
-    "frappe-datatable": "^1.17.3"
+    "frappe-datatable": "^1.17.3",
+    "handsontable": "^13.1.0"
   }
 }

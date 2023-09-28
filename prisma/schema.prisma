@@ -13,10 +13,10 @@ generator client {
 model User {
   id            Int           @id
   name          String
-  gender        String
   email_address String
-  password      String
+  gender        String
   details       String?
+  password      String
   is_admin      Boolean
   transactions  Transaction[]
   marks         Mark[]

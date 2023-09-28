@@ -3,12 +3,9 @@ import { capitalize } from '$lib/helpers.js';
 import { parseData, pojoData } from '$lib/serverHelpers.js';
 
 export async function load() {
-	let users = await user.findMany({});
 	let columns = [
 		{ id: 'id', name: 'Admn. no', type: 'number' },
 		{ id: 'name' },
-		{ id: 'email_address', type: 'email' },
-		{ id: 'details' },
 		{
 			id: 'gender',
 			type: 'select',
@@ -17,16 +14,13 @@ export async function load() {
 				{ value: 'F', label: 'Female' }
 			],
 			opts: { creatable: false }
-		}
+		},
+		{ id: 'details' },
+		{ id: 'email_address', type: 'email' }
 	].map((data) => ({ ...data, name: data.name || capitalize(data.id) }));
-	console.log(users);
-	users = users.map(({ id, name, email_address, details, gender }) => [
-		id,
-		name,
-		email_address,
-		details,
-		gender === 'M' ? 'Male' : 'Female'
-	]);
+	let users = await user.findMany({
+		select: { id: true, name: true, email_address: true, gender: true, details: true }
+	});
 	return { columns, users };
 }
 

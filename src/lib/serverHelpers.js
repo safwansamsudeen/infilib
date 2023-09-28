@@ -1,6 +1,6 @@
 import { author, item, category, language, publisher, book, magazine } from '$lib/db.js';
 import { capitalize, date } from '$lib/helpers.js';
-import { fail } from '@sveltejs/kit';
+import { fail, json } from '@sveltejs/kit';
 
 export async function pojoData(request) {
 	return Object.fromEntries(await request.formData());
@@ -24,6 +24,16 @@ export async function response(func, return_val) {
 	} catch (error) {
 		console.log(error);
 		return fail(500, {});
+	}
+}
+
+export async function serverResponse(func, status_code = 200) {
+	try {
+		let result = await func();
+		return new json({ success: true, status_code });
+	} catch (error) {
+		console.log(error);
+		return new json({ success: false, status_code: 500, detail: error });
 	}
 }
 
