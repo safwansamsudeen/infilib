@@ -6,12 +6,18 @@
     import Grid from "gridjs-svelte";
     import {html} from 'gridjs'
     import Input from "$lib/components/Input.svelte";
-    import {findValue} from "$lib/helpers.js";
+    import {findValue, setBookDetails, setFormField} from "$lib/helpers.js";
     import {page} from "$app/stores";
 
 
-    let addFormVisible = data.addFormVisible || false
+    let addFormVisible = data.addFormVisible || false;
+    let scannerVisible = false;
     let type = data.type || 'book';
+
+    let publishers = findValue(data.itemColumns, 'publisher').items,
+        authors = findValue(data.bookColumns, 'authors').items,
+        categories = findValue(data.itemColumns, 'categories').items,
+        languages = findValue(data.itemColumns, 'languages').items;
 </script>
 
 <svelte:head>
@@ -35,10 +41,28 @@
     </div>
     {#if addFormVisible}
         {#if type === 'book'}
-            <Scanner publishers={findValue(data.itemColumns, 'publisher').items}
-                     authors={findValue(data.bookColumns, 'authors').items}
-                     categories={findValue(data.itemColumns, 'categories').items}
-                     languages={findValue(data.itemColumns, 'languages').items}/>
+            <div class="form-check form-switch">
+                <input
+                        bind:checked={scannerVisible}
+                        class="form-check-input"
+                        id="scanner-visible"
+                        role="switch"
+                        type="checkbox"
+                />
+                <label class="form-check-label" for="scanner-visible">Show scanner</label>
+            </div>
+            {#if scannerVisible}
+                <Scanner {publishers}
+                         {authors}
+                         {categories}
+                         {languages}/>
+            {:else}
+                <form class="mb-4"
+                      on:submit={e => setBookDetails(+e.target[0].value, publishers, authors, languages, categories)}>
+                    <Input name="Search by ISBN" on:change/>
+                    <button class='btn btn-success' type="submit">Search</button>
+                </form>
+            {/if}
         {/if}
         <form action="?/create" method="post" use:enhance>
             <div class="row g-3">

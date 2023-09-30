@@ -1,4 +1,5 @@
 import Input from '$lib/components/Input.svelte';
+import dayjs from 'dayjs';
 
 export function capitalize(label) {
 	return label
@@ -55,14 +56,39 @@ export function setSelectField(id, items, newValue, multi = false) {
 			items,
 			type: 'select',
 			opts: { value },
-			multiple: multi
+			multiple: multi,
+			important: true
 		}
 	});
 }
 
 export function date(value, to_str = true) {
+	if (!value) {
+		return null;
+	}
 	if (to_str) {
-		return value?.toDateString();
+		return dayjs(value).format('YYYY-MM-DD');
 	}
 	return new Date(value);
+}
+
+export async function setBookDetails(isbn, publishers, authors, languages, categories, scanner) {
+	scanner?.pause?.();
+	let res = await fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:' + isbn);
+	let item = (await res.json()).items[0];
+	let volumeInfo = item.volumeInfo;
+	//   Populate form fields with request data
+	setFormField('title', volumeInfo.title);
+	setFormField('subtitle', volumeInfo.subtitle);
+	setFormField('no_of_pages', volumeInfo.pageCount);
+	setFormField('remarks', volumeInfo.description);
+	setFormField('publication_year', volumeInfo.publishedDate?.split('-')[0]);
+	setFormField('purchase_price', item.saleInfo.listPrice?.amount);
+	setFormField('purchase_details', item.saleInfo.listPrice?.buyLink);
+	setFormField('isbn', isbn);
+
+	setSelectField('publisher', publishers, volumeInfo.publisher);
+	setSelectField('authors', authors, volumeInfo.authors, true);
+	setSelectField('languages', languages, [volumeInfo.language], true);
+	setSelectField('categories', categories, volumeInfo.categories, true);
 }

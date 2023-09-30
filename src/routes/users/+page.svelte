@@ -7,7 +7,6 @@
     import Input from "$lib/components/Input.svelte";
 
     let addFormVisible = false;
-    console.log(data.columns)
 </script>
 
 <svelte:head>
@@ -44,8 +43,8 @@
             </div>
         </form>
     {/if}
-    <Table columns={data.columns} data={data.users}
-           url='users'/>
+    <Table actions={[['Details', 'users']]} columns={data.columns}
+           data={data.users} url='users'/>
 
 </div>
 </body>

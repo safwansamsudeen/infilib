@@ -5,9 +5,7 @@ import { validateUserProperty } from '$lib/validators.js';
 export async function PATCH({ request }) {
 	const { id, property, value } = await request.json();
 	return await serverResponse(async () => {
-		if (!validateUserProperty(value, property)) {
-			throw new Error('data is malformed');
-		}
+		validateUserProperty(value, property);
 		await user.update({ where: { id: +id }, data: { [property]: value } });
 	});
 }

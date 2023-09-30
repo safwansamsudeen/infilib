@@ -6,7 +6,7 @@
         name = capitalize(id),
         type = 'text',
         important = false,
-        required = true,
+        required = important,
         opts = {},
         // Select fields
         multiple = false,

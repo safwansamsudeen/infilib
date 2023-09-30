@@ -5,7 +5,6 @@
     import Input from "$lib/components/Input.svelte";
 
     export let data;
-    let editable = false;
 </script>
 
 <svelte:head>
