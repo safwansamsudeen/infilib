@@ -1,12 +1,12 @@
 <script>
-    import {onMount} from "svelte";
     import Table from '$lib/components/Table.svelte';
 
-    export let data;
-    import {enhance} from "$app/forms";
-    import Input from "$lib/components/Input.svelte";
+    export let data, form;
+    import {enhance} from '$app/forms';
+    import Input from '$lib/components/Input.svelte';
 
     let addFormVisible = false;
+    console.log(form)
 </script>
 
 <svelte:head>
@@ -27,12 +27,17 @@
                 role="switch"
                 type="checkbox"
         />
-        <label class="form-check-label" for="form-switch"
-        >Add user</label
-        >
+        <label class="form-check-label" for="form-switch">Add user</label>
     </div>
     {#if addFormVisible}
         <form action="?/create" method="post" use:enhance>
+            {#if form?.missing}<p class="alert alert-danger">The "{form.label}" field is required</p>{/if}
+            {#if form?.incorrect}<p class="alert alert-danger">The "{form.label}" field does not have a valid
+
+                value: {form.value}</p>{/if}
+            {#if form?.error}<p class="alert alert-danger">An error was raised! Did you give an ID that already
+                exists?</p>{/if}
+
             <div class="row g-3">
                 {#each data.columns as column}
                     <Input {...column}/>
@@ -43,8 +48,13 @@
             </div>
         </form>
     {/if}
-    <Table actions={[['Details', 'users']]} columns={data.columns}
-           data={data.users} url='users'/>
-
+    {#key data}
+        <Table
+                actions={[['Details', 'users']]}
+                columns={data.columns}
+                data={data.users}
+                updateUrl="users"
+        />
+    {/key}
 </div>
 </body>
