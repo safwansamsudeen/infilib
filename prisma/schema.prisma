@@ -1,7 +1,7 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -10,16 +10,33 @@ generator client {
 }
 
 // People
+model UserSubscription {
+  id     Int    @id @default(autoincrement())
+  name   String @unique
+  length Int
+  price  Int
+  users  User[]
+}
+
+model Gender {
+  code  String @id
+  name  String @unique
+  users User[]
+}
+
 model User {
-  id            Int           @id
-  name          String
-  email_address String
-  gender        String
-  details       String?
-  password      String
-  is_admin      Boolean
-  transactions  Transaction[]
-  marks         Mark[]
+  id              Int               @id @default(autoincrement())
+  name            String
+  email_address   String
+  password        String
+  gender_code     String
+  gender          Gender            @relation(fields: [gender_code], references: [code])
+  details         String?
+  is_admin        Boolean
+  subscribtion_id Int?
+  subscription    UserSubscription? @relation(fields: [subscribtion_id], references: [id])
+  transactions    Transaction[]
+  marks           Mark[]
 }
 
 // Book records
@@ -31,7 +48,7 @@ model Author {
 
 model Category {
   id    Int    @id @default(autoincrement())
-  name  String
+  name  String @unique
   items Item[]
 }
 
@@ -43,14 +60,8 @@ model Publisher {
 }
 
 model Language {
-  code  String @id
-  name  String
-  items Item[]
-}
-
-model Cd {
   id    Int    @id @default(autoincrement())
-  name  String
+  name  String @unique
   items Item[]
 }
 
@@ -61,27 +72,28 @@ model Periodical {
 }
 
 model Book {
-  acc_no           Int      @id
+  id               Int      @id
   subtitle         String?
   authors          Author[]
   publication_year Int
   edition          String?
   isbn             String
-  item             Item     @relation(fields: [acc_no], references: [acc_no], onDelete: Cascade, onUpdate: Cascade)
+  item             Item     @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Magazine {
-  acc_no Int      @id
+  id     Int      @id
   sc_no  Int
+  issn   String?
   volume String
   issue  String
   from   DateTime
   to     DateTime
-  item   Item     @relation(fields: [acc_no], references: [acc_no], onDelete: Cascade, onUpdate: Cascade)
+  item   Item     @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Item {
-  acc_no           Int           @id
+  id               Int           @id
   title            String
   status           String
   publisher_id     Int
@@ -89,7 +101,7 @@ model Item {
   languages        Language[]
   categories       Category[]
   reference        Boolean
-  call_no          String
+  call_no          Float         @db.DoublePrecision
   no_of_pages      Int
   purchase_price   Int
   purchase_details String?
@@ -99,8 +111,6 @@ model Item {
   magazine         Magazine?
   transactions     Transaction[]
   mark             Mark?
-  Cd               Cd?           @relation(fields: [cdId], references: [id])
-  cdId             Int?
 }
 
 // Transactions
@@ -109,18 +119,20 @@ model Transaction {
   user_id     Int
   item_id     Int
   user        User      @relation(fields: [user_id], references: [id])
-  item        Item      @relation(fields: [item_id], references: [acc_no])
+  item        Item      @relation(fields: [item_id], references: [id])
   issued_at   DateTime
   due_at      DateTime
   returned_at DateTime?
+  price       Int?
+  fine        Int?
   comments    String?
 }
 
 model Mark {
   id          Int      @id @default(autoincrement())
-  acc_no      Int      @unique
+  item_id     Int      @unique
   user_id     Int
   user        User     @relation(fields: [user_id], references: [id])
-  item        Item     @relation(fields: [acc_no], references: [acc_no])
+  item        Item     @relation(fields: [id], references: [id])
   borrow_time DateTime
 }

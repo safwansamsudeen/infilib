@@ -1,7 +1,8 @@
 import { transaction } from '$lib/db.js';
-import { date } from '$lib/helpers.js';
+import { standardizeSelects } from '$lib/helpers.js';
 import { pojoData } from '$lib/serverHelpers.js';
-import { response, transColumns } from '../../lib/serverHelpers';
+import { response } from '../../lib/serverHelpers';
+import { getTransColumns } from '$lib/columns.js';
 
 export async function load({ url }) {
   let params = {};
@@ -16,30 +17,18 @@ export async function load({ url }) {
     }
   }
   let transactions = await transaction.findMany({
-    select: {
+    include: {
       item: true,
-      user: true,
-      comments: true,
-      due_at: true,
-      issued_at: true,
-      returned_at: true,
-      id: true
+      user: true
     },
     where: params
   });
+  const transColumns = await getTransColumns();
+  standardizeSelects(transactions, transColumns);
+
   return {
-    columns: transColumns(),
-    transactions: transactions.map(
-      ({ id, item, user, comments, due_at, issued_at, returned_at }) => ({
-        id,
-        user: `${user.id} ${user.name}`,
-        item: `${item.acc_no} ${item.title}`,
-        issued_at: date(issued_at),
-        due_at: date(due_at),
-        returned_at: date(returned_at) || 'NA',
-        comments
-      })
-    )
+    columns: transColumns,
+    transactions: transactions
   };
 }
 
@@ -51,7 +40,7 @@ export const actions = {
   return: async function({ request }) {
     return await response(async () => {
       const { id, comments } = await pojoData(request);
-      await transaction.update({ where: { id: +id }, data: { returned_at: new Date(), comments } });
+      await transaction.update({ where: { id: +id }, data: { returned_at: new Date(), comments, item: { update: { status: 'IN' } } } });
     });
   }
 };

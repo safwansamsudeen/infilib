@@ -1,29 +1,28 @@
 <script>
-	import { enhance } from '$app/forms';
-	import Input from '$lib/components/Input.svelte';
-	import TransactionTable from '$lib/components/TransactionTable.svelte';
 	import AddForm from '$lib/components/AddForm.svelte';
 	import { page } from '$app/stores';
+	import TransactionTable from '$lib/components/TransactionTable.svelte';
 
 	export let data;
 </script>
 
 <svelte:head>
-	<title>Manage: {data.user.name}</title>
+	<title>Manage: {data.item.title}</title>
+	<meta name="description" content="View all the users, and manage them." />
 </svelte:head>
 <div class="text-column text-center">
-	<h1>Manage: <em>{data.user.name}</em></h1>
+	<h1>Manage: <em>{data.item.title}</em></h1>
 </div>
 <body>
 	<div class="container">
 		<div class="d-grid gap-2 my-4" role="group">
-			<a class="btn btn-outline-success" href="/circulation/borrow/all?user={data.user.id}"
-				>Borrow</a
-			>
+			{#if data.item.status === 'IN' && !data.item.reference}
+				<a class="btn btn-outline-success" href="/circulation/borrow/{data.item.id}">Borrow</a>
+			{/if}
 			<form
 				action="?/delete"
-				method="POST"
 				on:submit={() => confirm('Are you sure you want to delete this user?')}
+				method="POST"
 			>
 				<button class="btn btn-outline-danger w-100" type="submit">Delete</button>
 			</form>
@@ -33,7 +32,14 @@
 			{#if $page.form?.success}
 				<p class="alert alert-success">Successfully updated!</p>
 			{/if}
-			<AddForm action="update" addTogglable={false} columns={data.columns} />
+
+			<AddForm
+				action="update"
+				addTogglable={false}
+				columns={data.columns}
+				type={data.type}
+				inputColumns={data.inputColumns}
+			/>
 
 			<h3 class="text-center">Borrowed</h3>
 			{#key data.transactions}

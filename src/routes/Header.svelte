@@ -12,18 +12,18 @@
                 <a href="/">Home</a>
             </li>
             <li
-                    aria-current={$page.url.pathname === "/users" ? "page" : undefined}
+                    aria-current={$page.url.pathname.startsWith("/users") ? "page": undefined}
                     class="mx-2 mx-md-4"
             >
                 <a href="/users">Users</a>
             </li>
             <li
-                    aria-current={$page.url.pathname.startsWith("/books")
+                    aria-current={$page.url.pathname.startsWith("/items")
           ? "page"
           : undefined}
                     class="mx-2 mx-md-4"
             >
-                <a class="mx-2 mx-md-4" href="/books">Books</a>
+                <a class="mx-2 mx-md-4" href="/items">Items</a>
             </li>
             <li
                     aria-current={$page.url.pathname.startsWith("/circulation")

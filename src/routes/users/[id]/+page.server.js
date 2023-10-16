@@ -1,58 +1,57 @@
 import { transaction, user } from '$lib/db.js';
-import { date } from '$lib/helpers.js';
-import { parseData, pojoData, response } from '$lib/serverHelpers.js';
-import { parseProperties, validateUserProperty } from '$lib/validators.js';
+import { standardizeSelects } from '$lib/helpers.js';
+import { pojoData, response } from '$lib/serverHelpers.js';
+import { parseProperties } from '$lib/validators.js';
 import { fail, redirect } from '@sveltejs/kit';
-import { transColumns, getUserColumns } from '$lib/columns.js';
+import { getTransColumns, getUserColumns } from '$lib/columns.js';
 
 export async function load({ params }) {
-	let user_obj = await user.findUnique({
-		where: { id: +params.id }
-	});
+  const user_obj = await user.findUnique({
+    where: { id: +params.id },
+    include: { gender: true }
+  });
+  const transColumns = (await getTransColumns()).filter(({ id }) => id !== 'user');
+  const userColumns = await getUserColumns();
 
-	const transactions = await transaction.findMany({
-		where: { user_id: +params.id },
-		include: { item: true }
-	});
-
-	return {
-		user: user_obj,
-		transactions: transactions.map(({ id, item, issued_at, due_at, returned_at, comments }) => ({
-			id,
-			item: `${item.acc_no} ${item.title}`,
-			issued_at: date(issued_at),
-			due_at: date(due_at),
-			returned_at: date(returned_at) || 'NA',
-			comments
-		})),
-		columns: getUserColumns(),
-		transColumns: transColumns(false)
-	};
+  const transactions = await transaction.findMany({
+    where: { user_id: +params.id },
+    include: { item: true }
+  });
+  standardizeSelects(transactions, transColumns);
+  standardizeSelects([user_obj], userColumns);
+  return {
+    user: user_obj,
+    transactions,
+    columns: userColumns.map(({ opts, ...data }) => ({
+      ...data,
+      opts: { ...opts, value: user_obj[data.id], disabled: data.id === 'id' }
+    })),
+    transColumns
+  };
 }
 
 export const actions = {
-	update: async ({ request }) => {
-		const data = await pojoData(request);
-		let check = parseProperties(data, await getUserColumns());
-		if (check) return new fail(400, check);
-		try {
-			await user.update({
-				where: { id: data.id },
-				data
-			});
-		} catch (error) {
-			return fail(400, { error: error.message });
-		}
-	},
-	delete: async ({ request, params }) => {
-		const { confirmed } = await pojoData(request);
-		try {
-			if (confirmed === 'true') {
-				await user.delete({ where: { id: +params.id } });
-			}
-		} catch (error) {
-			return fail(400, { error: error.message });
-		}
-		throw redirect(302, '/users');
-	}
+  update: async ({ request, params }) => {
+    let data = await pojoData(request);
+    let check = parseProperties(
+      data,
+      (await getUserColumns()).filter(({ id }) => id !== 'id')
+    );
+    if (check) return new fail(400, check);
+
+    return response(async () => {
+      await user.update({
+        where: { id: +params.id },
+        data
+      });
+    });
+  },
+  delete: async ({ params }) => {
+    try {
+      await user.delete({ where: { id: +params.id } });
+    } catch (error) {
+      return fail(400, { error: error.message });
+    }
+    throw redirect(302, '/users');
+  }
 };
