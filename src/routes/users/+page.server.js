@@ -17,20 +17,18 @@ export async function load() {
 
 export const actions = {
 	create: async function ({ request }) {
-		let data = await pojoData(request);
-		let check = parseProperties(data, await getUserColumns());
+		let requestData = await pojoData(request);
+		let check = parseProperties(requestData, await getUserColumns());
 		if (check) return new fail(400, check);
 		return response(async () => {
+			let data = {
+				is_admin: false,
+				password: requestData.id + requestData.name
+			};
+			const columns = await getUserColumns();
+			for (let { id } of columns) data[id] = requestData[id];
 			await user.create({
-				data: {
-					id: data.id,
-					name: data.name,
-					gender: { connect: { code: data.gender.value } },
-					email_address: data.email_address,
-					details: data.details,
-					is_admin: false,
-					password: data.id + data.name
-				}
+				data
 			});
 		});
 	}

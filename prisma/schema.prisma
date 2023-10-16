@@ -25,7 +25,7 @@ model Gender {
 }
 
 model User {
-  id              Int               @id @default(autoincrement())
+  id              Int               @id
   name            String
   email_address   String
   password        String

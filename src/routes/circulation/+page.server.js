@@ -5,42 +5,45 @@ import { response } from '../../lib/serverHelpers';
 import { getTransColumns } from '$lib/columns.js';
 
 export async function load({ url }) {
-  let params = {};
-  for (let [key, val] of url.searchParams.entries()) {
-    if (key === 'due') {
-      if (val === 'today') {
-        params.due_at = { lte: new Date() };
-        params.returned_at = { equals: null };
-      } else params['due_at'] = { lte: new Date(), gte: new Date(val) };
-    } else if (val) {
-      params[key] = val;
-    }
-  }
-  let transactions = await transaction.findMany({
-    include: {
-      item: true,
-      user: true
-    },
-    where: params
-  });
-  const transColumns = await getTransColumns();
-  standardizeSelects(transactions, transColumns);
+	let params = {};
+	for (let [key, val] of url.searchParams.entries()) {
+		if (key === 'due') {
+			if (val === 'today') {
+				params.due_at = { lte: new Date() };
+				params.returned_at = { equals: null };
+			} else params['due_at'] = { lte: new Date(), gte: new Date(val) };
+		} else if (val) {
+			params[key] = val;
+		}
+	}
+	let transactions = await transaction.findMany({
+		include: {
+			item: true,
+			user: true
+		},
+		where: params
+	});
+	const transColumns = await getTransColumns();
+	standardizeSelects(transactions, transColumns);
 
-  return {
-    columns: transColumns,
-    transactions: transactions
-  };
+	return {
+		columns: transColumns,
+		transactions: transactions
+	};
 }
 
 export const actions = {
-  delete: async function({ request }) {
-    const { id } = await pojoData(request);
-    await transaction.delete({ where: { id: +id } });
-  },
-  return: async function({ request }) {
-    return await response(async () => {
-      const { id, comments } = await pojoData(request);
-      await transaction.update({ where: { id: +id }, data: { returned_at: new Date(), comments, item: { update: { status: 'IN' } } } });
-    });
-  }
+	delete: async function ({ request }) {
+		const { id } = await pojoData(request);
+		await transaction.delete({ where: { id: +id } });
+	},
+	return: async function ({ request }) {
+		return await response(async () => {
+			const { id, comments } = await pojoData(request);
+			await transaction.update({
+				where: { id: +id },
+				data: { returned_at: new Date(), comments, item: { update: { status: 'IN' } } }
+			});
+		});
+	}
 };

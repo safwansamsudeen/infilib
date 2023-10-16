@@ -1,22 +1,24 @@
 <script>
-    import {setBookDetails} from "$lib/helpers.js";
-    import {onDestroy, onMount} from 'svelte';
+	import { setBookDetails } from '$lib/helpers.js';
+	import { onDestroy, onMount } from 'svelte';
 
-    export let publishers, authors, languages, categories;
+	export let publishers, authors, languages, categories;
 
-
-    let scanner;
-    onMount(() => {
-        scanner = new Html5QrcodeScanner(
-            "reader",
-            {fps: 10, qrbox: {width: 250, height: 250}},
-            true,
-        );
-        scanner.render((decodedText) => setBookDetails(decodedText, publishers, authors, languages, categories, scanner));
-    })
-    onDestroy(() => {
-        scanner.clear();
-        document.getElementById("reader").innerHTML = "";
-    })
+	let scanner;
+	onMount(() => {
+		scanner = new Html5QrcodeScanner(
+			'reader',
+			{ fps: 10, qrbox: { width: 250, height: 250 } },
+			true
+		);
+		scanner.render((decodedText) =>
+			setBookDetails(decodedText, publishers, authors, languages, categories, scanner)
+		);
+	});
+	onDestroy(() => {
+		scanner.clear();
+		document.getElementById('reader').innerHTML = '';
+	});
 </script>
+
 <div id="reader" width="600px"></div>

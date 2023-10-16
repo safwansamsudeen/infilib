@@ -91,7 +91,7 @@
 						if (oldValue === value) {
 							continue;
 						}
-						console.log('Updating');
+
 						fetch('/' + updateUrl, {
 							method: 'PATCH',
 							headers: {
