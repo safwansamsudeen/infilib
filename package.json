@@ -10,6 +10,9 @@
     "format": "prettier --write  --plugin prettier-plugin-svelte .",
     "postinstall": "prisma generate"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "devDependencies": {
     "@prisma/client": "^5.2.0",
     "@sveltejs/adapter-vercel": "^3.0.3",
@@ -24,6 +27,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@vercel/analytics": "^1.1.1",
     "dayjs": "^1.11.10",
     "handsontable": "^13.1.0"
   }
