@@ -34,16 +34,20 @@ export async function load({ url }) {
 		}
 	}
 
-	let items = await item.findMany({
-		include,
-		where: params
-	});
-	type && flatten(items, type);
-	standardizeSelects(items, itemColumns);
 	return {
 		columns: itemColumns,
 		inputColumns: others,
-		items
+		items: {
+			data: new Promise(async (fulfil) => {
+				let items = await item.findMany({
+					include,
+					where: params
+				});
+				type && flatten(items, type);
+				standardizeSelects(items, itemColumns);
+				fulfil(items);
+			})
+		}
 	};
 }
 

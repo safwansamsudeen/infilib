@@ -1,11 +1,14 @@
 <script>
 	import { onMount } from 'svelte';
 
-	export let data, columns;
+	export let promise, data, columns;
 	import { enhance } from '$app/forms';
 	import Table from '$lib/components/Table.svelte';
 
 	onMount(async () => {
+		if (!data) {
+			return;
+		}
 		const { default: Handsontable } = await import('handsontable');
 		new Table({
 			target: document.getElementById('transaction-table'),
@@ -45,28 +48,38 @@
 	});
 </script>
 
-<div id="transaction-table">
-	{#each data as { id, returned_at, comments }}
-		{#if returned_at === 'Invalid Date'}
+{#if promise !== undefined}
+	{#await promise.data}
+		Loading...
+	{:then data}
+		<svelte:self {columns} {data} />
+	{:catch error}
+		{error.message}
+	{/await}
+{:else}
+	<div id="transaction-table">
+		{#each data as { id, returned_at, comments }}
+			{#if returned_at === 'Invalid Date'}
+				<form
+					action="/circulation?/return"
+					method="POST"
+					class="d-none"
+					id="{id}-return-form"
+					use:enhance
+				>
+					<input id="{id}-comments-return" name="comments" type="hidden" value={comments} />
+					<input name="id" type="hidden" value={id} />
+				</form>
+			{/if}
 			<form
-				action="/circulation?/return"
+				action="/circulation?/delete"
 				method="POST"
 				class="d-none"
-				id="{id}-return-form"
+				id="{id}-delete-form"
 				use:enhance
 			>
-				<input id="{id}-comments-return" name="comments" type="hidden" value={comments} />
 				<input name="id" type="hidden" value={id} />
 			</form>
-		{/if}
-		<form
-			action="/circulation?/delete"
-			method="POST"
-			class="d-none"
-			id="{id}-delete-form"
-			use:enhance
-		>
-			<input name="id" type="hidden" value={id} />
-		</form>
-	{/each}
-</div>
+		{/each}
+	</div>
+{/if}

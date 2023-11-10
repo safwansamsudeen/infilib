@@ -3,7 +3,8 @@
 	import Toast from '$lib/components/Toast.svelte';
 	import { page } from '$app/stores';
 
-	export let data,
+	export let promise,
+		data,
 		columns,
 		updateUrl = '',
 		hiddenColumns = columns
@@ -26,6 +27,9 @@
 	};
 
 	onMount(async () => {
+		if (!data) {
+			return;
+		}
 		const { default: MultiSelectEditor } = await import('$lib/MultiSelectEditor.js');
 		const { default: Handsontable } = await import('handsontable');
 
@@ -144,6 +148,15 @@
 	});
 </script>
 
+{#if promise !== undefined}
+	{#await promise.data}
+		Loading...
+	{:then data}
+		<svelte:self {actions} {columns} {data} {updateUrl} />
+	{:catch error}
+		{error.message}
+	{/await}
+{/if}
 <div style="height: 500px;">
 	<div class="toast-container"></div>
 	<div class="my-4 h-50" id="table"></div>

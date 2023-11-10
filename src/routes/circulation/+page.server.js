@@ -16,19 +16,23 @@ export async function load({ url }) {
 			params[key] = val;
 		}
 	}
-	let transactions = await transaction.findMany({
-		include: {
-			item: true,
-			user: true
-		},
-		where: params
-	});
 	const transColumns = await getTransColumns();
-	standardizeSelects(transactions, transColumns);
 
 	return {
 		columns: transColumns,
-		transactions: transactions
+		transactions: {
+			data: new Promise(async (fulfil) => {
+				const transactions = await transaction.findMany({
+					include: {
+						item: true,
+						user: true
+					},
+					where: params
+				});
+				standardizeSelects(transactions, transColumns);
+				fulfil(transactions);
+			})
+		}
 	};
 }
 

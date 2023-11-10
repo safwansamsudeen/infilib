@@ -20,7 +20,7 @@
 			<Table
 				actions={[['Details', 'users']]}
 				columns={data.columns}
-				data={data.users}
+				promise={data.users}
 				updateUrl="users"
 			/>
 		{/key}

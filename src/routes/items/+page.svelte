@@ -52,7 +52,7 @@
 					['Borrow', 'circulation/borrow', (row) => row.status !== 'IN' || row.reference]
 				]}
 				columns={data.columns}
-				data={data.items}
+				promise={data.items}
 				updateUrl="items"
 			/>
 		{/key}

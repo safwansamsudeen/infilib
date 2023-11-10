@@ -8,11 +8,18 @@ import { standardizeSelects } from '$lib/helpers.js';
 
 export async function load() {
 	const userColumns = await getUserColumns();
-	const users = await user.findMany({
-		select: { id: true, name: true, email_address: true, gender: true, details: true }
-	});
-	standardizeSelects(users, userColumns);
-	return { columns: userColumns, users };
+	return {
+		columns: userColumns,
+		users: {
+			data: new Promise(async (fulfil) => {
+				const users = await user.findMany({
+					select: { id: true, name: true, email_address: true, gender: true, details: true }
+				});
+				standardizeSelects(users, userColumns);
+				fulfil(users);
+			})
+		}
+	};
 }
 
 export const actions = {

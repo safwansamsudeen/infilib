@@ -28,7 +28,7 @@
 	<div class="grid px-0 my-3">
 		<div class="row align-items-start">
 			{#key data}
-				<TransactionTable columns={data.columns} data={data.transactions} />
+				<TransactionTable columns={data.columns} promise={data.transactions} />
 			{/key}
 		</div>
 	</div>
