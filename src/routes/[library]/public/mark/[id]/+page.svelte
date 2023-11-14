@@ -14,12 +14,6 @@
         });
     })
 </script>
-<script>
-	import Table from '$lib/components/Table.svelte';
-	import AddForm from '$lib/components/AddForm.svelte';
-
-	export let data;
-</script>
 <div class="text-column text-center">
 	<h1>Mark <em>{data.item_name}</em> For Borrow</h1>
 </div>
