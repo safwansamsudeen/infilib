@@ -8,6 +8,9 @@ export async function load({ params }) {
 	const item_obj = await item.findUnique({
 		where: { id: +params.id }
 	});
+	if (item_obj.status === 'OUT') {
+		throw redirect(303, `/${params.library}/circulation/`);
+	}
 	const transColumns = await getTransColumns();
 	return {
 		item: item_obj,
@@ -44,6 +47,6 @@ export const actions = {
 			await item.update({ where: { id: +params.id }, data: { status: 'OUT' } });
 		}, true);
 		if (res) return res;
-		throw redirect(303, '/circulation/');
+		throw redirect(303, `/${params.library}/circulation/`);
 	}
 };

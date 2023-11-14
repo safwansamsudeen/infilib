@@ -1,11 +1,10 @@
-import { transaction } from '$lib/db.js';
+import { item, transaction } from '$lib/db.js';
 import { standardizeSelects } from '$lib/helpers.js';
-import { pojoData } from '$lib/serverHelpers.js';
-import { response } from '../../lib/serverHelpers';
+import { pojoData, response } from '$lib/serverHelpers.js';
 import { getTransColumns } from '$lib/columns.js';
 
 export async function load({ url }) {
-	let params = {};
+	let params = { deleted: { not: true } };
 	for (let [key, val] of url.searchParams.entries()) {
 		if (key === 'due') {
 			if (val === 'today') {
@@ -35,7 +34,10 @@ export async function load({ url }) {
 export const actions = {
 	delete: async function ({ request }) {
 		const { id } = await pojoData(request);
-		await transaction.delete({ where: { id: +id } });
+		await transaction.update({
+			where: { id: +id },
+			data: { deleted: true, item: { update: { status: 'IN' } } }
+		});
 	},
 	return: async function ({ request }) {
 		return await response(async () => {

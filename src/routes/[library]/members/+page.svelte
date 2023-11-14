@@ -6,11 +6,11 @@
 </script>
 
 <svelte:head>
-	<title>Users</title>
+	<title>Members</title>
 	<meta content="View users" name="description" />
 </svelte:head>
 <div class="text-column text-center">
-	<h1>Manage Users</h1>
+	<h1>Manage Members</h1>
 </div>
 
 <body>
@@ -18,10 +18,10 @@
 		<AddForm columns={data.columns} id="user"></AddForm>
 		{#key data}
 			<Table
-				actions={[['Details', 'users']]}
+				actions={[['Details', 'members']]}
 				columns={data.columns}
 				data={data.users}
-				updateUrl="users"
+				updateUrl="members"
 			/>
 		{/key}
 	</div>

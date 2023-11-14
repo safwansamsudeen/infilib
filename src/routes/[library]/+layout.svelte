@@ -1,13 +1,10 @@
 <script>
-	import Header from './Header.svelte';
-	import { dev } from '$app/environment';
-	import { inject } from '@vercel/analytics';
-
-	inject({ mode: dev ? 'development' : 'production' });
+	import Header from '$lib/components/Header.svelte';
+	export let data;
 </script>
 
 <div class="app">
-	<Header />
+	<Header admin={data.user.admin}/>
 	<main style="max-width: 85%;">
 		<slot />
 	</main>

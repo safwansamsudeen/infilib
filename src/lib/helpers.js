@@ -85,11 +85,14 @@ export function setSelectField(id, items, newValue, multi = false) {
 	});
 }
 
-export function date(value, to_str = true) {
+export function date(value, to_str = true, time = false) {
 	if (!value) {
 		return null;
 	}
 	if (to_str) {
+		if (time) {
+			return dayjs(value).format('YYYY-MM-DD HH:mm');
+		}
 		return dayjs(value).format('YYYY-MM-DD');
 	}
 	return new Date(value);
@@ -114,4 +117,20 @@ export async function setBookDetails(isbn, publishers, authors, languages, categ
 	setSelectField('authors', authors, volumeInfo.authors, true);
 	setSelectField('languages', languages, [volumeInfo.language], true);
 	setSelectField('categories', categories, volumeInfo.categories, true);
+}
+
+export function flatten(records, type) {
+	records.map((rec) => Object.entries(rec[type]).map(([key, value]) => (rec[key] = value)));
+}
+
+export function truncate(text, totalChars = 80, endChars = 20) {
+	endChars = Math.min(endChars, totalChars);
+	const start = text.slice(0, totalChars - endChars);
+	const end = endChars > 0 ? text.slice(-endChars) : '';
+
+	if (start.length + end.length < text.length) {
+		return start + '…' + end;
+	} else {
+		return text;
+	}
 }

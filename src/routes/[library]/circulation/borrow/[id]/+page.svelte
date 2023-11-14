@@ -12,16 +12,6 @@
 
 <body>
 	<div class="container">
-		<!--    <form action="?/borrow" method="post" use:enhance>-->
-		<!--        <div class="row">-->
-		<!--        {#each data.columns as column}-->
-		<!--            <Input {...column} />-->
-		<!--        {/each}-->
-		<!--</div>-->
-		<!--        <div class="d-grid gap-2 my-3">-->
-		<!--            <input class="btn btn-outline-success" type="submit" value="Borrow"/>-->
-		<!--        </div>-->
-		<!--    </form>-->
 		<AddForm action="borrow" addTogglable={false} columns={data.columns} />
 	</div>
 	<script>

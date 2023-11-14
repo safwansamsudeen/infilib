@@ -1,7 +1,15 @@
+/*
+FILE FOR MANAGING COLUMNS
+This file is the JSON version of the Prisma schema.
+Based on the contents here, forms will be generated, validation will be ensured, and DB creation/updates will be managed.
+Handle with care.
+*/
+
 import { capitalize, date } from '$lib/helpers.js';
 import { author, category, language, publisher, gender, user, item } from '$lib/db.js';
 
 function normalize(fn) {
+	// I have next to no idea what this monolith is doing but I'm sure it's crucial
 	return async function (...args) {
 		let res = await fn(...args);
 		if (Array.isArray(res[0])) {
@@ -62,6 +70,17 @@ export const getUserColumns = normalize(async function () {
 	];
 });
 
+export const getMarkColumns = normalize(async function () {
+	return [
+		{
+			id: 'item'
+		},
+		{ id: 'user', type: 'hidden' },
+		{ id: 'borrow_time', name: 'Time Of Pickup', type: 'datetime-local' },
+		{ id: 'comments', type: 'textarea', important: false }
+	];
+});
+
 export const getTransColumns = normalize(async function () {
 	const users = await user.findMany();
 	const items = await item.findMany();
@@ -86,7 +105,6 @@ export const getTransColumns = normalize(async function () {
 		},
 		{
 			id: 'item',
-			name: 'Item',
 			type: 'select',
 			opts: {
 				items: items.map(({ id, title }) => ({

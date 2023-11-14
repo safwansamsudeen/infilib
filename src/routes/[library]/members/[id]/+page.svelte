@@ -1,6 +1,4 @@
 <script>
-	import { enhance } from '$app/forms';
-	import Input from '$lib/components/Input.svelte';
 	import TransactionTable from '$lib/components/TransactionTable.svelte';
 	import AddForm from '$lib/components/AddForm.svelte';
 	import { page } from '$app/stores';

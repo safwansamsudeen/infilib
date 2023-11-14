@@ -22,7 +22,8 @@
 		hidden: 'text',
 		heading: 'text',
 		textarea: 'text',
-		email: 'text'
+		email: 'text',
+		'datetime-local': 'text'
 	};
 
 	onMount(async () => {
@@ -56,7 +57,7 @@
 				}
 				html =
 					html +
-					`<a type="button" class="btn btn-outline-primary" href="/${url}/${data[row].id}">${label}</a>`;
+					`<a type="button" class="btn btn-outline-primary" href="/${$page.params.library}/${url}/${data[row].id}">${label}</a>`;
 			}
 			td.innerHTML = html + '</div>';
 		}
@@ -92,7 +93,7 @@
 							continue;
 						}
 
-						fetch('/' + updateUrl, {
+						fetch(`/${$page.params.library}/${updateUrl}`, {
 							method: 'PATCH',
 							headers: {
 								'Content-Type': 'application/json'
