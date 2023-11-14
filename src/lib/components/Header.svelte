@@ -1,28 +1,47 @@
 <script>
 	import { page } from '$app/stores';
+	export let admin;
 </script>
 
 <header>
 	<nav>
 		<ul>
-			<li aria-current={$page.url.pathname === '/' ? 'page' : undefined} class="mx-3 mx-md-4">
-				<a href="/">Home</a>
-			</li>
 			<li
-				aria-current={$page.url.pathname.startsWith('/users') ? 'page' : undefined}
+				aria-current={$page.url.pathname.split('/').length === 2 ? 'page' : undefined}
+				class="mx-3 mx-md-4"
+			>
+				<a href="/{$page.params.library}">Home</a>
+			</li>
+			{#if admin}
+			<li
+				aria-current={$page.url.pathname.includes('/members') ? 'page' : undefined}
 				class="mx-2 mx-md-4"
 			>
-				<a href="/users">Users</a>
+				<a href="/{$page.params.library}/members">Members</a>
 			</li>
 			<li
-				aria-current={$page.url.pathname.startsWith('/items') ? 'page' : undefined}
+				aria-current={$page.url.pathname.includes('/items') ? 'page' : undefined}
 				class="mx-2 mx-md-4"
 			>
-				<a class="mx-2 mx-md-4" href="/items">Items</a>
+				<a class="mx-2 mx-md-4" href="/{$page.params.library}/items">Items</a>
 			</li>
-			<li aria-current={$page.url.pathname.startsWith('/circulation') ? 'page' : undefined}>
-				<a href="/circulation">Circulate</a>
+			<li aria-current={$page.url.pathname.includes('/circulation') ? 'page' : undefined}>
+				<a href="/{$page.params.library}/circulation">Circulate</a>
 			</li>
+				{:else}
+			<li
+				aria-current={$page.url.pathname.includes('/public') ? 'page' : undefined}
+				class="mx-2 mx-md-4"
+			>
+				<a href="/{$page.params.library}/public">Books</a>
+			</li>
+			<li
+				aria-current={$page.url.pathname.includes('/about') ? 'page' : undefined}
+				class="mx-2 mx-md-4"
+			>
+				<a class="mx-2 mx-md-4" href="/{$page.params.library}/about">About</a>
+			</li>
+			{/if}
 		</ul>
 	</nav>
 </header>

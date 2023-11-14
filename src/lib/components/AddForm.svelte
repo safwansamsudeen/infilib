@@ -2,7 +2,7 @@
 	import Input from '$lib/components/Input.svelte';
 	import { enhance } from '$app/forms';
 	import { capitalize, setBookDetails } from '$lib/helpers.js';
-	import Scanner from '../../routes/items/Scanner.svelte';
+	import Scanner from '$lib/components/Scanner.svelte';
 	import { page } from '$app/stores';
 
 	export let columns,
@@ -30,6 +30,7 @@
 </div>
 {#if addFormVisible || !addTogglable}
 	{#if Object.keys(inputColumns).length !== 0 && addTogglable}
+		<!-- For different types of books -->
 		<div class="d-grid gap-2">
 			<div class="btn-group" role="group">
 				{#each Object.entries(inputColumns) as [name]}
@@ -47,7 +48,7 @@
 				{/each}
 			</div>
 		</div>
-	{:else if !addTogglable}
+	{:else if !addTogglable && type}
 		<input type="hidden" name="type" bind:value={type} form="{action}-form" />
 	{/if}
 	{#if scanner}

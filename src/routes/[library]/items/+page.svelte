@@ -13,12 +13,12 @@
 </script>
 
 <svelte:head>
-	<title>Users</title>
+	<title>Items</title>
 	<meta content="View, edit, and manage all the items in your library." name="description" />
 </svelte:head>
 
 <div class="text-column text-center">
-	<h1>Manage Users</h1>
+	<h1>Manage Items</h1>
 </div>
 
 <body>

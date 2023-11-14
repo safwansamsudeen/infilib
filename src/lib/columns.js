@@ -1,12 +1,20 @@
+/*
+FILE FOR MANAGING COLUMNS
+This file is the JSON version of the Prisma schema.
+Based on the contents here, forms will be generated, validation will be ensured, and DB creation/updates will be managed.
+Handle with care.
+*/
+
 import { capitalize, date } from '$lib/helpers.js';
 import { author, category, language, publisher, gender, user, item } from '$lib/db.js';
 
 function normalize(fn) {
+	// I have next to no idea what this monolith is doing but I'm sure it's crucial
 	return async function (...args) {
 		let res = await fn(...args);
 		if (Array.isArray(res[0])) {
 			return [
-				res[0].map(({ name, important, required, ...data }) => {
+				res[0].map(({ name, important, ...data }) => {
 					return {
 						...data,
 						name: name || capitalize(data.id),
@@ -25,7 +33,7 @@ function normalize(fn) {
 				)
 			];
 		}
-		return res.map(({ name, important, required, ...data }) => {
+		return res.map(({ name, important, ...data }) => {
 			return {
 				...data,
 				name: name || capitalize(data.id),
@@ -62,6 +70,17 @@ export const getUserColumns = normalize(async function () {
 	];
 });
 
+export const getMarkColumns = normalize(async function () {
+	return [
+		{
+			id: 'item'
+		},
+		{ id: 'user', type: 'hidden' },
+		{ id: 'borrow_time', name: 'Time Of Pickup', type: 'datetime-local' },
+		{ id: 'comments', type: 'textarea', required: false }
+	];
+});
+
 export const getTransColumns = normalize(async function () {
 	const users = await user.findMany();
 	const items = await item.findMany();
@@ -86,7 +105,6 @@ export const getTransColumns = normalize(async function () {
 		},
 		{
 			id: 'item',
-			name: 'Item',
 			type: 'select',
 			opts: {
 				items: items.map(({ id, title }) => ({
@@ -103,7 +121,7 @@ export const getTransColumns = normalize(async function () {
 		{ id: 'issued_at', type: 'date' },
 		{ id: 'due_at', type: 'date' },
 		{ id: 'returned_at', type: 'date', hidden: true },
-		{ id: 'comments', type: 'textarea' }
+		{ id: 'comments', type: 'textarea', required: false }
 	];
 	return res;
 });

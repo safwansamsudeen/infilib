@@ -2,11 +2,9 @@ import { item } from '$lib/db.js';
 import { pojoData, response } from '$lib/serverHelpers.js';
 import { fail } from '@sveltejs/kit';
 import { getItemColumns } from '$lib/columns.js';
-import { standardizeSelects } from '$lib/helpers.js';
+import { standardizeSelects, flatten } from '$lib/helpers.js';
 import { parseProperties } from '$lib/validators.js';
-function flatten(records, type) {
-	records.map((rec) => Object.entries(rec[type]).map(([key, value]) => (rec[key] = value)));
-}
+
 
 export async function load({ url }) {
 	let params = {};

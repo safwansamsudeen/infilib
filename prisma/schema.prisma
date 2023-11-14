@@ -10,12 +10,26 @@ generator client {
 }
 
 // People
+model Library {
+  slug             String             @id
+  name             String             @unique
+  address          String
+  administrator_id Int
+  administrator    User               @relation(name: "administrator", fields: [administrator_id], references: [id])
+  members          User[]             @relation("members")
+  UserSubscription UserSubscription[]
+  items            Item[]
+}
+
 model UserSubscription {
-  id     Int    @id @default(autoincrement())
-  name   String @unique
-  length Int
-  price  Int
-  users  User[]
+  id           Int     @id @default(autoincrement())
+  library      Library @relation(fields: [librarySlug], references: [slug])
+  name         String  @unique
+  no_of_days   Int
+  no_of_books  Int
+  annual_price Int
+  users        User[]
+  librarySlug  String
 }
 
 model Gender {
@@ -27,16 +41,16 @@ model Gender {
 model User {
   id              Int               @id
   name            String
-  email_address   String
-  password        String
+  email_address   String            @unique
   gender_code     String
   gender          Gender            @relation(fields: [gender_code], references: [code])
   details         String?
-  is_admin        Boolean
   subscribtion_id Int?
   subscription    UserSubscription? @relation(fields: [subscribtion_id], references: [id])
   transactions    Transaction[]
   marks           Mark[]
+  libraries       Library[]         @relation("administrator")
+  subscriptions   Library[]         @relation("members")
 }
 
 // Book records
@@ -105,7 +119,10 @@ model Item {
   no_of_pages      Int
   purchase_price   Int
   purchase_details String?
+  library_slug     String
+  library          Library       @relation(fields: [library_slug], references: [slug])
   level            String?
+  image_url        String?
   remarks          String?
   book             Book?
   magazine         Magazine?
@@ -123,6 +140,7 @@ model Transaction {
   issued_at   DateTime
   due_at      DateTime
   returned_at DateTime?
+  deleted     Boolean   @default(false)
   price       Int?
   fine        Int?
   comments    String?
@@ -133,6 +151,7 @@ model Mark {
   item_id     Int      @unique
   user_id     Int
   user        User     @relation(fields: [user_id], references: [id])
-  item        Item     @relation(fields: [id], references: [id])
+  item        Item     @relation(fields: [item_id], references: [id])
+  comments    String?
   borrow_time DateTime
 }

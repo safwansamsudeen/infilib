@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
+	import {page} from '$app/stores';
 
 	export let promise, data, columns;
 	import { enhance } from '$app/forms';
@@ -72,7 +73,7 @@
 				</form>
 			{/if}
 			<form
-				action="/circulation?/delete"
+				action="/{$page.params.library}/circulation?/delete"
 				method="POST"
 				class="d-none"
 				id="{id}-delete-form"
