@@ -4,10 +4,10 @@
 </script>
 
 <svelte:head>
-	<title>Borrow {data.item.title}</title>
+	<title>Borrow {data.item?.title || ''}</title>
 </svelte:head>
 <div class="text-column text-center">
-	<h1>Borrowing <em>{data.item.title}</em></h1>
+	<h1>{data.user?.name || ''} Borrowing <em>{data.item?.title || ''}</em></h1>
 </div>
 
 <body>

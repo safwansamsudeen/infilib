@@ -14,7 +14,7 @@ function normalize(fn) {
 		let res = await fn(...args);
 		if (Array.isArray(res[0])) {
 			return [
-				res[0].map(({ name, important, required, ...data }) => {
+				res[0].map(({ name, important, ...data }) => {
 					return {
 						...data,
 						name: name || capitalize(data.id),
@@ -33,7 +33,7 @@ function normalize(fn) {
 				)
 			];
 		}
-		return res.map(({ name, important, required, ...data }) => {
+		return res.map(({ name, important, ...data }) => {
 			return {
 				...data,
 				name: name || capitalize(data.id),
@@ -77,7 +77,7 @@ export const getMarkColumns = normalize(async function () {
 		},
 		{ id: 'user', type: 'hidden' },
 		{ id: 'borrow_time', name: 'Time Of Pickup', type: 'datetime-local' },
-		{ id: 'comments', type: 'textarea', important: false }
+		{ id: 'comments', type: 'textarea', required: false }
 	];
 });
 
@@ -121,7 +121,7 @@ export const getTransColumns = normalize(async function () {
 		{ id: 'issued_at', type: 'date' },
 		{ id: 'due_at', type: 'date' },
 		{ id: 'returned_at', type: 'date', hidden: true },
-		{ id: 'comments', type: 'textarea' }
+		{ id: 'comments', type: 'textarea', required: false }
 	];
 	return res;
 });

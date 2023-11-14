@@ -38,7 +38,6 @@ export const actions = {
 			(await getUserColumns()).filter(({ id }) => id !== 'id')
 		);
 		if (check) return new fail(400, check);
-		console.log(data);
 		return response(async () => {
 			await user.update({
 				where: { id: +params.id },

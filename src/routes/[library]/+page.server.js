@@ -12,11 +12,13 @@ export async function load({ params }) {
 	});
 	marks = marks.map(
 		({
+			id,
 			comments,
 			borrow_time,
 			item: { id: book_id, title, call_no },
 			user: { id: user_id, name }
 		}) => ({
+			id,
 			comments,
 			borrow_time: date(borrow_time, true, true),
 			user: `${user_id} ${name}`,
@@ -24,7 +26,6 @@ export async function load({ params }) {
 		})
 	);
 	const markColumns = getMarkColumns();
-	console.log(marks);
 	return {
 		columns: markColumns,
 		marks

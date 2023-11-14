@@ -5,19 +5,20 @@
 </script>
 
 <svelte:head>
-	<title>Admin Panel - Home</title>
-	<meta content="Admin Panel - Home" name="description" />
+	<title>Home</title>
+	<meta content="Home" name="description" />
 </svelte:head>
+{#if data.user.admin}
 
 <div class="text-column text-center">
-	<h1>Manage Members</h1>
+	<h1>Welcome to the Admin Panel</h1>
 </div>
 
 <body>
 	<div class="container">
 		{#key data}
 			<Table
-				actions={[['Details', 'members']]}
+				actions={[['Pop', 'circulation/mark']]}
 				columns={data.columns}
 				data={data.marks}
 				updateUrl="members"
@@ -25,3 +26,4 @@
 		{/key}
 	</div>
 </body>
+{/if}

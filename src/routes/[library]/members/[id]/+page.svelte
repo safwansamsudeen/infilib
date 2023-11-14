@@ -15,7 +15,7 @@
 <body>
 	<div class="container">
 		<div class="d-grid gap-2 my-4" role="group">
-			<a class="btn btn-outline-success" href="/circulation/borrow/all?user={data.user.id}"
+			<a class="btn btn-outline-success" href="/{$page.params.library}/circulation/borrow/any?user={data.user.id}"
 				>Borrow</a
 			>
 			<form
