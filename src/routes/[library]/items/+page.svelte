@@ -6,10 +6,10 @@
 
 	export let data;
 
-	let publishers = findValue(data.columns, 'publisher').items,
-		authors = findValue(data.columns, 'authors')?.items,
-		categories = findValue(data.columns, 'categories').items,
-		languages = findValue(data.columns, 'languages').items;
+	let publishers = findValue(data.columns, 'publisher').opts.items,
+		authors = findValue(data.columns, 'authors')?.opts.items || [],
+		categories = findValue(data.columns, 'categories').opts.items,
+		languages = findValue(data.columns, 'languages').opts.items;
 </script>
 
 <svelte:head>
@@ -54,6 +54,7 @@
 				columns={data.columns}
 				promise={data.items}
 				updateUrl="items"
+				idColumn="acc_no"
 			/>
 		{/key}
 	</div>

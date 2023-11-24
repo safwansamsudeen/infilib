@@ -1,105 +1,88 @@
 <script>
 	import { page } from '$app/stores';
-	export let admin;
+	export let admin, library;
 </script>
 
 <header>
-	<nav>
-		<ul>
-			<li
-				aria-current={$page.url.pathname.split('/').length === 2 ? 'page' : undefined}
-				class="mx-3 mx-md-4"
+	<nav class="navbar bg-body-tertiary navbar-expand-md w-100">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="/{$page.params.library}">{library}</a>
+			<button
+				aria-controls="offcanvasNavbar"
+				aria-label="Toggle navigation"
+				class="navbar-toggler"
+				data-bs-target="#offcanvasNavbar"
+				data-bs-toggle="offcanvas"
+				type="button"
 			>
-				<a href="/{$page.params.library}">Home</a>
-			</li>
-			{#if admin}
-			<li
-				aria-current={$page.url.pathname.includes('/members') ? 'page' : undefined}
-				class="mx-2 mx-md-4"
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div
+				aria-labelledby="offcanvasNavbarLabel"
+				class="offcanvas offcanvas-end"
+				id="offcanvasNavbar"
+				tabindex="-1"
 			>
-				<a href="/{$page.params.library}/members">Members</a>
-			</li>
-			<li
-				aria-current={$page.url.pathname.includes('/items') ? 'page' : undefined}
-				class="mx-2 mx-md-4"
-			>
-				<a class="mx-2 mx-md-4" href="/{$page.params.library}/items">Items</a>
-			</li>
-			<li aria-current={$page.url.pathname.includes('/circulation') ? 'page' : undefined}>
-				<a href="/{$page.params.library}/circulation">Circulate</a>
-			</li>
-				{:else}
-			<li
-				aria-current={$page.url.pathname.includes('/public') ? 'page' : undefined}
-				class="mx-2 mx-md-4"
-			>
-				<a href="/{$page.params.library}/public">Books</a>
-			</li>
-			<li
-				aria-current={$page.url.pathname.includes('/about') ? 'page' : undefined}
-				class="mx-2 mx-md-4"
-			>
-				<a class="mx-2 mx-md-4" href="/{$page.params.library}/about">About</a>
-			</li>
-			{/if}
-		</ul>
+				<div class="offcanvas-header">
+					<h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
+					<button aria-label="Close" class="btn-close" data-bs-dismiss="offcanvas" type="button"></button>
+				</div>
+				<div class="offcanvas-body">
+					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+						<li class="nav-item">
+							<a
+								class="nav-link {$page.url.pathname.split('/').length === 2 ? 'active' : ''}"
+								href="/{$page.params.library}">Home</a
+							>
+						</li>
+						{#if admin}
+							<li class="nav-item">
+								<a
+									class="nav-link {$page.url.pathname.includes('/members') ? 'active' : ''}"
+									href="/{$page.params.library}/members">Members</a
+								>
+							</li>
+							<li class="nav-item">
+								<a
+									class="nav-link {$page.url.pathname.includes('/items') ? 'active' : ''}"
+									href="/{$page.params.library}/items">Items</a
+								>
+							</li>
+							<li class="nav-item">
+								<a
+									class="nav-link {$page.url.pathname.includes('/circulation') ? 'active' : ''}"
+									href="/{$page.params.library}/circulation">Circulate</a
+								>
+							</li>
+							<li class="nav-item">
+								<a
+									class="nav-link {$page.url.pathname.includes('/settings') ? 'active' : ''}"
+									href="/{$page.params.library}/settings">Settings</a
+								>
+							</li>
+						{:else}
+							<li
+								class="nav-item"
+							>
+								<a class="nav-link {$page.url.pathname.includes('/public') ? 'active' : ''}" href="/{$page.params.library}/public">Books</a>
+							</li>
+							<li
+								class="nav-item"
+							>
+								<a class="nav-link {$page.url.pathname.includes('/about') ? 'active' : ''}" href="/{$page.params.library}/about">About</a>
+							</li>
+						{/if}
+					</ul>
+				</div>
+			</div>
+		</div>
 	</nav>
 </header>
 
 <style>
-	header {
-		display: flex;
-		justify-content: space-between;
-	}
-
-	nav {
-		width: 100%;
-		display: flex;
-		justify-content: center;
-		--background: rgba(255, 255, 255, 0.7);
-	}
-
-	ul {
-		position: relative;
-		padding: 0;
-		margin: 0;
-		height: 3em;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		list-style: none;
-		background: var(--background);
-		background-size: contain;
-	}
-
-	li {
-		position: relative;
-		height: 100%;
-	}
-
-	li[aria-current='page']::before {
-		--size: 6px;
-		content: '';
-		width: 0;
-		height: 0;
-		position: absolute;
-		top: 0;
-		left: calc(50% - var(--size));
-		border: var(--size) solid transparent;
-		border-top: var(--size) solid black;
-	}
-
-	nav a {
-		display: flex;
-		height: 100%;
-		align-items: center;
-		color: black;
-		font-weight: 700;
-		font-size: 0.8rem;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		text-decoration: none;
-		transition: color 0.2s linear;
+	.nav-item {
+		letter-spacing: 0.02em;
+		margin: 0 0.5rem;
 	}
 
 	a:hover {

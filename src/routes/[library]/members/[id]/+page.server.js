@@ -1,4 +1,4 @@
-import { transaction, user } from '$lib/db.js';
+import { transaction, user, userSubscription } from '$lib/db.js';
 import { standardizeSelects } from '$lib/helpers.js';
 import { pojoData, response } from '$lib/serverHelpers.js';
 import { parseProperties } from '$lib/validators.js';
@@ -7,14 +7,20 @@ import { getTransColumns, getUserColumns } from '$lib/columns.js';
 
 export async function load({ params }) {
 	const user_obj = await user.findUnique({
-		where: { id: +params.id },
-		include: { gender: true }
+		where: {
+			id: +params.id,
+			subscriptions: { some: { library_slug: { equals: params.library } } }
+		},
+		include: { gender: true, subscriptions: true }
 	});
 	const transColumns = (await getTransColumns()).filter(({ id }) => id !== 'user');
 	const userColumns = await getUserColumns();
 
 	const transactions = await transaction.findMany({
-		where: { user_id: +params.id },
+		where: {
+			user_id: +params.id
+			// subscriptions: { some: { library_slug: { equals: params.library } } }
+		},
 		include: { item: true }
 	});
 	standardizeSelects(transactions, transColumns);
@@ -47,10 +53,19 @@ export const actions = {
 	},
 	delete: async ({ params }) => {
 		try {
-			await user.delete({ where: { id: +params.id } });
+			// TODO: deactivate subscription instead
+			const subscription = await userSubscription.findFirst({
+				where: { library_slug: params.library, users: { some: { id: +params.id } } }
+			});
+			console.log(subscription);
+			await user.update({
+				where: { id: +params.id },
+				data: { subscriptions: { disconnect: { id: subscription.id } } }
+			});
 		} catch (error) {
+			console.log(error);
 			return fail(400, { error: error.message });
 		}
-		throw redirect(302, '/users');
+		throw redirect(302, `/${params.library}/members`);
 	}
 };

@@ -32,8 +32,8 @@ export function standardizeSelects(records, columns, date_format = 'DD/MM/YYYY')
 									label: subRecord[opts.unpacking.label]
 							  }))
 							: {
-									value: record[id][opts.unpacking.value],
-									label: record[id][opts.unpacking.label]
+									value: record[id]?.[opts.unpacking.value],
+									label: record[id]?.[opts.unpacking.label]
 							  })
 			);
 		}
@@ -46,7 +46,6 @@ export function standardizeSelects(records, columns, date_format = 'DD/MM/YYYY')
 export function setSelectField(id, items, newValue, multi = false) {
 	let value = multi ? [] : {};
 	let foundItems;
-
 	// Add new value(s) to item list
 	if (multi) {
 		for (let expectedValue of newValue) {
@@ -69,17 +68,15 @@ export function setSelectField(id, items, newValue, multi = false) {
 	}
 
 	// Empty component
-	document.querySelector(`#${id}-div`).innerHTML = '';
 
+	document.querySelector(`#${id}-div`).innerHTML = '';
 	// Rerender component
 	new Input({
 		target: document.querySelector(`#${id}-div`),
 		props: {
 			id: id,
-			items,
 			type: 'select',
-			opts: { value },
-			multiple: multi,
+			opts: { value, items, multiple: multi },
 			important: true
 		}
 	});

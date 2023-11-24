@@ -82,7 +82,7 @@
 				The "{$page.form.name}" field does not have a valid value: {$page.form.value}
 			</p>{/if}
 		{#if $page.form?.error}<p class="alert alert-danger">
-				An error was raised! Did you give an ID that already exists?
+				An error was raised! Did you give a duplicate value for a unique field?
 			</p>{/if}
 		<div class="row g-3">
 			{#each columns as column}

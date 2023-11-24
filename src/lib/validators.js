@@ -19,6 +19,10 @@ export function parseProperties(obj, columns, clean = false) {
 		if (important && obj[id] === null) {
 			return { name, missing: true };
 		}
+		if (!important && obj[id]?.length === 0) {
+			obj[id] = undefined;
+			continue;
+		}
 		try {
 			if (!clean && ['select', 'number'].includes(type)) {
 				obj[id] = JSON.parse(obj[id] || '[]');
@@ -33,7 +37,7 @@ export function parseProperties(obj, columns, clean = false) {
 							connectOrCreate: obj[id].map(({ value, label }) => {
 								return {
 									where: {
-										[opts.unpacking.value]: value || 0,
+										// [opts.unpacking.value]: value,
 										[opts.unpacking.label]: label
 									},
 									create: {
@@ -48,7 +52,7 @@ export function parseProperties(obj, columns, clean = false) {
 						obj[id] = {
 							connectOrCreate: {
 								where: {
-									[opts.unpacking.value]: value || 0,
+									// [opts.unpacking.value]: value || 0,
 									[opts.unpacking.label]: label
 								},
 								create: {
@@ -86,7 +90,6 @@ export function parseProperties(obj, columns, clean = false) {
 				obj[id] = new Date(obj[id]);
 			}
 		} catch (error) {
-			console.log(error);
 			return { name, value: obj[id], incorrect: true, error: error.message };
 		}
 	}

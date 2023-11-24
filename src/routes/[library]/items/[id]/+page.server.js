@@ -1,5 +1,5 @@
 import { item, transaction } from '$lib/db.js';
-import { pojoData, response } from '$lib/serverHelpers.js';
+import { findOr404, pojoData, response } from '$lib/serverHelpers.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { standardizeSelects } from '$lib/helpers.js';
 import { getItemColumns, getTransColumns } from '$lib/columns.js';
@@ -10,7 +10,7 @@ function flatten(records, type) {
 }
 
 export async function load({ params }) {
-	let item_obj = await item.findUnique({
+	let item_obj = await findOr404(item, {
 		where: { id: +params.id },
 		include: {
 			book: { include: { authors: true } },
@@ -71,9 +71,9 @@ export const actions = {
 		}, true);
 	},
 	delete: async ({ params }) => {
-		return await response(async () => {
-			await item.delete({ where: { acc_no: +params.id } });
-			throw redirect(301, '/items');
+		await response(async () => {
+			await item.delete({ where: { id: +params.id } });
 		});
+		throw redirect(301, `/${params.library}/items`);
 	}
 };

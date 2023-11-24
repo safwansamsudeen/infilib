@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import {page} from '$app/stores';
+	import { page } from '$app/stores';
 
 	export let promise, data, columns;
 	import { enhance } from '$app/forms';
@@ -62,7 +62,7 @@
 		{#each data as { id, returned_at, comments }}
 			{#if returned_at === 'Invalid Date'}
 				<form
-					action="/circulation?/return"
+					action="/{$page.params.library}/circulation?/return"
 					method="POST"
 					class="d-none"
 					id="{id}-return-form"

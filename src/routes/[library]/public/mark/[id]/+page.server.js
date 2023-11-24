@@ -11,7 +11,7 @@ export async function load({ params }) {
 		throw redirect(303, `/${params.library}/public/`);
 	}
 	return {
-		item_name: item_obj.name,
+		item_name: item_obj.title,
 		columns: (await getMarkColumns()).map((column) =>
 			column.id === 'item'
 				? { ...column, opts: { ...column.opts, disabled: true, value: item_obj.title } }

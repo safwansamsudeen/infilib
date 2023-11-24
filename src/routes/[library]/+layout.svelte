@@ -4,7 +4,7 @@
 </script>
 
 <div class="app">
-	<Header admin={data.user.admin}/>
+	<Header admin={data.user?.admin} library={data.library_name} />
 	<main style="max-width: 85%;">
 		<slot />
 	</main>

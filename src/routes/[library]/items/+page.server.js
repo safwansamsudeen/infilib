@@ -5,12 +5,11 @@ import { getItemColumns } from '$lib/columns.js';
 import { standardizeSelects, flatten } from '$lib/helpers.js';
 import { parseProperties } from '$lib/validators.js';
 
-
-export async function load({ url }) {
-	let params = {};
+export async function load({ url, params }) {
 	const [columns, others] = await getItemColumns();
 	let itemColumns = columns;
 
+	let where = { library_slug: params.library };
 	let include = {
 		publisher: true,
 		categories: true,
@@ -20,7 +19,7 @@ export async function load({ url }) {
 	for (let [key, val] of url.searchParams.entries()) {
 		if (key === 'show') {
 			if (Object.keys(others).includes(val)) {
-				params[val] = { isNot: null };
+				where[val] = { isNot: null };
 				include[val] = {
 					include: Object.fromEntries(
 						others[val].filter(({ type }) => type === 'select').map(({ id }) => [id, true])
@@ -39,7 +38,7 @@ export async function load({ url }) {
 			data: new Promise(async (fulfil) => {
 				let items = await item.findMany({
 					include,
-					where: params
+					where
 				});
 				type && flatten(items, type);
 				standardizeSelects(items, itemColumns);
@@ -50,15 +49,16 @@ export async function load({ url }) {
 }
 
 export const actions = {
-	create: async function ({ request }) {
+	create: async function ({ request, params }) {
 		return response(async () => {
 			let requestData = await pojoData(request);
+			delete requestData['id'];
 			const type = requestData.type;
 			const [columns, others] = await getItemColumns();
 			const joinedColumns = columns.concat(others[type]);
 			let check = parseProperties(requestData, joinedColumns);
 			if (check) return new fail(400, check);
-			let data = {};
+			let data = { library: { connect: { slug: params.library } } };
 			for (let { id } of columns) data[id] = requestData[id];
 			let shootOff = {};
 			for (let { id } of others[type]) shootOff[id] = requestData[id];

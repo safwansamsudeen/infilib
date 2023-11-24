@@ -8,7 +8,7 @@
 
 <svelte:head>
 	<title>Manage: {data.item.title}</title>
-	<meta name="description" content="View all the users, and manage them." />
+	<meta content="View all the users, and manage them." name="description" />
 </svelte:head>
 <div class="text-column text-center">
 	<h1>Manage: <em>{data.item.title}</em></h1>
@@ -17,12 +17,12 @@
 	<div class="container">
 		<div class="d-grid gap-2 my-4" role="group">
 			{#if data.item.status === 'IN' && !data.item.reference}
-				<a class="btn btn-outline-success" href="/circulation/borrow/{data.item.id}">Borrow</a>
+				<a class="btn btn-outline-success" href="/{$page.params.library}/circulation/borrow/{data.item.id}">Borrow</a>
 			{/if}
 			<form
 				action="?/delete"
-				on:submit={() => confirm('Are you sure you want to delete this user?')}
 				method="POST"
+				on:submit={() => confirm('Are you sure you want to delete this item?')}
 			>
 				<button class="btn btn-outline-danger w-100" type="submit">Delete</button>
 			</form>
@@ -37,8 +37,8 @@
 				action="update"
 				addTogglable={false}
 				columns={data.columns}
-				type={data.type}
 				inputColumns={data.inputColumns}
+				type={data.type}
 			/>
 
 			<h3 class="text-center">Borrowed</h3>

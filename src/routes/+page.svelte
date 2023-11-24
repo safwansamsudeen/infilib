@@ -1,11 +1,23 @@
 <svelte:head>
 	<title>Home</title>
 </svelte:head>
+<script>
+	export let data;
+</script>
 
 <section>
 	<h1>InfiLib</h1>
 
-	<h2>Library Management Software</h2>
+	<h2>The fast, beautiful, and user-friendly library software.</h2>
+	<div class="my-5">
+
+	<h5>Libraries currently using InfiLib:</h5>
+		<ul>
+		{#each data.libraries as library}
+			<li><a href="/{library.slug}">{library.name}</a></li>
+		{/each}
+			</ul>
+	</div>
 </section>
 
 <style>

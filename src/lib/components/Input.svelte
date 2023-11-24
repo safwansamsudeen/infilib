@@ -14,7 +14,7 @@
 {#if type === 'hidden' || hidden}
 	<input {id} name={id} {required} type="hidden" value={opts.value} />
 {:else}
-	<div class="col-md-{important ? '6' : '3'}" id="{id}-div">
+	<div class="col-md-{required ? '6' : '3'}" id="{id}-div">
 		{#if type === 'select'}
 			<label for={id}>{name}</label>
 			<CustomSelect {id} {required} {...opts} />

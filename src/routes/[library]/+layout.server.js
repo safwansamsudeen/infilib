@@ -17,12 +17,13 @@ export async function load({ cookies, params, url }) {
 			email_address: user_obj?.email_address || '',
 			id: user_obj?.id,
 			admin: library_obj.administrator_id === user_obj?.id
-		}
+		},
+		library_name: library_obj.name
 	};
 	const subRoute = url.pathname.split('/')[2];
 	// Check that the signed in user is the administrator
 	if (subRoute && subRoute !== 'public' && !data.user.admin) {
-		throw error(404, 'Not Authorized');
+		throw error(403, 'Not Authorized');
 	}
 	return data;
 }

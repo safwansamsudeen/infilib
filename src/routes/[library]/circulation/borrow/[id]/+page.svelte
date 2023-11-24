@@ -12,6 +12,7 @@
 
 <body>
 	<div class="container">
+		<input form="borrow-form" name="mark_id" type="hidden" value="{data.mark_id}">
 		<AddForm action="borrow" addTogglable={false} columns={data.columns} />
 	</div>
 	<script>

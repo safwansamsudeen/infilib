@@ -6,7 +6,16 @@ Handle with care.
 */
 
 import { capitalize, date } from '$lib/helpers.js';
-import { author, category, language, publisher, gender, user, item } from '$lib/db.js';
+import {
+	author,
+	category,
+	language,
+	publisher,
+	gender,
+	user,
+	item,
+	userSubscription
+} from '$lib/db.js';
 
 function normalize(fn) {
 	// I have next to no idea what this monolith is doing but I'm sure it's crucial
@@ -45,6 +54,7 @@ function normalize(fn) {
 
 export const getUserColumns = normalize(async function () {
 	const genders = await gender.findMany();
+	const subscriptions = await userSubscription.findMany();
 	return [
 		{ id: 'id', name: 'ID', type: 'number' },
 		{ id: 'name' },
@@ -64,7 +74,25 @@ export const getUserColumns = normalize(async function () {
 				}
 			}
 		},
-
+		{
+			id: 'subscriptions',
+			name: 'Subscription',
+			type: 'select',
+			important: true,
+			opts: {
+				multiple: true,
+				uiSingle: true,
+				creatable: false,
+				items: subscriptions.map(({ id, name }) => ({
+					value: id,
+					label: name
+				})),
+				unpacking: {
+					value: 'id',
+					label: 'name'
+				}
+			}
+		},
 		{ id: 'details' },
 		{ id: 'email_address', type: 'email' }
 	];
@@ -81,9 +109,23 @@ export const getMarkColumns = normalize(async function () {
 	];
 });
 
+export const getSubscriptionColumns = normalize(async function () {
+	return [
+		{
+			id: 'name'
+		},
+		{ id: 'no_of_days', type: 'number' },
+		{ id: 'no_of_books', type: 'number' },
+		{ id: 'deposit', type: 'number' },
+		{ id: 'annual_price', type: 'number', important: false },
+		{ id: 'half_yearly_price', type: 'number', important: false }
+	];
+});
+
 export const getTransColumns = normalize(async function () {
 	const users = await user.findMany();
 	const items = await item.findMany();
+	const subscriptions = await userSubscription.findMany();
 
 	let res = [
 		{ id: 'id', type: 'hidden' },
@@ -121,7 +163,21 @@ export const getTransColumns = normalize(async function () {
 		{ id: 'issued_at', type: 'date' },
 		{ id: 'due_at', type: 'date' },
 		{ id: 'returned_at', type: 'date', hidden: true },
-		{ id: 'comments', type: 'textarea', required: false }
+		{
+			id: 'subscription',
+			type: 'select',
+			opts: {
+				items: subscriptions.map(({ id, name }) => ({ value: id, label: name })),
+				creatable: false,
+				unpacking: {
+					value: 'id',
+					label: 'name'
+				}
+			},
+			important: true
+		},
+		{ id: 'price', type: 'number', important: true },
+		{ id: 'comments', type: 'textarea', important: false }
 	];
 	return res;
 });
@@ -133,7 +189,8 @@ export const getItemColumns = normalize(async function () {
 	const languages = await language.findMany();
 
 	const columns = [
-		{ id: 'id', name: 'Acc. No.', type: 'number' },
+		{ id: 'id', name: 'Internal ID', type: 'hidden', important: false },
+		{ id: 'acc_no', name: 'Acc. No.', type: 'number', important: false, required: true },
 		{ id: 'call_no', type: 'number', opts: { step: 0.01 } },
 		{ id: 'title' },
 		{ id: 'status', type: 'hidden', opts: { value: 'IN', readOnly: true } },
@@ -165,6 +222,10 @@ export const getItemColumns = normalize(async function () {
 		},
 		{ id: 'no_of_pages', type: 'number' },
 		{
+			id: 'purchase_price',
+			type: 'number'
+		},
+		{
 			id: 'languages',
 			type: 'select',
 			opts: {
@@ -177,19 +238,15 @@ export const getItemColumns = normalize(async function () {
 			},
 			important: false
 		},
-		{
-			id: 'purchase_price',
-			type: 'number',
-			important: false
-		},
+
 		{ id: 'purchase_details', important: false },
+		{ id: 'image_url', important: false },
 		{ id: 'level', important: false },
 		{ id: 'remarks', type: 'textarea', important: false },
 		{ id: 'reference', type: 'checkbox' }
 	];
 	const others = {
 		book: [
-			{ id: 'subtitle', important: false },
 			{
 				id: 'authors',
 				type: 'select',
@@ -203,6 +260,7 @@ export const getItemColumns = normalize(async function () {
 				}
 			},
 			{ id: 'isbn', type: 'text', name: 'ISBN' },
+			{ id: 'subtitle', important: false },
 			{ id: 'publication_year', type: 'number', name: 'Year Published', important: false },
 			{ id: 'edition', important: false }
 		],

@@ -3,8 +3,8 @@
 	import Toast from '$lib/components/Toast.svelte';
 	import { page } from '$app/stores';
 
-	export let promise,
-		data,
+	export let promise = null,
+		data = null,
 		columns,
 		updateUrl = '',
 		hiddenColumns = columns
@@ -16,6 +16,7 @@
 		actions = [],
 		actionButtonsFunc = null,
 		afterChangeFunc = null,
+			idColumn='id',
 		table = null;
 
 	const columnMap = {
@@ -61,7 +62,7 @@
 				}
 				html =
 					html +
-					`<a type="button" class="btn btn-outline-primary" href="/${$page.params.library}/${url}/${data[row].id}">${label}</a>`;
+					`<a type="button" class="btn btn-outline-primary" href="/${$page.params.library}/${url}${url.endsWith('=') ? '' : '/'}${data[row].id}">${label}</a>`;
 			}
 			td.innerHTML = html + '</div>';
 		}
@@ -71,7 +72,7 @@
 			licenseKey: 'non-commercial-and-evaluation',
 			colHeaders: columnHeaders.concat(['Actions']),
 			rowHeaders: function (index) {
-				return data[index].id;
+				return data[index][idColumn];
 			},
 			stretchH: 'all',
 			width: '100%',
@@ -115,7 +116,7 @@
 									new Toast({
 										target: document.querySelector('.toast-container'),
 										props: {
-											msg: `Error updating "${property}" of ${data[row].id} to ${
+											msg: `Error updating "${property}" of ${data[row][idColumn]} to ${
 												value.label ?? value
 											}.`,
 											type: 'danger'
@@ -125,7 +126,7 @@
 									new Toast({
 										target: document.querySelector('.toast-container'),
 										props: {
-											msg: `Updated "${property}" of ${data[row].id} to ${value.label ?? value}`,
+											msg: `Updated "${property}" of ${data[row][idColumn]} to ${value.label ?? value}`,
 											type: 'success'
 										}
 									});
@@ -135,7 +136,7 @@
 								new Toast({
 									target: document.querySelector('.toast-container'),
 									props: {
-										msg: `Error updating "${property}" of ${data[row].id} to ${
+										msg: `Error updating "${property}" of ${data[row][idColumn]} to ${
 											value.label ?? value
 										}.`,
 										type: 'danger'
@@ -149,11 +150,11 @@
 	});
 </script>
 
-{#if promise !== undefined}
+{#if promise !== null}
 	{#await promise.data}
 		Loading...
 	{:then data}
-		<svelte:self {actions} {columns} {data} {updateUrl} />
+		<svelte:self {actions} {columns} {data} {updateUrl} {idColumn} />
 	{:catch error}
 		{error.message}
 	{/await}
@@ -162,8 +163,6 @@
 	<div class="toast-container"></div>
 	<div class="my-4 h-50" id="table"></div>
 </div>
-
-<link
-	href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css"
-	rel="stylesheet"
-/>
+<style>
+	@import 'handsontable/dist/handsontable.full.min.css';
+</style>

@@ -18,6 +18,7 @@ export default class MultiSelectEditor extends Handsontable.editors.BaseEditor {
 				multiple: this.cellProperties.opts.multiple || false,
 				creatable: this.cellProperties.opts.creatable || true,
 				required: this.cellProperties.important,
+				uiSingle: this.cellProperties.opts.uiSingle,
 				id: cellProperties.data,
 				onChange: (value) => {
 					this.setValue(value);
@@ -51,7 +52,7 @@ export default class MultiSelectEditor extends Handsontable.editors.BaseEditor {
 }
 
 function MultiSelectRenderer(instance, td, row, col, prop, value, cellProperties) {
-	td.textContent = value.label || value.map(({ label }) => label).join(', ');
+	td.textContent = value.label || value.map(({ label }) => label).join?.(', ') || '';
 }
 
 Handsontable.renderers.registerRenderer('MultiSelectRenderer', MultiSelectRenderer);

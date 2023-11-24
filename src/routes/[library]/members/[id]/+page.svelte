@@ -15,8 +15,9 @@
 <body>
 	<div class="container">
 		<div class="d-grid gap-2 my-4" role="group">
-			<a class="btn btn-outline-success" href="/{$page.params.library}/circulation/borrow/any?user={data.user.id}"
-				>Borrow</a
+			<a
+				class="btn btn-outline-success"
+				href="/{$page.params.library}/circulation/borrow/any?user={data.user.id}">Borrow</a
 			>
 			<form
 				action="?/delete"

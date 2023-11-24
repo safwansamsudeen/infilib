@@ -24,7 +24,8 @@ export async function load({ url }) {
 				const transactions = await transaction.findMany({
 					include: {
 						item: true,
-						user: true
+						user: true,
+						subscription: true
 					},
 					where: params
 				});

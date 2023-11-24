@@ -13,8 +13,8 @@ export async function load({ params }) {
 		users: {
 			data: new Promise(async (fulfil) => {
 				const users = await user.findMany({
-					where: { subscriptions: { some: { slug: { equals: params.library } } } },
-					select: { id: true, name: true, email_address: true, gender: true, details: true }
+					where: { subscriptions: { some: { library_slug: { equals: params.library } } } },
+					include: { gender: true, subscriptions: true }
 				});
 				standardizeSelects(users, userColumns);
 				fulfil(users);
@@ -29,14 +29,22 @@ export const actions = {
 		let check = parseProperties(requestData, await getUserColumns());
 		if (check) return new fail(400, check);
 		return response(async () => {
-			let data = {
-				subscriptions: { connect: [{ slug: params.library }] }
-			};
+			let data = {};
 			const columns = await getUserColumns();
-			for (let { id } of columns) data[id] = requestData[id];
-			await user.create({
-				data
+			const currentUser = await user.findUnique({
+				where: { email_address: requestData.email_address }
 			});
+			if (currentUser) {
+				await user.update({
+					where: { email_address: requestData.email_address },
+					data: {
+						subscriptions: requestData.subscriptions
+					}
+				});
+			} else {
+				for (let { id } of columns) data[id] = requestData[id];
+				await user.create({ data });
+			}
 		});
 	}
 };

@@ -1,6 +1,7 @@
 <script>
 	import Table from '$lib/components/Table.svelte';
 	import AddForm from '$lib/components/AddForm.svelte';
+	import {onMount} from "svelte";
 
 	export let data;
 </script>

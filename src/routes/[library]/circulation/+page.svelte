@@ -22,8 +22,6 @@
 			class:active={$page.url.searchParams.has('due')}
 			href="?due=today">Due Today</a
 		>
-		<a class="btn btn-outline-dark" href="#">Blank</a>
-		<a class="btn btn-outline-dark" href="#">Blank</a>
 	</div>
 	<div class="grid px-0 my-3">
 		<div class="row align-items-start">

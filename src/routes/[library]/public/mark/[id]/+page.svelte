@@ -1,19 +1,20 @@
 <script>
-    import AddForm from "$lib/components/AddForm.svelte";
-    import {onMount} from "svelte";
-    import flatpickr from "flatpickr";
-    import "flatpickr/dist/themes/airbnb.css";
-    export let data
-    onMount(() => {
-        flatpickr("#time_of_pickup", {
-            enableTime: true,
-            minDate: "today",
-            maxDate: new Date().fp_incr(2),
-            minTime: "10:00",
-            maxTime: "18:00",
-        });
-    })
+	import AddForm from '$lib/components/AddForm.svelte';
+	import { onMount } from 'svelte';
+	import flatpickr from 'flatpickr';
+	import 'flatpickr/dist/themes/airbnb.css';
+	export let data;
+	onMount(() => {
+		flatpickr('#time_of_pickup', {
+			enableTime: true,
+			minDate: 'today',
+			maxDate: new Date().fp_incr(2),
+			minTime: '10:00',
+			maxTime: '18:00'
+		});
+	});
 </script>
+
 <div class="text-column text-center">
 	<h1>Mark <em>{data.item_name}</em> For Borrow</h1>
 </div>
@@ -23,5 +24,5 @@
 </svelte:head>
 
 <div class="container">
-    <AddForm action="mark" addTogglable={false} columns={data.columns} />
+	<AddForm action="mark" addTogglable={false} columns={data.columns} />
 </div>

@@ -15,21 +15,23 @@ model Library {
   name             String             @unique
   address          String
   administrator_id Int
-  administrator    User               @relation(name: "administrator", fields: [administrator_id], references: [id])
-  members          User[]             @relation("members")
-  UserSubscription UserSubscription[]
+  administrator    User               @relation(fields: [administrator_id], references: [id])
+  subscribed       UserSubscription[]
   items            Item[]
 }
 
 model UserSubscription {
-  id           Int     @id @default(autoincrement())
-  library      Library @relation(fields: [librarySlug], references: [slug])
-  name         String  @unique
-  no_of_days   Int
-  no_of_books  Int
-  annual_price Int
-  users        User[]
-  librarySlug  String
+  id                Int           @id @default(autoincrement())
+  library           Library       @relation(fields: [library_slug], references: [slug])
+  name              String        @unique
+  no_of_days        Int
+  no_of_books       Int
+  deposit           Int?
+  annual_price      Int?
+  half_yearly_price Int?
+  users             User[]
+  library_slug      String
+  Transaction       Transaction[]
 }
 
 model Gender {
@@ -39,24 +41,22 @@ model Gender {
 }
 
 model User {
-  id              Int               @id
-  name            String
-  email_address   String            @unique
-  gender_code     String
-  gender          Gender            @relation(fields: [gender_code], references: [code])
-  details         String?
-  subscribtion_id Int?
-  subscription    UserSubscription? @relation(fields: [subscribtion_id], references: [id])
-  transactions    Transaction[]
-  marks           Mark[]
-  libraries       Library[]         @relation("administrator")
-  subscriptions   Library[]         @relation("members")
+  id            Int                @id
+  name          String
+  email_address String             @unique
+  gender_code   String
+  gender        Gender             @relation(fields: [gender_code], references: [code])
+  details       String?
+  transactions  Transaction[]
+  marks         Mark[]
+  libraries     Library[]
+  subscriptions UserSubscription[]
 }
 
 // Book records
 model Author {
   id    Int    @id @default(autoincrement())
-  name  String
+  name  String @unique
   books Book[]
 }
 
@@ -68,7 +68,7 @@ model Category {
 
 model Publisher {
   id      Int     @id @default(autoincrement())
-  name    String
+  name    String  @unique
   address String?
   items   Item[]
 }
@@ -89,7 +89,7 @@ model Book {
   id               Int      @id
   subtitle         String?
   authors          Author[]
-  publication_year Int
+  publication_year Int?
   edition          String?
   isbn             String
   item             Item     @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -107,7 +107,8 @@ model Magazine {
 }
 
 model Item {
-  id               Int           @id
+  id               Int           @id @default(autoincrement())
+  acc_no           Int
   title            String
   status           String
   publisher_id     Int
@@ -132,18 +133,20 @@ model Item {
 
 // Transactions
 model Transaction {
-  id          Int       @id @default(autoincrement())
-  user_id     Int
-  item_id     Int
-  user        User      @relation(fields: [user_id], references: [id])
-  item        Item      @relation(fields: [item_id], references: [id])
-  issued_at   DateTime
-  due_at      DateTime
-  returned_at DateTime?
-  deleted     Boolean   @default(false)
-  price       Int?
-  fine        Int?
-  comments    String?
+  id              Int               @id @default(autoincrement())
+  user_id         Int
+  item_id         Int
+  user            User              @relation(fields: [user_id], references: [id])
+  item            Item              @relation(fields: [item_id], references: [id])
+  issued_at       DateTime
+  due_at          DateTime
+  returned_at     DateTime?
+  deleted         Boolean           @default(false)
+  subscription_id Int?
+  subscription    UserSubscription? @relation(fields: [subscription_id], references: [id])
+  price           Int?
+  fine            Int?
+  comments        String?
 }
 
 model Mark {
