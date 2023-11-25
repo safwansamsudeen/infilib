@@ -38,7 +38,8 @@ export async function load({ url, params }) {
 			data: new Promise(async (fulfil) => {
 				let items = await item.findMany({
 					include,
-					where
+					where,
+					cacheStrategy: { swr: 60, ttl: 60 }
 				});
 				type && flatten(items, type);
 				standardizeSelects(items, itemColumns);
