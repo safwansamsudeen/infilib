@@ -9,12 +9,13 @@ import { standardizeSelects } from '$lib/helpers.js';
 export async function load({ params }) {
 	const userColumns = await getUserColumns();
 	return {
-		columns: userColumns,
+		columns: { data: getUserColumns() },
 		users: {
 			data: new Promise(async (fulfil) => {
 				const users = await user.findMany({
 					where: { subscriptions: { some: { library_slug: { equals: params.library } } } },
-					include: { gender: true, subscriptions: true }
+					include: { gender: true, subscriptions: true },
+					cacheStrategy: { swr: 60, ttl: 60 }
 				});
 				standardizeSelects(users, userColumns);
 				fulfil(users);

@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 
-	export let promise, data, columns;
+	export let promise = undefined, data = undefined, columns;
 	import { enhance } from '$app/forms';
 	import Table from '$lib/components/Table.svelte';
 

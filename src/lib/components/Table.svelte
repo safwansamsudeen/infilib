@@ -8,11 +8,11 @@
 		columns,
 		updateUrl = '',
 		hiddenColumns = columns
-			.map(({ id, important, type }, index) =>
+			.map?.(({ id, important, type }, index) =>
 				id === 'id' || important === false || type === 'heading' ? index : false
 			)
-			.filter((x) => x !== false),
-		columnHeaders = columns.map(({ name }) => name),
+			?.filter((x) => x !== false),
+		columnHeaders = columns?.map(({ name }) => name),
 		actions = [],
 		actionButtonsFunc = null,
 		afterChangeFunc = null,

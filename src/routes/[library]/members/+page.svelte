@@ -16,14 +16,20 @@
 
 <body>
 	<div class="container">
-		<AddForm columns={data.columns} id="user"></AddForm>
-		{#key data}
-			<Table
-				actions={[['Details', 'members']]}
-				columns={data.columns}
-				promise={data.users}
-				updateUrl="members"
-			/>
-		{/key}
+		{#await data.columns.data}
+			<p>loading...</p>
+			{:then columns}
+			<AddForm id="user" columns={columns}></AddForm>
+			{#key data}
+				<Table
+					actions={[['Details', 'members']]}
+					{columns}
+					promise={data.users}
+					updateUrl="members"
+				/>
+			{/key}
+				{:catch error}
+				<p>{error.message}</p>
+		{/await}
 	</div>
 </body>
