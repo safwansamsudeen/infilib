@@ -1,6 +1,6 @@
 <script>
     export let data;
-    import AddForm from "$lib/components/AddForm.svelte";
+    import AddForm from "$lib/components/Form.svelte";
 </script>
 <svelte:head>
     <title>Library Settings</title>

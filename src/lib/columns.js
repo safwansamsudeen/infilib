@@ -5,7 +5,7 @@ Based on the contents here, forms will be generated, validation will be ensured,
 Handle with care.
 */
 
-import { capitalize, date } from '$lib/helpers.js';
+import { capitalize } from '$lib/helpers.js';
 import {
 	author,
 	category,
@@ -14,7 +14,7 @@ import {
 	gender,
 	user,
 	item,
-	userSubscription
+	subscriptionType
 } from '$lib/db.js';
 
 const CACHE_STRATEGY = { cacheStrategy: { swr: 60, ttl: 60 } };
@@ -55,7 +55,7 @@ function normalize(fn) {
 
 export const getUserColumns = normalize(async function () {
 	const genders = await gender.findMany(CACHE_STRATEGY);
-	const subscriptions = await userSubscription.findMany(CACHE_STRATEGY);
+	const subscriptions = await subscriptionType.findMany(CACHE_STRATEGY);
 	return [
 		{ id: 'id', name: 'ID', type: 'number' },
 		{ id: 'name' },
@@ -115,8 +115,8 @@ export const getSubscriptionColumns = normalize(async function () {
 		{
 			id: 'name'
 		},
-		{ id: 'no_of_days', type: 'number' },
-		{ id: 'no_of_books', type: 'number' },
+		{ id: 'no_of_days', name: 'Maximum Number of Borrowing Days', type: 'number' },
+		{ id: 'no_of_books', name: 'Maximum Number of Books', type: 'number' },
 		{ id: 'deposit', type: 'number' },
 		{ id: 'annual_price', type: 'number', important: false },
 		{ id: 'half_yearly_price', type: 'number', important: false }
@@ -126,7 +126,6 @@ export const getSubscriptionColumns = normalize(async function () {
 export const getTransColumns = normalize(async function () {
 	const users = await user.findMany(CACHE_STRATEGY);
 	const items = await item.findMany(CACHE_STRATEGY);
-	const subscriptions = await userSubscription.findMany(CACHE_STRATEGY);
 
 	let res = [
 		{ id: 'id', type: 'hidden' },
@@ -164,19 +163,6 @@ export const getTransColumns = normalize(async function () {
 		{ id: 'issued_at', type: 'date' },
 		{ id: 'due_at', type: 'date' },
 		{ id: 'returned_at', type: 'date', hidden: true },
-		{
-			id: 'subscription',
-			type: 'select',
-			opts: {
-				items: subscriptions.map(({ id, name }) => ({ value: id, label: name })),
-				creatable: false,
-				unpacking: {
-					value: 'id',
-					label: 'name'
-				}
-			},
-			important: true
-		},
 		{ id: 'price', type: 'number', important: true },
 		{ id: 'comments', type: 'textarea', important: false }
 	];
@@ -241,7 +227,7 @@ export const getItemColumns = normalize(async function () {
 		},
 
 		{ id: 'purchase_details', important: false },
-		{ id: 'image_url', important: false },
+		{ id: 'image_url', name: 'Image URL', important: false },
 		{ id: 'level', important: false },
 		{ id: 'remarks', type: 'textarea', important: false },
 		{ id: 'reference', type: 'checkbox' }

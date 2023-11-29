@@ -34,10 +34,9 @@ export function parseProperties(obj, columns, clean = false) {
 				if (opts.creatable !== false) {
 					if (opts.multiple) {
 						obj[id] = {
-							connectOrCreate: obj[id].map(({ value, label }) => {
+							connectOrCreate: obj[id].map(({ label }) => {
 								return {
 									where: {
-										// [opts.unpacking.value]: value,
 										[opts.unpacking.label]: label
 									},
 									create: {
@@ -47,12 +46,11 @@ export function parseProperties(obj, columns, clean = false) {
 							})
 						};
 					} else {
-						const { value, label } = obj[id];
+						const { label } = obj[id];
 
 						obj[id] = {
 							connectOrCreate: {
 								where: {
-									// [opts.unpacking.value]: value || 0,
 									[opts.unpacking.label]: label
 								},
 								create: {

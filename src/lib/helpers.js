@@ -20,9 +20,9 @@ export function findValue(array, key_value, key = 'id') {
 	}
 }
 
-export function standardizeSelects(records, columns, date_format = 'DD/MM/YYYY') {
+export function standardize(records, columns, date_format = 'DD/MM/YYYY') {
 	for (let { id, type, opts } of columns) {
-		if (type === 'select') {
+		if (type === 'select' && !records[0]?.[id]?.label && !records[0]?.[id]?.[0]?.label) {
 			records.map(
 				(record) =>
 					(record[id] =
@@ -114,6 +114,7 @@ export async function setBookDetails(isbn, publishers, authors, languages, categ
 	setSelectField('authors', authors, volumeInfo.authors, true);
 	setSelectField('languages', languages, [volumeInfo.language], true);
 	setSelectField('categories', categories, volumeInfo.categories, true);
+	return false;
 }
 
 export function flatten(records, type) {
@@ -129,5 +130,31 @@ export function truncate(text, totalChars = 80, endChars = 20) {
 		return start + '…' + end;
 	} else {
 		return text;
+	}
+}
+
+export function injectLibraryInSelect(data, library_slug) {
+	if (Array.isArray(data.connectOrCreate)) {
+		// Handle the case where the value is a list of objects
+		return {
+			connectOrCreate: data.connectOrCreate.map((item) => ({
+				where: item.where,
+				create: {
+					...item.create,
+					library_slug
+				}
+			}))
+		};
+	} else {
+		// Handle the case where the value is a single object
+		return {
+			connectOrCreate: {
+				where: data.connectOrCreate.where,
+				create: {
+					...data.connectOrCreate.create,
+					library_slug
+				}
+			}
+		};
 	}
 }

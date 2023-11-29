@@ -1,6 +1,6 @@
 <script>
 	import TransactionTable from '$lib/components/TransactionTable.svelte';
-	import AddForm from '$lib/components/AddForm.svelte';
+	import AddForm from '$lib/components/Form.svelte';
 	import { page } from '$app/stores';
 
 	export let data;
@@ -22,7 +22,11 @@
 			<form
 				action="?/delete"
 				method="POST"
-				on:submit={() => confirm('Are you sure you want to delete this user?')}
+				on:submit={(e) => {
+					if(!confirm('Are you sure you want to delete this item?')) {
+						e.preventDefault()
+					}
+				}}
 			>
 				<button class="btn btn-outline-danger w-100" type="submit">Delete</button>
 			</form>

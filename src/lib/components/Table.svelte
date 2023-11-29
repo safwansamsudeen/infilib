@@ -151,7 +151,7 @@
 </script>
 
 {#if promise !== null}
-	{#await promise.data}
+	{#await promise}
 		Loading...
 	{:then data}
 		<svelte:self {actions} {columns} {data} {updateUrl} {idColumn} />

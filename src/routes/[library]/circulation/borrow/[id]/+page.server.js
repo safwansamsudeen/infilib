@@ -54,6 +54,8 @@ export async function load({ params, url }) {
 					}
 				};
 			} else if (column.id === 'subscription') {
+				console.log('s', subscription, user_obj);
+
 				return {
 					...column,
 					opts: {
@@ -68,6 +70,7 @@ export async function load({ params, url }) {
 			}
 		}
 		if (column.id === 'price') {
+			console.log(subscription);
 			return {
 				...column,
 				opts: {

@@ -4,21 +4,34 @@ import { pojoData, response } from '$lib/serverHelpers.js';
 import { getUserColumns } from '$lib/columns.js';
 import { parseProperties } from '$lib/validators.js';
 import { fail } from '@sveltejs/kit';
-import { standardizeSelects } from '$lib/helpers.js';
+import { standardize } from '$lib/helpers.js';
 
 export async function load({ params }) {
-	const userColumns = await getUserColumns();
+	let library_slug = params.library;
 	return {
-		columns: { data: getUserColumns() },
-		users: {
-			data: new Promise(async (fulfil) => {
-				const users = await user.findMany({
-					where: { subscriptions: { some: { library_slug: { equals: params.library } } } },
-					include: { gender: true, subscriptions: true },
+		streamed: {
+			users: new Promise(async (res) => {
+				const userColumns = await getUserColumns();
+
+				let users = await user.findMany({
+					where: { subscriptions: { some: { library_slug } } },
+					include: { gender: true, subscriptions: { include: { type: true } } },
 					cacheStrategy: { swr: 60, ttl: 60 }
 				});
-				standardizeSelects(users, userColumns);
-				fulfil(users);
+
+				users = users.map(({ subscriptions, ...user_obj }) => ({
+					...user_obj,
+					subscriptions: subscriptions.map((subscription) => ({
+						id: subscription.type.id,
+						label: subscription.type.name
+					}))
+				}));
+				standardize(users, userColumns);
+
+				res({
+					users,
+					userColumns
+				});
 			})
 		}
 	};
@@ -27,14 +40,17 @@ export async function load({ params }) {
 export const actions = {
 	create: async function ({ request, params }) {
 		let requestData = await pojoData(request);
-		let check = parseProperties(requestData, await getUserColumns());
+		const userColumns = await getUserColumns();
+		let check = parseProperties(requestData, userColumns);
 		if (check) return new fail(400, check);
+
 		return response(async () => {
 			let data = {};
-			const columns = await getUserColumns();
 			const currentUser = await user.findUnique({
 				where: { email_address: requestData.email_address }
 			});
+			const { id: type_id } = requestData.subscriptions.connect;
+			requestData.subscriptions = { create: { type_id, library_slug: params.library } };
 			if (currentUser) {
 				await user.update({
 					where: { email_address: requestData.email_address },
@@ -43,7 +59,7 @@ export const actions = {
 					}
 				});
 			} else {
-				for (let { id } of columns) data[id] = requestData[id];
+				for (let { id } of userColumns) data[id] = requestData[id];
 				await user.create({ data });
 			}
 		});

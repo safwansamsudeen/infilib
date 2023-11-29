@@ -1,6 +1,6 @@
 <script>
 	import Table from '$lib/components/Table.svelte';
-	import AddForm from '$lib/components/AddForm.svelte';
+	import AddForm from '$lib/components/Form.svelte';
 	import {onMount} from "svelte";
 
 	export let data;
@@ -16,20 +16,20 @@
 
 <body>
 	<div class="container">
-		{#await data.columns.data}
-			<p>loading...</p>
-			{:then columns}
-			<AddForm id="user" columns={columns}></AddForm>
+		{#await data.streamed.users}
+			<p>Loading...</p>
+		{:then {userColumns, users}}
+			<AddForm id="user" columns={userColumns}></AddForm>
 			{#key data}
 				<Table
 					actions={[['Details', 'members']]}
-					{columns}
-					promise={data.users}
+					columns={userColumns}
+					data={users}
 					updateUrl="members"
 				/>
 			{/key}
-				{:catch error}
-				<p>{error.message}</p>
+		{:catch error}
+			<p>{error.message}</p>
 		{/await}
 	</div>
 </body>

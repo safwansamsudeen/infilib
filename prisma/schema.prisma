@@ -11,27 +11,44 @@ generator client {
 
 // People
 model Library {
-  slug             String             @id
-  name             String             @unique
-  address          String
-  administrator_id Int
-  administrator    User               @relation(fields: [administrator_id], references: [id])
-  subscribed       UserSubscription[]
-  items            Item[]
+  slug                    String             @id
+  name                    String             @unique
+  address                 String
+  administrator_id        Int
+  administrator           User               @relation(fields: [administrator_id], references: [id])
+  subscribed              UserSubscription[]
+  available_subscriptions SubscriptionType[]
+  items                   Item[]
+  categories              Category[]
+  languages               Language[]
+  publishers              Publisher[]
+  authors                 Author[]
 }
 
-model UserSubscription {
-  id                Int           @id @default(autoincrement())
-  library           Library       @relation(fields: [library_slug], references: [slug])
-  name              String        @unique
+model SubscriptionType {
+  id                Int                @id @default(autoincrement())
+  library           Library            @relation(fields: [library_slug], references: [slug])
+  name              String
   no_of_days        Int
   no_of_books       Int
   deposit           Int?
   annual_price      Int?
   half_yearly_price Int?
-  users             User[]
+  users             UserSubscription[]
   library_slug      String
-  Transaction       Transaction[]
+
+  @@unique([library_slug, name])
+}
+
+model UserSubscription {
+  id           Int              @id @default(autoincrement())
+  type         SubscriptionType @relation(fields: [type_id], references: [id])
+  type_id      Int
+  user         User             @relation(fields: [user_id], references: [id])
+  user_id      Int
+  transactions Transaction[]
+  library      Library?         @relation(fields: [library_slug], references: [slug])
+  library_slug String?
 }
 
 model Gender {
@@ -41,48 +58,50 @@ model Gender {
 }
 
 model User {
-  id            Int                @id
-  name          String
-  email_address String             @unique
-  gender_code   String
-  gender        Gender             @relation(fields: [gender_code], references: [code])
-  details       String?
-  transactions  Transaction[]
-  marks         Mark[]
-  libraries     Library[]
-  subscriptions UserSubscription[]
+  id              Int                @id
+  name            String
+  email_address   String             @unique
+  gender_code     String
+  gender          Gender             @relation(fields: [gender_code], references: [code])
+  details         String?
+  transactions    Transaction[]
+  marks           Mark[]
+  owned_libraries Library[]
+  subscriptions   UserSubscription[]
 }
 
 // Book records
 model Author {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
-  books Book[]
+  id           Int     @id @default(autoincrement())
+  name         String  @unique
+  library      Library @relation(fields: [library_slug], references: [slug])
+  library_slug String
+  books        Book[]
 }
 
 model Category {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
-  items Item[]
+  id           Int     @id @default(autoincrement())
+  name         String  @unique
+  library      Library @relation(fields: [library_slug], references: [slug])
+  library_slug String
+  items        Item[]
 }
 
 model Publisher {
-  id      Int     @id @default(autoincrement())
-  name    String  @unique
-  address String?
-  items   Item[]
+  id           Int     @id @default(autoincrement())
+  name         String  @unique
+  address      String?
+  library      Library @relation(fields: [library_slug], references: [slug])
+  library_slug String
+  items        Item[]
 }
 
 model Language {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
-  items Item[]
-}
-
-model Periodical {
-  id   Int      @id @default(autoincrement())
-  name String
-  date DateTime
+  id           Int     @id @default(autoincrement())
+  name         String  @unique
+  library      Library @relation(fields: [library_slug], references: [slug])
+  library_slug String
+  items        Item[]
 }
 
 model Book {

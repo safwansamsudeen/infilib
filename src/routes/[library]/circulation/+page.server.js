@@ -1,5 +1,5 @@
 import { item, transaction } from '$lib/db.js';
-import { standardizeSelects } from '$lib/helpers.js';
+import { standardize } from '$lib/helpers.js';
 import { pojoData, response } from '$lib/serverHelpers.js';
 import { getTransColumns } from '$lib/columns.js';
 
@@ -29,7 +29,7 @@ export async function load({ url }) {
 					},
 					where: params
 				});
-				standardizeSelects(transactions, transColumns);
+				standardize(transactions, transColumns);
 				fulfil(transactions);
 			})
 		}

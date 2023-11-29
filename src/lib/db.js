@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { withAccelerate } from '@prisma/extension-accelerate';
+import { DATABASE_URL } from '$env/static/private';
 
 const prisma = new PrismaClient().$extends(withAccelerate());
 
@@ -18,6 +19,7 @@ const {
 	transaction,
 	gender,
 	library,
+	subscriptionType,
 	userSubscription
 } = prisma;
 
@@ -32,5 +34,6 @@ export {
 	transaction,
 	gender,
 	library,
+	subscriptionType,
 	userSubscription
 };

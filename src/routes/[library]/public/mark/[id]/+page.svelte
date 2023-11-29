@@ -1,5 +1,5 @@
 <script>
-	import AddForm from '$lib/components/AddForm.svelte';
+	import AddForm from '$lib/components/Form.svelte';
 	import { onMount } from 'svelte';
 	import flatpickr from 'flatpickr';
 	import 'flatpickr/dist/themes/airbnb.css';
