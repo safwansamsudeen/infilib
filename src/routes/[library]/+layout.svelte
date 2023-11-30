@@ -4,7 +4,7 @@
 	export let data;
 </script>
         <div class="app">
-	<Header admin={data.user?.admin} library={data.library_name} />
+	<Header library={data.library_name} user={data.user} />
 	<main style="max-width: 85%;">
         {#if $navigating}
             <div class="spinner-border d-flex align-self-center my-5" role="status">

@@ -43,8 +43,7 @@ export const actions = {
 		const userColumns = await getUserColumns();
 		let check = parseProperties(requestData, userColumns);
 		if (check) return new fail(400, check);
-		await new Promise((r) => setTimeout(r, 5000));
-		return new fail(400, { error: true, message: 'god help us' });
+
 		return response(async () => {
 			let data = {};
 			const currentUser = await user.findUnique({

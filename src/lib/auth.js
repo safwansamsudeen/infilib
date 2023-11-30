@@ -4,7 +4,7 @@ import { PASSAGE_API_KEY } from '$env/static/private';
 import { redirect } from '@sveltejs/kit';
 import { user } from '$lib/db.js';
 
-export async function getCurrentUser(psg_auth_token) {
+export async function getCurrentUser(psg_auth_token, url) {
 	const passage = new Passage({
 		appID: PUBLIC_PASSAGE_APP_ID,
 		apiKey: PASSAGE_API_KEY,
@@ -18,9 +18,16 @@ export async function getCurrentUser(psg_auth_token) {
 			}
 		};
 		userID = await passage.authenticateRequest(req);
+		const user_passage = await passage.user.get(userID);
+		return user.findUniqueOrThrow({ where: { email_address: user_passage.email } });
 	} catch (error) {
-		throw redirect(302, '/users/login');
+		throw redirect(302, `/users/login?next=${url}`);
 	}
-	const user_passage = await passage.user.get(userID);
-	return user.findUnique({ where: { email_address: user_passage.email } });
+}
+
+export async function logout() {
+	const passage = new Passage({ appID: PUBLIC_PASSAGE_APP_ID });
+	console.log(passage);
+	const session = passage.session.getCurrentSession();
+	await session.signOut();
 }

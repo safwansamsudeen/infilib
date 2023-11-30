@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	export let admin, library;
+	export let user, library;
 </script>
 
 <header>
@@ -35,7 +35,7 @@
 								href="/{$page.params.library}">Home</a
 							>
 						</li>
-						{#if admin}
+						{#if user.admin}
 							<li class="nav-item">
 								<a
 									class="nav-link {$page.url.pathname.includes('/members') ? 'active' : ''}"
@@ -72,6 +72,19 @@
 								<a class="nav-link {$page.url.pathname.includes('/about') ? 'active' : ''}" href="/{$page.params.library}/about">About</a>
 							</li>
 						{/if}
+						<li
+								class="nav-item me-auto"
+							>
+								<a class="nav-link {$page.url.pathname.includes('/users/settings') ? 'active' : ''}" href="/users/settings">User Settings</a>
+							</li>
+						<li
+								class="nav-item me-auto"
+							>
+								<a class="nav-link" on:click={(e) => {
+									e.preventDefault()
+									fetch('/users/logout').catch(e => console.log(e))
+								}}>Logout</a>
+						</li>
 					</ul>
 				</div>
 			</div>

@@ -15,7 +15,8 @@
 
 	<body>
 		<div class="container my-3">
-			<h3>Marks</h3>
+
+			<h4>Marks</h4>
 			{#key data}
 				<Table
 					actions={[['Pop', 'circulation/borrow/any?mark=']]}

@@ -10,7 +10,7 @@ export async function load({ cookies, params, url }) {
 		}
 	});
 	// Authenticate user - all pages under /[library]/* require authentication
-	const user_obj = await getCurrentUser(cookies.get('psg_auth_token'));
+	const user_obj = await getCurrentUser(cookies.get('psg_auth_token'), url.toString());
 	let data = {
 		user: {
 			signedIn: true,
