@@ -8,7 +8,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write  --plugin prettier-plugin-svelte .",
-		"postinstall": "npx prisma db push && npx prisma generate --no-engine"
+		"postinstall": "npx prisma db push --force-reset && npx prisma generate --no-engine"
 	},
 	"prisma": {
 		"seed": "node prisma/seed.js"
