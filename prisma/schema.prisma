@@ -50,6 +50,8 @@ model UserSubscription {
   transactions Transaction[]
   library      Library?         @relation(fields: [library_slug], references: [slug])
   library_slug String?
+
+  @@unique([type_id, user_id])
 }
 
 model Gender {
