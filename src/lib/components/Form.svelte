@@ -10,6 +10,7 @@
 		addFormVisible = false,
 		id = '',
 		action = 'create';
+	let creating = false;
 </script>
 
 <div class="form-check form-switch">
@@ -27,7 +28,14 @@
 {#if addFormVisible || !addTogglable}
 	<slot name="options" />
 	<slot name="scanner" />
-	<form action="?/{action}" method="post" use:enhance id="{action}-form">
+	<form action="?/{action}" method="post" use:enhance={() => {
+		creating = true;
+
+		return async ({ update }) => {
+			await update();
+			creating = false;
+		};
+	}} id="{action}-form">
 
 		{#if $page.form?.missing}<p class="alert alert-danger">
 				The "{$page.form.name}" field is required
@@ -41,8 +49,11 @@
 		{/if}
 		<div class="row g-3">
 			{#each columns as column}
-				<Input {...column} />
+				<Input {...column} disabled={creating} />
 			{/each}
+			{#if creating}
+				<em>Please wait...</em>
+			{/if}
 			<slot name="options-extra-columns"/>
 		</div>
 		<div class="d-grid gap-2 my-3">
