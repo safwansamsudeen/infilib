@@ -5,9 +5,20 @@ const GENDERS = [
 	['M', 'Male'],
 	['F', 'Female']
 ];
+
 const USERS = [
-	[1, 'safwansamsudeen@gmail.com', 'Safwan (Superuser)', ''],
-	['F', 'Female']
+	[1, 'safwansamsudeen@gmail.com', 'Safwan (Superuser)', 'M'],
+	[2, 'librarian.ups@unityschool.in', 'Shakii', 'M']
+];
+
+const LIBRARIES = [
+	['unity-public', 'Unity Public School', 'Kottur, Chennai', 'librarian.ups@unityschool.in'],
+	[
+		'test',
+		'The Testing Library',
+		'Test Address, Random City, Weird Country, Mars',
+		'safwansamsudeen@gmail.com'
+	]
 ];
 
 async function main() {
@@ -19,73 +30,41 @@ async function main() {
 		});
 	}
 
-	await prisma.language.upsert({
-		where: { name: 'English' },
-		update: {},
-		create: {
-			name: 'English'
-		}
-	});
-
-	await prisma.user.upsert({
-		where: { email_address: 'safwansamsudeen@gmail.com' },
-		update: {},
-		create: {
-			id: 1,
-			name: 'Safwan (Superuser)',
-			email_address: 'safwansamsudeen@gmail.com',
-			gender: { connect: { code: 'M' } }
-		}
-	});
-	await prisma.user.upsert({
-		where: { email_address: 'librarian.ups@unityschool.in' },
-		update: {},
-		create: {
-			id: 1,
-			name: 'Shakii',
-			email_address: 'librarian.ups@unityschool.in',
-			gender: { connect: { code: 'M' } }
-		}
-	});
-	await prisma.library.upsert({
-		where: { slug: 'unity-public' },
-		update: {},
-		create: {
-			slug: 'unity-public',
-			name: 'Unity Public School',
-			address: 'Kottur, Chennai',
-			administrator: { connect: { email_address: 'librarian.ups@unityschool.in' } }
-		}
-	});
-	await prisma.library.upsert({
-		where: { slug: 'test' },
-		update: {},
-		create: {
-			slug: 'test',
-			name: 'Test Library',
-			address: 'Test Address, Test City, Weird Status, Mars',
-			administrator: { connect: { email_address: 'safwansamsudeen@gmail.com' } }
-		}
-	});
-	const subscription = await prisma.userSubscription.upsert({
-		where: { library_slug_name: { library_slug: 'test', name: 'Membership' } },
-		update: {},
-		create: {
-			library_slug_name: {
-				library_slug: 'test',
-				name: 'Membership',
-				no_of_days: 15,
-				no_of_books: 4,
-				deposit: 500
+	for (let [id, email_address, name, gender_code] of USERS) {
+		await prisma.user.upsert({
+			where: { email_address },
+			update: {},
+			create: {
+				id,
+				name,
+				email_address,
+				gender: { connect: { code: gender_code } }
 			}
-		}
-	});
-	await prisma.library.update({
-		where: { slug: 'test' },
-		data: {
-			subscribed: {}
-		}
-	});
+		});
+	}
+
+	for (let [slug, name, address, email_address] of LIBRARIES) {
+		await prisma.library.upsert({
+			where: { slug: slug },
+			update: {},
+			create: {
+				slug,
+				name,
+				address,
+				administrator: { connect: { email_address } },
+				languages: { create: { name: 'English' } },
+				available_subscriptions: {
+					create: {
+						name: 'Membership',
+						no_of_days: 15,
+						no_of_books: 4,
+						deposit: 500,
+						users: { create: { user: { connect: { email_address } } } }
+					}
+				}
+			}
+		});
+	}
 }
 main()
 	.then(async () => {

@@ -73,35 +73,43 @@ model User {
 // Book records
 model Author {
   id           Int     @id @default(autoincrement())
-  name         String  @unique
+  name         String
   library      Library @relation(fields: [library_slug], references: [slug])
   library_slug String
   books        Book[]
+
+  @@unique([library_slug, name])
 }
 
 model Category {
   id           Int     @id @default(autoincrement())
-  name         String  @unique
+  name         String
   library      Library @relation(fields: [library_slug], references: [slug])
   library_slug String
   items        Item[]
+
+  @@unique([library_slug, name])
 }
 
 model Publisher {
   id           Int     @id @default(autoincrement())
-  name         String  @unique
+  name         String
   address      String?
   library      Library @relation(fields: [library_slug], references: [slug])
   library_slug String
   items        Item[]
+
+  @@unique([library_slug, name])
 }
 
 model Language {
   id           Int     @id @default(autoincrement())
-  name         String  @unique
+  name         String
   library      Library @relation(fields: [library_slug], references: [slug])
   library_slug String
   items        Item[]
+
+  @@unique([library_slug, name])
 }
 
 model Book {
