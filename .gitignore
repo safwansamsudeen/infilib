@@ -13,3 +13,6 @@ vite.config.ts.timestamp-*
 .idea
 *.db
 *.db-journal
+
+# Local Netlify folder
+.netlify

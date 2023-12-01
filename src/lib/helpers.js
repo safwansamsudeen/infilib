@@ -138,7 +138,7 @@ export function injectLibraryInSelect(data, library_slug) {
 		// Handle the case where the value is a list of objects
 		return {
 			connectOrCreate: data.connectOrCreate.map((item) => ({
-				where: item.where,
+				where: { library_slug_name: { library_slug, ...item.where } },
 				create: {
 					...item.create,
 					library_slug
@@ -149,7 +149,7 @@ export function injectLibraryInSelect(data, library_slug) {
 		// Handle the case where the value is a single object
 		return {
 			connectOrCreate: {
-				where: data.connectOrCreate.where,
+				where: { library_slug_name: { library_slug, ...data.connectOrCreate.where } },
 				create: {
 					...data.connectOrCreate.create,
 					library_slug

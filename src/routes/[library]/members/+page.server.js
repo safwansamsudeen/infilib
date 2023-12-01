@@ -11,7 +11,7 @@ export async function load({ params }) {
 	return {
 		streamed: {
 			users: new Promise(async (res) => {
-				const userColumns = await getUserColumns();
+				const userColumns = await getUserColumns(library_slug);
 
 				let users = await user.findMany({
 					where: { subscriptions: { some: { library_slug } } },
@@ -40,7 +40,7 @@ export async function load({ params }) {
 export const actions = {
 	create: async function ({ request, params }) {
 		let requestData = await pojoData(request);
-		const userColumns = await getUserColumns();
+		const userColumns = await getUserColumns(params.library);
 		let check = parseProperties(requestData, userColumns);
 		if (check) return new fail(400, check);
 

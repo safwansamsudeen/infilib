@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import { withAccelerate } from '@prisma/extension-accelerate';
-import { DATABASE_URL } from '$env/static/private';
 
 const prisma = new PrismaClient().$extends(withAccelerate());
 

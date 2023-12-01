@@ -6,6 +6,7 @@ Handle with care.
 */
 
 import { capitalize } from '$lib/helpers.js';
+
 import {
 	author,
 	category,
@@ -53,9 +54,12 @@ function normalize(fn) {
 	};
 }
 
-export const getUserColumns = normalize(async function () {
+export const getUserColumns = normalize(async function (library_slug) {
 	const genders = await gender.findMany(CACHE_STRATEGY);
-	const subscriptions = await subscriptionType.findMany(CACHE_STRATEGY);
+	const subscriptions = await subscriptionType.findMany({
+		...CACHE_STRATEGY,
+		where: { library_slug: library_slug }
+	});
 	return [
 		{ id: 'id', name: 'ID', type: 'number' },
 		{ id: 'name' },

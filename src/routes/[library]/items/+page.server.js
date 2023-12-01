@@ -78,7 +78,6 @@ export const actions = {
 						: requestData[id];
 			let shootOff = {};
 			for (let { id, type } of others[itemType]) {
-				console.log('d', requestData[id]);
 				shootOff[id] =
 					type === 'select'
 						? injectLibraryInSelect(requestData[id], params.library)
