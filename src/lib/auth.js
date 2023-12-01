@@ -27,7 +27,6 @@ export async function getCurrentUser(psg_auth_token, url) {
 
 export async function logout() {
 	const passage = new Passage({ appID: PUBLIC_PASSAGE_APP_ID });
-	console.log(passage);
 	const session = passage.session.getCurrentSession();
 	await session.signOut();
 }

@@ -35,7 +35,6 @@
 		</div>
 
 		<div class="row">
-			{@debug $page}
 			{#if $page.form?.success}
 				<p class="alert alert-success">Successfully updated!</p>
 			{/if}

@@ -80,10 +80,7 @@
 						<li
 								class="nav-item me-auto"
 							>
-								<a class="nav-link" on:click={(e) => {
-									e.preventDefault()
-									fetch('/users/logout').catch(e => console.log(e))
-								}}>Logout</a>
+								<a class="nav-link" href="/users/logout">Logout</a>
 						</li>
 					</ul>
 				</div>

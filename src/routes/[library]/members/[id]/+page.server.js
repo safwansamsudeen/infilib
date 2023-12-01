@@ -14,7 +14,7 @@ export async function load({ params }) {
 		include: { gender: true, subscriptions: { include: { type: true } } }
 	});
 	const transColumns = (await getTransColumns()).filter(({ id }) => id !== 'user');
-	const userColumns = await getUserColumns();
+	const userColumns = await getUserColumns(params.library);
 
 	user_obj.subscriptions = user_obj.subscriptions.map((subscription) => ({
 		id: subscription.type.id,
@@ -49,7 +49,7 @@ export const actions = {
 		let data = await pojoData(request);
 		let check = parseProperties(
 			data,
-			(await getUserColumns()).filter(({ id }) => id !== 'id')
+			(await getUserColumns(params.library)).filter(({ id }) => id !== 'id')
 		);
 		if (check) return new fail(400, check);
 		return response(async () => {
