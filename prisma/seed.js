@@ -8,7 +8,8 @@ const GENDERS = [
 
 const USERS = [
 	[1, 'safwansamsudeen@gmail.com', 'Safwan (Superuser)', 'M'],
-	[2, 'librarian.ups@unityschool.in', 'Shakii', 'M']
+	[2, 'librarian.ups@unityschool.in', 'Shakii', 'M'],
+	[3, 'naqeebkabir@gmal.com', 'Naqeeb Sultana', 'F']
 ];
 
 const LIBRARIES = [
@@ -18,6 +19,12 @@ const LIBRARIES = [
 		'The Testing Library',
 		'Test Address, Random City, Weird Country, Mars',
 		'safwansamsudeen@gmail.com'
+	],
+	[
+		'naqeeb-library',
+		"Naqeeb's Library",
+		'Kottivakkam, Chennai, Tamil Nadu, India',
+		'naqeebkabir@gmal.com'
 	]
 ];
 
