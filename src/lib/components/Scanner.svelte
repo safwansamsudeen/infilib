@@ -2,7 +2,12 @@
 	import { setBookDetails } from '$lib/helpers.js';
 	import { onDestroy, onMount } from 'svelte';
 
-	export let publishers, authors, languages, categories, onCompleteFunc=(decodedText) => setBookDetails(decodedText, publishers, authors, languages, categories, scanner);
+	export let publishers,
+		authors,
+		languages,
+		categories,
+		onCompleteFunc = (decodedText) =>
+			setBookDetails(decodedText, publishers, authors, languages, categories, scanner);
 
 	let scanner;
 	onMount(() => {

@@ -28,15 +28,19 @@
 {#if addFormVisible || !addTogglable}
 	<slot name="options" />
 	<slot name="scanner" />
-	<form action="?/{action}" method="post" use:enhance={() => {
-		creating = true;
+	<form
+		action="?/{action}"
+		method="post"
+		use:enhance={() => {
+			creating = true;
 
-		return async ({ update }) => {
-			await update();
-			creating = false;
-		};
-	}} id="{action}-form">
-
+			return async ({ update }) => {
+				await update();
+				creating = false;
+			};
+		}}
+		id="{action}-form"
+	>
 		{#if $page.form?.missing}<p class="alert alert-danger">
 				The "{$page.form.name}" field is required
 			</p>{/if}
@@ -54,7 +58,7 @@
 			{#if creating}
 				<em>Please wait...</em>
 			{/if}
-			<slot name="options-extra-columns"/>
+			<slot name="options-extra-columns" />
 		</div>
 		<div class="d-grid gap-2 my-3">
 			<input

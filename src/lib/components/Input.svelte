@@ -7,7 +7,8 @@
 		type = 'text',
 		important = false,
 		required = important,
-		hidden = false, disabled = false,
+		hidden = false,
+		disabled = false,
 		opts = {};
 </script>
 
@@ -17,11 +18,18 @@
 	<div class="col-md-{required ? '6' : '3'}" id="{id}-div">
 		{#if type === 'select'}
 			<label for={id}>{name}</label>
-			<CustomSelect {id} {required} {...opts} {disabled}/>
+			<CustomSelect {id} {required} {...opts} {disabled} />
 		{:else if type === 'checkbox'}
 			<div class="form-check">
 				<label for={id} class="form-control-check">{name}</label>
-				<input class="form-check-input" type="checkbox" checked={opts.value} {id} name={id} {disabled} />
+				<input
+					class="form-check-input"
+					type="checkbox"
+					checked={opts.value}
+					{id}
+					name={id}
+					{disabled}
+				/>
 			</div>
 		{:else if type === 'textarea'}
 			<label for={id}>{name}</label>

@@ -23,8 +23,8 @@
 				action="?/delete"
 				method="POST"
 				on:submit={(e) => {
-					if(!confirm('Are you sure you want to delete this item?')) {
-						e.preventDefault()
+					if (!confirm('Are you sure you want to delete this item?')) {
+						e.preventDefault();
 					}
 				}}
 			>

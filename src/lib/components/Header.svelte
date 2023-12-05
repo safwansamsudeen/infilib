@@ -25,7 +25,8 @@
 			>
 				<div class="offcanvas-header">
 					<h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
-					<button aria-label="Close" class="btn-close" data-bs-dismiss="offcanvas" type="button"></button>
+					<button aria-label="Close" class="btn-close" data-bs-dismiss="offcanvas" type="button"
+					></button>
 				</div>
 				<div class="offcanvas-body">
 					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -61,26 +62,27 @@
 								>
 							</li>
 						{:else}
-							<li
-								class="nav-item"
-							>
-								<a class="nav-link {$page.url.pathname.includes('/public') ? 'active' : ''}" href="/{$page.params.library}/public">Books</a>
+							<li class="nav-item">
+								<a
+									class="nav-link {$page.url.pathname.includes('/public') ? 'active' : ''}"
+									href="/{$page.params.library}/public">Books</a
+								>
 							</li>
-							<li
-								class="nav-item"
-							>
-								<a class="nav-link {$page.url.pathname.includes('/about') ? 'active' : ''}" href="/{$page.params.library}/about">About</a>
+							<li class="nav-item">
+								<a
+									class="nav-link {$page.url.pathname.includes('/about') ? 'active' : ''}"
+									href="/{$page.params.library}/about">About</a
+								>
 							</li>
 						{/if}
-						<li
-								class="nav-item me-auto"
+						<li class="nav-item me-auto">
+							<a
+								class="nav-link {$page.url.pathname.includes('/users/settings') ? 'active' : ''}"
+								href="/users/settings">User Settings</a
 							>
-								<a class="nav-link {$page.url.pathname.includes('/users/settings') ? 'active' : ''}" href="/users/settings">User Settings</a>
-							</li>
-						<li
-								class="nav-item me-auto"
-							>
-								<a class="nav-link" href="/users/logout">Logout</a>
+						</li>
+						<li class="nav-item me-auto">
+							<a class="nav-link" href="/users/logout">Logout</a>
 						</li>
 					</ul>
 				</div>

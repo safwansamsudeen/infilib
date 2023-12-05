@@ -81,19 +81,18 @@
 					{:else}
 						<form
 							class="mb-4"
-							on:submit={(e) =>
-								{
+							on:submit={(e) => {
 								e.preventDefault();
-									setBookDetails(
+								setBookDetails(
 									+e.target[0].value.replaceAll('-', ''),
 									obtainOptions(itemColumns, 'publishers'),
 									obtainOptions(itemColumns, 'authors'),
 									obtainOptions(itemColumns, 'categories'),
 									obtainOptions(itemColumns, 'languages')
-								)
-								}}
+								);
+							}}
 						>
-							<Input name="Search by ISBN" id="search"on:change />
+							<Input name="Search by ISBN" id="search" on:change />
 							<button class="btn btn-success my-3" type="submit">Search</button>
 						</form>
 					{/if}

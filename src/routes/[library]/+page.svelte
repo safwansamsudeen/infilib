@@ -15,7 +15,6 @@
 
 	<body>
 		<div class="container my-3">
-
 			<h4>Marks</h4>
 			{#key data}
 				<Table

@@ -12,7 +12,9 @@
 		disabled = false,
 		uiSingle = false,
 		onChange = () => {};
-	if (uiSingle) {value = value && value[0]}
+	if (uiSingle) {
+		value = value && value[0];
+	}
 	let filterText = '';
 	function handleFilter(e) {
 		if (multiple && value?.find((i) => i.label === filterText)) return;
@@ -49,5 +51,13 @@
 		</div>
 	</Select>
 {:else}
-	<Select bind:value {id} {items} multiple={multiple && !uiSingle} {required} {disabled} name={id} />
+	<Select
+		bind:value
+		{id}
+		{items}
+		multiple={multiple && !uiSingle}
+		{required}
+		{disabled}
+		name={id}
+	/>
 {/if}

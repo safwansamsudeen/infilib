@@ -1,4 +1,5 @@
 <script>
-    export let data
+	export let data;
 </script>
+
 <h2>TBD</h2>

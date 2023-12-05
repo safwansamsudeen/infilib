@@ -16,7 +16,7 @@
 		actions = [],
 		actionButtonsFunc = null,
 		afterChangeFunc = null,
-			idColumn='id',
+		idColumn = 'id',
 		table = null;
 
 	const columnMap = {
@@ -62,7 +62,9 @@
 				}
 				html =
 					html +
-					`<a type="button" class="btn btn-outline-primary" href="/${$page.params.library}/${url}${url.endsWith('=') ? '' : '/'}${data[row].id}">${label}</a>`;
+					`<a type="button" class="btn btn-outline-primary" href="/${$page.params.library}/${url}${
+						url.endsWith('=') ? '' : '/'
+					}${data[row].id}">${label}</a>`;
 			}
 			td.innerHTML = html + '</div>';
 		}
@@ -126,7 +128,9 @@
 									new Toast({
 										target: document.querySelector('.toast-container'),
 										props: {
-											msg: `Updated "${property}" of ${data[row][idColumn]} to ${value.label ?? value}`,
+											msg: `Updated "${property}" of ${data[row][idColumn]} to ${
+												value.label ?? value
+											}`,
 											type: 'success'
 										}
 									});
@@ -163,6 +167,7 @@
 	<div class="toast-container"></div>
 	<div class="my-4 h-50" id="table"></div>
 </div>
+
 <style>
 	@import 'handsontable/dist/handsontable.full.min.css';
 </style>

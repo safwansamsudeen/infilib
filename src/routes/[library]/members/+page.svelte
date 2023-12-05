@@ -1,7 +1,7 @@
 <script>
 	import Table from '$lib/components/Table.svelte';
 	import AddForm from '$lib/components/Form.svelte';
-	import {onMount} from "svelte";
+	import { onMount } from 'svelte';
 
 	export let data;
 </script>
@@ -18,7 +18,7 @@
 	<div class="container">
 		{#await data.streamed.users}
 			<p>Loading...</p>
-		{:then {userColumns, users}}
+		{:then { userColumns, users }}
 			<AddForm id="user" columns={userColumns}></AddForm>
 			{#key data}
 				<Table
