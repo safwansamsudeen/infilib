@@ -9,11 +9,11 @@ export async function load({ params }) {
 	const user_obj = await user.findUnique({
 		where: {
 			id: +params.id,
-			subscriptions: { some: { library_slug: { equals: params.library } } }
+			subscriptions: { some: { type: { library_slug: params.library } } }
 		},
 		include: { gender: true, subscriptions: { include: { type: true } } }
 	});
-	const transColumns = (await getTransColumns()).filter(({ id }) => id !== 'user');
+	const transColumns = (await getTransColumns(params.library)).filter(({ id }) => id !== 'user');
 	const userColumns = await getUserColumns(params.library);
 
 	user_obj.subscriptions = user_obj.subscriptions.map((subscription) => ({
@@ -62,7 +62,7 @@ export const actions = {
 	delete: async ({ params }) => {
 		try {
 			const subscription = await userSubscription.findFirst({
-				where: { library_slug: params.library, user_id: +params.id }
+				where: { type: { library_slug: params.library }, user_id: +params.id }
 			});
 			await user.update({
 				where: { id: +params.id },

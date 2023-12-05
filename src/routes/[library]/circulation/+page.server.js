@@ -3,7 +3,7 @@ import { standardize } from '$lib/helpers.js';
 import { pojoData, response } from '$lib/serverHelpers.js';
 import { getTransColumns } from '$lib/columns.js';
 
-export async function load({ url }) {
+export async function load({ url, params: requestParams }) {
 	let params = { deleted: { not: true } };
 	for (let [key, val] of url.searchParams.entries()) {
 		if (key === 'due') {
@@ -15,7 +15,7 @@ export async function load({ url }) {
 			params[key] = val;
 		}
 	}
-	const transColumns = await getTransColumns();
+	const transColumns = await getTransColumns(requestParams.library);
 
 	return {
 		columns: transColumns,

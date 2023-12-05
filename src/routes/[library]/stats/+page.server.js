@@ -7,7 +7,7 @@ export async function load({ params }) {
 		}),
 		transactions: await transaction.findMany({ where: { item: { library_slug: params.library } } }),
 		users: await user.findMany({
-			where: { subscriptions: { some: { library_slug: { equals: params.library } } } }
+			where: { subscriptions: { some: { type: { library_slug: params.library } } } }
 		})
 	};
 }

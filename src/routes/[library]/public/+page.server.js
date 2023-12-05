@@ -13,7 +13,7 @@ export async function load({ params }) {
 			mark: true
 		}
 	});
-	const [columns, others] = await getItemColumns();
+	const [columns, others] = await getItemColumns(params.library);
 	flatten(books, 'book');
 	await standardize(books, columns.concat(others.book));
 	return { books };

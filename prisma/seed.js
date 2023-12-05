@@ -42,7 +42,7 @@ async function main() {
 			}
 		});
 	}
-
+	let library;
 	for (let [slug, name, address, email_address] of LIBRARIES) {
 		await prisma.library.upsert({
 			where: { slug: slug },
@@ -59,7 +59,11 @@ async function main() {
 						no_of_days: 15,
 						no_of_books: 4,
 						deposit: 500,
-						users: { create: { user: { connect: { email_address } } } }
+						users: {
+							create: {
+								user: { connect: { email_address } }
+							}
+						}
 					}
 				}
 			}

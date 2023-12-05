@@ -10,7 +10,7 @@ export async function load({ url, params }) {
 	return {
 		streamed: {
 			items: new Promise(async (res) => {
-				const [columns, otherColumns] = await getItemColumns();
+				const [columns, otherColumns] = await getItemColumns(library_slug);
 				// Set up DB params for modification
 				let itemColumns = columns;
 				let where = { library_slug };
@@ -64,7 +64,7 @@ export const actions = {
 			let requestData = await pojoData(request);
 			delete requestData['id'];
 			const itemType = requestData.type;
-			const [columns, others] = await getItemColumns();
+			const [columns, others] = await getItemColumns(params.library);
 			const joinedColumns = columns.concat(others[itemType]);
 
 			let check = parseProperties(requestData, joinedColumns);

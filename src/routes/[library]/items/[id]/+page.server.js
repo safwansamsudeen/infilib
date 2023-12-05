@@ -20,9 +20,9 @@ export async function load({ params }) {
 			languages: true
 		}
 	});
-	const transColumns = (await getTransColumns()).filter(({ id }) => id !== 'item');
+	const transColumns = (await getTransColumns(params.library)).filter(({ id }) => id !== 'item');
 
-	const [columns, otherColumns] = await getItemColumns();
+	const [columns, otherColumns] = await getItemColumns(params.library);
 
 	// Find type of item
 	let type;
@@ -59,7 +59,7 @@ export const actions = {
 		return await response(async () => {
 			let requestData = await pojoData(request);
 			const itemType = requestData.type;
-			let [columns, others] = await getItemColumns();
+			let [columns, others] = await getItemColumns(params.library);
 			// Ensure DB ID doesn't get updated
 			columns = columns.filter(({ id }) => id !== 'id');
 			const joinedColumns = columns.concat(others[itemType]);

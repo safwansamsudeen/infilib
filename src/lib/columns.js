@@ -19,6 +19,7 @@ import {
 } from '$lib/db.js';
 
 const CACHE_STRATEGY = { cacheStrategy: { swr: 60, ttl: 60 } };
+
 function normalize(fn) {
 	// I have next to no idea what this monolith is doing but I'm sure it's crucial
 	return async function (...args) {
@@ -58,7 +59,7 @@ export const getUserColumns = normalize(async function (library_slug) {
 	const genders = await gender.findMany(CACHE_STRATEGY);
 	const subscriptions = await subscriptionType.findMany({
 		...CACHE_STRATEGY,
-		where: { library_slug: library_slug }
+		where: { library_slug }
 	});
 	return [
 		{ id: 'id', name: 'ID', type: 'number' },
@@ -127,9 +128,15 @@ export const getSubscriptionColumns = normalize(async function () {
 	];
 });
 
-export const getTransColumns = normalize(async function () {
-	const users = await user.findMany(CACHE_STRATEGY);
-	const items = await item.findMany(CACHE_STRATEGY);
+export const getTransColumns = normalize(async function (library_slug) {
+	const users = await user.findMany({
+		...CACHE_STRATEGY,
+		where: { subscriptions: { some: { type: { library_slug } } } }
+	});
+	const items = await item.findMany({
+		...CACHE_STRATEGY,
+		where: { library_slug }
+	});
 
 	let res = [
 		{ id: 'id', type: 'hidden' },
@@ -173,11 +180,23 @@ export const getTransColumns = normalize(async function () {
 	return res;
 });
 
-export const getItemColumns = normalize(async function () {
-	const authors = await author.findMany(CACHE_STRATEGY);
-	const publishers = await publisher.findMany(CACHE_STRATEGY);
-	const categories = await category.findMany(CACHE_STRATEGY);
-	const languages = await language.findMany(CACHE_STRATEGY);
+export const getItemColumns = normalize(async function (library_slug) {
+	const authors = await author.findMany({
+		...CACHE_STRATEGY,
+		where: { library_slug }
+	});
+	const publishers = await publisher.findMany({
+		...CACHE_STRATEGY,
+		where: { library_slug }
+	});
+	const categories = await category.findMany({
+		...CACHE_STRATEGY,
+		where: { library_slug }
+	});
+	const languages = await language.findMany({
+		...CACHE_STRATEGY,
+		where: { library_slug }
+	});
 
 	const columns = [
 		{ id: 'id', name: 'Internal ID', type: 'hidden', important: false },

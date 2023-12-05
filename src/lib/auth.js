@@ -19,7 +19,9 @@ export async function getCurrentUser(psg_auth_token, url) {
 		};
 		userID = await passage.authenticateRequest(req);
 		const user_passage = await passage.user.get(userID);
-		return user.findUniqueOrThrow({ where: { email_address: user_passage.email } });
+		const user_obj = await user.findUnique({ where: { email_address: user_passage.email } });
+		if (!user_obj) throw new Error('not found');
+		return user_obj;
 	} catch (error) {
 		throw redirect(302, `/users/login?next=${url}`);
 	}

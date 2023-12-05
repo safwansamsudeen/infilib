@@ -4,10 +4,10 @@ import { getItemColumns } from '$lib/columns.js';
 import { parseProperties } from '$lib/validators.js';
 import { findValue } from '$lib/helpers.js';
 
-export async function PATCH({ request }) {
+export async function PATCH({ request, params }) {
 	const { id, property, value, type } = await request.json();
 	return await serverResponse(async () => {
-		let [columns, others] = await getItemColumns();
+		let [columns, others] = await getItemColumns(params.library);
 
 		columns = columns.concat(others[type] | []);
 

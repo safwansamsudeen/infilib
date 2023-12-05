@@ -14,11 +14,11 @@ export async function load({ params }) {
 				const userColumns = await getUserColumns(library_slug);
 
 				let users = await user.findMany({
-					where: { subscriptions: { some: { library_slug } } },
+					where: { subscriptions: { some: { type: { library_slug } } } },
 					include: { gender: true, subscriptions: { include: { type: true } } },
 					cacheStrategy: { swr: 60, ttl: 60 }
 				});
-
+				console.log(users[0].subscriptions);
 				users = users.map(({ subscriptions, ...user_obj }) => ({
 					...user_obj,
 					subscriptions: subscriptions.map((subscription) => ({
@@ -50,7 +50,7 @@ export const actions = {
 				where: { email_address: requestData.email_address }
 			});
 			const { id: type_id } = requestData.subscriptions.connect;
-			requestData.subscriptions = { create: { type_id, library_slug: params.library } };
+			requestData.subscriptions = { create: { type_id } };
 			if (currentUser) {
 				await user.update({
 					where: { email_address: requestData.email_address },

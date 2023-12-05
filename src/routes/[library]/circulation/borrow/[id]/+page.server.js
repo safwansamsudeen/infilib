@@ -24,13 +24,16 @@ export async function load({ params, url }) {
 	}
 
 	if (user_id) {
-		user_obj = await findOr404(user, { where: { id: +user_id }, include: { subscriptions: true } });
+		user_obj = await findOr404(user, {
+			where: { id: +user_id },
+			include: { subscriptions: { include: { type: true } } }
+		});
 		subscription = user_obj.subscriptions.find(
-			({ library_slug }) => library_slug === params.library
-		);
+			({ type }) => type.library_slug === params.library
+		).type;
 	}
 
-	const transColumns = (await getTransColumns()).map((column) => {
+	const transColumns = (await getTransColumns(params.library)).map((column) => {
 		if (item_obj) {
 			if (column.id === 'item') {
 				return {
@@ -68,11 +71,15 @@ export async function load({ params, url }) {
 			}
 		}
 		if (column.id === 'price') {
+			console.log(Math.floor(item_obj?.purchase_price / 10), subscription);
 			return {
 				...column,
 				opts: {
 					...column.opts,
-					value: subscription?.name !== 'Membership' ? 0 : Math.floor(item_obj?.purchase_price / 10)
+					value:
+						subscription && subscription?.name !== 'Membership'
+							? 0
+							: Math.floor(item_obj?.purchase_price / 10)
 				}
 			};
 		}
@@ -90,7 +97,7 @@ export const actions = {
 	borrow: async function ({ request, params }) {
 		const { mark_id, ...requestData } = await pojoData(request);
 
-		const transColumns = (await getTransColumns()).filter(
+		const transColumns = (await getTransColumns(params.library)).filter(
 			({ id }) => !['returned_at', 'id'].includes(id)
 		);
 		const check = parseProperties(requestData, transColumns);

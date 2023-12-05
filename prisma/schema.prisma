@@ -1,9 +1,8 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -17,7 +16,6 @@ model Library {
   address                 String
   administrator_id        Int
   administrator           User               @relation(fields: [administrator_id], references: [id])
-  subscribed              UserSubscription[]
   available_subscriptions SubscriptionType[]
   items                   Item[]
   categories              Category[]
@@ -48,8 +46,6 @@ model UserSubscription {
   user         User             @relation(fields: [user_id], references: [id])
   user_id      Int
   transactions Transaction[]
-  library      Library?         @relation(fields: [library_slug], references: [slug])
-  library_slug String?
 
   @@unique([type_id, user_id])
 }
@@ -159,6 +155,8 @@ model Item {
   magazine         Magazine?
   transactions     Transaction[]
   mark             Mark?
+
+  @@unique([library_slug, acc_no])
 }
 
 // Transactions
