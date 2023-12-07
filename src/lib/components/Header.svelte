@@ -61,6 +61,12 @@
 									href="/{$page.params.library}/settings">Settings</a
 								>
 							</li>
+							<li class="nav-item">
+								<a
+									class="nav-link {$page.url.pathname.includes('/stats') ? 'active' : ''}"
+									href="/{$page.params.library}/stats">Stats</a
+								>
+							</li>
 						{:else}
 							<li class="nav-item">
 								<a

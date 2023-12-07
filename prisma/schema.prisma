@@ -46,6 +46,7 @@ model UserSubscription {
   type_id      Int
   user         User             @relation(fields: [user_id], references: [id])
   user_id      Int
+  details      String?
   transactions Transaction[]
 
   @@unique([type_id, user_id])
@@ -58,12 +59,15 @@ model Gender {
 }
 
 model User {
-  id              Int                @id
+  id              Int                @id @default(autoincrement())
+  passage_id      String?            @unique
   name            String
   email_address   String             @unique
   gender_code     String
   gender          Gender             @relation(fields: [gender_code], references: [code])
   details         String?
+  phone_number    String?
+  date_of_birth   DateTime?          @db.Date
   transactions    Transaction[]
   marks           Mark[]
   owned_libraries Library[]

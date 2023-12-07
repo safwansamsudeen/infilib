@@ -1,34 +1,62 @@
 import Passage from '@passageidentity/passage-node';
 import { PUBLIC_PASSAGE_APP_ID } from '$env/static/public';
 import { PASSAGE_API_KEY } from '$env/static/private';
-import { redirect } from '@sveltejs/kit';
-import { user } from '$lib/db.js';
 
-export async function getCurrentUser(psg_auth_token, url) {
-	const passage = new Passage({
-		appID: PUBLIC_PASSAGE_APP_ID,
-		apiKey: PASSAGE_API_KEY,
-		authStrategy: 'HEADER'
-	});
-	let userID;
-	try {
-		const req = {
-			headers: {
-				authorization: `Bearer ${psg_auth_token}`
-			}
-		};
-		userID = await passage.authenticateRequest(req);
-		const user_passage = await passage.user.get(userID);
-		const user_obj = await user.findUnique({ where: { email_address: user_passage.email } });
-		if (!user_obj) throw new Error('not found');
-		return user_obj;
-	} catch (error) {
-		throw redirect(302, `/users/login?next=${url}`);
-	}
+import { jwtVerify, importJWK } from 'jose';
+
+import { user } from '$lib/db.js';
+import { date } from '$lib/helpers.js';
+
+const JWK = {
+	e: 'AQAB',
+	kid: 'AZwX4SDhosfhwligUHOb8jre',
+	kty: 'RSA',
+	n: 'yagi6GQJbwB-5TcV0lpmGee36xEsUBAHiVf_LsslZPmPMvqHtHgUitQ8QxokrB2mUA23V4MVPzg-quTGe9GPy8HRXdGCaL0P10WB3h-Lwm-OUSW1ockqdc6NlX0n9cv7JDJEkaCW5iAHrsbYFD-ytyr4moUbakebMggYX3ZVhsQNKJeQ2YywrPzHjRzjHGaEl8pLaOGs2sv51mtxZjBAXkdJSA0Fss8mjLH2NgBaygKry-c7cd5zM4aGxHh_-_IMv7MTL2tDzpv-JpTop14yNxBxtGVub2GWJPYzceFQUwK2ShsVbMmNTLpuSZEyyXaeoTJBc5f4t97W9bC5_vRVkQ',
+	use: 'sig'
+};
+const passage = new Passage({ appID: PUBLIC_PASSAGE_APP_ID, apiKey: PASSAGE_API_KEY });
+
+export async function getPassageId(auth_token) {
+	const SECRET = await importJWK(JWK, 'RS256');
+	let {
+		payload: { sub: passage_id }
+	} = await jwtVerify(auth_token, SECRET);
+	return passage_id;
 }
 
-export async function logout() {
-	const passage = new Passage({ appID: PUBLIC_PASSAGE_APP_ID });
-	const session = passage.session.getCurrentSession();
-	await session.signOut();
+export async function getCurrentUser(auth_token) {
+	if (!auth_token) {
+		return null;
+	}
+
+	const passage_id = await getPassageId(auth_token);
+	const user_obj = await user.findUnique({ where: { passage_id } });
+
+	return user_obj;
+}
+
+export async function storeUserData(passage_id) {
+	const {
+		email,
+		login_count,
+		id,
+		phone,
+		user_metadata: { name, gender, details, date_of_birth }
+	} = await passage.user.get(passage_id);
+	const userDetails = {
+		email_address: email,
+		phone_number: phone,
+		passage_id: id,
+		name,
+		gender_code: gender === 'M' ? 'M' : 'F',
+		details,
+		date_of_birth: date(date_of_birth, false)
+	};
+	if (login_count < 10) {
+		await user.upsert({
+			where: { email_address: email },
+			update: userDetails,
+			create: userDetails
+		});
+	}
 }

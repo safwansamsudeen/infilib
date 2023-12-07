@@ -8,7 +8,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write  --plugin prettier-plugin-svelte .",
-		"postinstall": "npx prisma db push --force-reset && npx prisma generate --no-engine && npx prisma db seed"
+		"postinstall": "npx prisma db push --force-reset --accept-data-loss && npx prisma generate --no-engine && npx prisma db seed"
 	},
 	"prisma": {
 		"seed": "node prisma/seed.js"
@@ -36,6 +36,7 @@
 		"csv-parser": "^3.0.0",
 		"dayjs": "^1.11.10",
 		"flatpickr": "^4.6.13",
-		"handsontable": "^13.1.0"
+		"handsontable": "^13.1.0",
+		"jose": "^5.1.3"
 	}
 }

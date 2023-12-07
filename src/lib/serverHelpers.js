@@ -1,7 +1,4 @@
 import { fail, json, error } from '@sveltejs/kit';
-import { parseProperties } from '$lib/validators.js';
-import { findValue } from '$lib/helpers.js';
-
 export async function pojoData(request) {
 	return Object.fromEntries(await request.formData());
 }

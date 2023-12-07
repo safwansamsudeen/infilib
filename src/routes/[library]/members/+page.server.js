@@ -18,7 +18,6 @@ export async function load({ params }) {
 					include: { gender: true, subscriptions: { include: { type: true } } },
 					cacheStrategy: { swr: 60, ttl: 60 }
 				});
-				console.log(users[0].subscriptions);
 				users = users.map(({ subscriptions, ...user_obj }) => ({
 					...user_obj,
 					subscriptions: subscriptions.map((subscription) => ({

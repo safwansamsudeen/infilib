@@ -7,9 +7,9 @@ const GENDERS = [
 ];
 
 const USERS = [
-	[1, 'safwansamsudeen@gmail.com', 'Safwan (Superuser)', 'M'],
-	[2, 'librarian.ups@unityschool.in', 'Shakii', 'M'],
-	[3, 'naqeebkabir@gmal.com', 'Naqeeb Sultana', 'F']
+	['safwansamsudeen@gmail.com', 'Safwan (Superuser)', 'M'],
+	['librarian.ups@unityschool.in', 'Shakii', 'M'],
+	['naqeebkabir@gmal.com', 'Naqeeb Sultana', 'F']
 ];
 
 const LIBRARIES = [
@@ -37,12 +37,11 @@ async function main() {
 		});
 	}
 
-	for (let [id, email_address, name, gender_code] of USERS) {
+	for (let [email_address, name, gender_code] of USERS) {
 		await prisma.user.upsert({
 			where: { email_address },
 			update: {},
 			create: {
-				id,
 				name,
 				email_address,
 				gender: { connect: { code: gender_code } }

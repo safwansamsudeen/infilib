@@ -2,4 +2,4 @@
 	export let data;
 </script>
 
-<h2>TBD</h2>
+<h2>{data.a}</h2>

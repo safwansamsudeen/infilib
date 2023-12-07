@@ -71,7 +71,6 @@ export async function load({ params, url }) {
 			}
 		}
 		if (column.id === 'price') {
-			console.log(Math.floor(item_obj?.purchase_price / 10), subscription);
 			return {
 				...column,
 				opts: {

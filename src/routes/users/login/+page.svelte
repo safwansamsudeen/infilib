@@ -8,7 +8,14 @@
 	onMount(() => {
 		const passageAuth = document.querySelector('passage-auth');
 
-		passageAuth.onSuccess = ({ redirect_url }) => {
+		passageAuth.onSuccess = async ({ redirect_url, auth_token}) => {
+			await fetch('/users/login/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ auth_token })
+			})
 			const params = new URL(window.location.href).searchParams;
 			window.location.href = params.get('next') || redirect_url;
 		};
