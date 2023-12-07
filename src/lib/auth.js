@@ -30,7 +30,9 @@ export async function getCurrentUser(auth_token) {
 	}
 
 	const passage_id = await getPassageId(auth_token);
+	console.time('User');
 	const user_obj = await user.findUnique({ where: { passage_id } });
+	console.timeEnd('User');
 
 	return user_obj;
 }

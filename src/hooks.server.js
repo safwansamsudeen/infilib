@@ -9,6 +9,8 @@ export function handleError({ error }) {
 }
 
 export async function handle({ event, resolve }) {
+	console.time('Handle');
+	console.time('Auth');
 	const user_obj = await getCurrentUser(event.cookies.get('psg_auth_token'));
 	event.locals.user = {
 		signedIn: !!user_obj,
@@ -16,6 +18,8 @@ export async function handle({ event, resolve }) {
 		id: user_obj?.id,
 		passage_id: user_obj?.passage_id
 	};
+	console.timeEnd('Auth');
 	const response = await resolve(event);
+	console.timeEnd('Handle');
 	return response;
 }
