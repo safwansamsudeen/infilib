@@ -1,7 +1,5 @@
 <script>
-	import Table from '$lib/components/Table.svelte';
-	import AddForm from '$lib/components/Form.svelte';
-	import { onMount } from 'svelte';
+	import Table from '$lib/components/Table2.svelte';
 
 	export let data;
 </script>
@@ -16,17 +14,12 @@
 
 <body>
 	<div class="container">
+		<a href="members/add">Add a member</a>
 		{#await data.streamed.users}
 			<p>Loading...</p>
-		{:then { userColumns, users }}
-			<AddForm id="user" columns={userColumns}></AddForm>
+		{:then { columns, users }}
 			{#key data}
-				<Table
-					actions={[['Details', 'members']]}
-					columns={userColumns}
-					data={users}
-					updateUrl="members"
-				/>
+				<Table data={users} {columns} actions={[['Details', 'members'], ['Borrow', 'circulation/borrow/any?user='], ]}/>
 			{/key}
 		{:catch error}
 			<p>{error.message}</p>

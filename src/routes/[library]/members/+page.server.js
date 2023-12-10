@@ -1,66 +1,37 @@
 import { user } from '$lib/db.js';
-import { pojoData, response } from '$lib/serverHelpers.js';
-
 import { getUserColumns } from '$lib/columns.js';
-import { parseProperties } from '$lib/validators.js';
-import { fail } from '@sveltejs/kit';
-import { standardize } from '$lib/helpers.js';
+import { date } from '$lib/helpers.js';
 
 export async function load({ params }) {
 	let library_slug = params.library;
+
 	return {
 		streamed: {
-			users: new Promise(async (res) => {
-				const userColumns = await getUserColumns(library_slug);
+			users: (async () => {
+				const columns = await getUserColumns(library_slug);
 
 				let users = await user.findMany({
 					where: { subscriptions: { some: { type: { library_slug } } } },
-					include: { gender: true, subscriptions: { include: { type: true } } },
+					include: { subscriptions: { include: { type: true } } },
 					cacheStrategy: { swr: 60, ttl: 60 }
 				});
-				users = users.map(({ subscriptions, ...user_obj }) => ({
-					...user_obj,
-					subscriptions: subscriptions.map((subscription) => ({
-						id: subscription.type.id,
-						label: subscription.type.name
-					}))
-				}));
-				standardize(users, userColumns);
 
-				res({
-					users,
-					userColumns
+				// Select the one subscription of this library, clean date, add member ID
+				users = users.map(({ subscriptions, date_of_birth, ...user_obj }) => {
+					const subscription = subscriptions.find(({ type }) => type.library_slug === library_slug);
+					return {
+						...user_obj,
+						member_id: subscription.member_id,
+						date_of_birth: date(date_of_birth),
+						subscription: subscription.type.name
+					};
 				});
-			})
+
+				return {
+					users,
+					columns: [{ id: 'member_id', name: 'Member ID', important: true }, ...columns]
+				};
+			})()
 		}
 	};
 }
-
-export const actions = {
-	create: async function ({ request, params }) {
-		let requestData = await pojoData(request);
-		const userColumns = await getUserColumns(params.library);
-		let check = parseProperties(requestData, userColumns);
-		if (check) return new fail(400, check);
-
-		return response(async () => {
-			let data = {};
-			const currentUser = await user.findUnique({
-				where: { email_address: requestData.email_address }
-			});
-			const { id: type_id } = requestData.subscriptions.connect;
-			requestData.subscriptions = { create: { type_id } };
-			if (currentUser) {
-				await user.update({
-					where: { email_address: requestData.email_address },
-					data: {
-						subscriptions: requestData.subscriptions
-					}
-				});
-			} else {
-				for (let { id } of userColumns) data[id] = requestData[id];
-				await user.create({ data });
-			}
-		});
-	}
-};

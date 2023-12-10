@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { getUserColumns } from '$lib/columns.js';
 import { user } from '$lib/db.js';
-import { parseProperties } from '$lib/validators.js';
+import { validateAndClean } from '$lib/validators.js';
 import { findValue } from '$lib/helpers.js';
 
 export async function PATCH({ request, params }) {
@@ -12,7 +12,7 @@ export async function PATCH({ request, params }) {
 		columns = columns[0].concat(columns[1][type]?.map((obj) => ({ ...obj, type })) || []);
 	}
 
-	const check = parseProperties(
+	const check = validateAndClean(
 		{ id, [property]: value },
 		[findValue(columns, 'id', 'id'), findValue(columns, property, 'id')],
 		true

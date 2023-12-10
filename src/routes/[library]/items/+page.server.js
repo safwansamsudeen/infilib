@@ -3,7 +3,7 @@ import { pojoData, response } from '$lib/serverHelpers.js';
 import { fail } from '@sveltejs/kit';
 import { getItemColumns } from '$lib/columns.js';
 import { standardize, flatten, injectLibraryInSelect } from '$lib/helpers.js';
-import { parseProperties } from '$lib/validators.js';
+import { validateAndClean } from '$lib/validators.js';
 
 export async function load({ url, params }) {
 	const library_slug = params.library;
@@ -67,7 +67,7 @@ export const actions = {
 			const [columns, others] = await getItemColumns(params.library);
 			const joinedColumns = columns.concat(others[itemType]);
 
-			let check = parseProperties(requestData, joinedColumns);
+			let check = validateAndClean(requestData, joinedColumns);
 			if (check) return new fail(400, check);
 
 			let data = { library: { connect: { slug: params.library } } };

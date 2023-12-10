@@ -1,7 +1,7 @@
 import { item, user, transaction, mark } from '$lib/db.js';
 import { findOr404, pojoData, response } from '$lib/serverHelpers.js';
 import { getTransColumns } from '$lib/columns.js';
-import { parseProperties } from '$lib/validators.js';
+import { validateAndClean } from '$lib/validators.js';
 import { fail, redirect } from '@sveltejs/kit';
 
 export async function load({ params, url }) {
@@ -99,7 +99,7 @@ export const actions = {
 		const transColumns = (await getTransColumns(params.library)).filter(
 			({ id }) => !['returned_at', 'id'].includes(id)
 		);
-		const check = parseProperties(requestData, transColumns);
+		const check = validateAndClean(requestData, transColumns);
 		if (check) return new fail(400, check);
 		const item_obj = await item.findUnique({ where: { id: +requestData.item.connect.id } });
 		if (item_obj.status === 'OUT') {

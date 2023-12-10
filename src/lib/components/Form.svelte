@@ -2,7 +2,6 @@
 	import Input from '$lib/components/Input.svelte';
 	import { enhance } from '$app/forms';
 	import { capitalize, setBookDetails } from '$lib/helpers.js';
-	import Scanner from '$lib/components/Scanner.svelte';
 	import { page } from '$app/stores';
 
 	export let columns,

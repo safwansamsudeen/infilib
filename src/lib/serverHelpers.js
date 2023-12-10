@@ -1,9 +1,10 @@
 import { fail, json, error } from '@sveltejs/kit';
+
 export async function pojoData(request) {
 	return Object.fromEntries(await request.formData());
 }
 
-export async function response(func, return_val, status_code = 200) {
+export async function response(func, return_val = false, status_code = 200) {
 	try {
 		let result = await func();
 		if (return_val === true) {

@@ -1,11 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-const GENDERS = [
-	['M', 'Male'],
-	['F', 'Female']
-];
-
 const USERS = [
 	['safwansamsudeen@gmail.com', 'Safwan (Superuser)', 'M'],
 	['librarian.ups@unityschool.in', 'Shakii', 'M'],
@@ -29,26 +24,18 @@ const LIBRARIES = [
 ];
 
 async function main() {
-	for (let [code, name] of GENDERS) {
-		await prisma.gender.upsert({
-			where: { code },
-			update: {},
-			create: { name, code }
-		});
-	}
-
-	for (let [email_address, name, gender_code] of USERS) {
+	for (let [email_address, name, gender] of USERS) {
 		await prisma.user.upsert({
 			where: { email_address },
 			update: {},
 			create: {
 				name,
 				email_address,
-				gender: { connect: { code: gender_code } }
+				gender
 			}
 		});
 	}
-	let library;
+
 	for (let [slug, name, address, email_address] of LIBRARIES) {
 		await prisma.library.upsert({
 			where: { slug: slug },
@@ -58,7 +45,6 @@ async function main() {
 				name,
 				address,
 				administrator: { connect: { email_address } },
-				languages: { create: { name: 'English' } },
 				available_subscriptions: {
 					create: {
 						name: 'Membership',
@@ -67,7 +53,10 @@ async function main() {
 						deposit: 500,
 						users: {
 							create: {
-								user: { connect: { email_address } }
+								user: { connect: { email_address } },
+								member_id: 1,
+								purchased_on: new Date(),
+								valid_till: new Date('12/28/2023')
 							}
 						}
 					}

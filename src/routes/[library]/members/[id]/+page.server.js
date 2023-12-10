@@ -1,25 +1,50 @@
 import { transaction, user, userSubscription } from '$lib/db.js';
-import { standardize } from '$lib/helpers.js';
+import { date, standardize } from '$lib/helpers.js';
 import { pojoData, response } from '$lib/serverHelpers.js';
-import { parseProperties } from '$lib/validators.js';
+import { validateAndClean } from '$lib/validators.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { getTransColumns, getUserColumns } from '$lib/columns.js';
 
+function addDefaults(obj, { opts, ...data }) {
+	if (data.type !== 'object') {
+		return {
+			...data,
+			opts: {
+				...opts,
+				value: obj[data.id]
+			}
+		};
+	} else {
+		return {
+			...data,
+			columns: data.columns.map((col) => addDefaults(obj[data.id], col))
+		};
+	}
+}
+
 export async function load({ params }) {
-	const user_obj = await user.findUnique({
+	let user_obj = await user.findUnique({
 		where: {
 			id: +params.id,
 			subscriptions: { some: { type: { library_slug: params.library } } }
 		},
-		include: { gender: true, subscriptions: { include: { type: true } } }
+		include: { subscriptions: { include: { type: true } } }
 	});
-	const transColumns = (await getTransColumns(params.library)).filter(({ id }) => id !== 'user');
-	const userColumns = await getUserColumns(params.library);
+	// Do member specific stuff
+	const subscription = user_obj.subscriptions.find(
+		({ type }) => type.library_slug === params.library
+	);
+	user_obj = {
+		...user_obj,
+		gender: { value: user_obj.gender, label: user_obj.gender === 'M' ? 'Male' : 'Female' },
+		subscription: {
+			...subscription,
+			type: { value: subscription.type.id, label: subscription.type.name }
+		}
+	};
 
-	user_obj.subscriptions = user_obj.subscriptions.map((subscription) => ({
-		id: subscription.type.id,
-		label: subscription.type.name
-	}));
+	const transColumns = (await getTransColumns(params.library)).filter(({ id }) => id !== 'user');
+	const userColumns = await getUserColumns(params.library, true);
 
 	const transactions = await transaction.findMany({
 		where: {
@@ -27,40 +52,49 @@ export async function load({ params }) {
 		},
 		include: { item: true }
 	});
+
 	standardize(transactions, transColumns);
-	standardize([user_obj], userColumns);
+	console.log(transactions);
+
 	return {
 		user: user_obj,
 		transactions,
-		columns: userColumns.map(({ opts, ...data }) => ({
-			...data,
-			opts: {
-				...opts,
-				value: user_obj[data.id],
-				disabled: data.id === 'id' || data.id === 'subscriptions'
-			}
-		})),
+		userColumns: userColumns.map((col) => addDefaults(user_obj, col)),
 		transColumns
 	};
 }
 
 export const actions = {
 	update: async ({ request, params }) => {
-		let data = await pojoData(request);
-		let check = parseProperties(
-			data,
-			(await getUserColumns(params.library)).filter(({ id }) => id !== 'id')
-		);
-		if (check) return new fail(400, check);
+		const requestData = await pojoData(request);
+
+		const userColumns = await getUserColumns(params.library);
+		let check = validateAndClean(requestData, userColumns);
+		if (check) return check;
+
+		// Modifications specific to User model
+		requestData.gender = requestData.gender.connect.value;
+		requestData.subscriptions = {
+			update: {
+				where: {
+					type_id_user_id: {
+						type_id: requestData.subscription.create.type.connect.id,
+						user_id: +params.id
+					}
+				},
+				data: requestData.subscription.create
+			}
+		};
+		delete requestData.subscription;
 		return response(async () => {
 			await user.update({
 				where: { id: +params.id },
-				data
+				data: requestData
 			});
 		});
 	},
 	delete: async ({ params }) => {
-		try {
+		const res = await response(async () => {
 			const subscription = await userSubscription.findFirst({
 				where: { type: { library_slug: params.library }, user_id: +params.id }
 			});
@@ -68,10 +102,8 @@ export const actions = {
 				where: { id: +params.id },
 				data: { subscriptions: { delete: { id: subscription.id } } }
 			});
-		} catch (error) {
-			console.log(error);
-			return fail(400, { error: error.message });
-		}
+		}, true);
+		if (res) throw res;
 		throw redirect(302, `/${params.library}/members`);
 	}
 };

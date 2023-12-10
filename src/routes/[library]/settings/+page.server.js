@@ -1,6 +1,6 @@
 import { getSubscriptionColumns, getTransColumns } from '$lib/columns.js';
 import { pojoData } from '$lib/serverHelpers.js';
-import { parseProperties } from '$lib/validators.js';
+import { validateAndClean } from '$lib/validators.js';
 import { fail } from '@sveltejs/kit';
 import { subscriptionType } from '$lib/db.js';
 
@@ -14,7 +14,7 @@ export const actions = {
 		const columns = (await getSubscriptionColumns()).filter(
 			({ id }) => !['returned_at', 'id'].includes(id)
 		);
-		const check = parseProperties(requestData, columns);
+		const check = validateAndClean(requestData, columns);
 		if (check) return new fail(400, check);
 		let data = { library_slug: params.library };
 		for (let { id } of columns) data[id] = requestData[id];

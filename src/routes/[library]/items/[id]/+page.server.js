@@ -3,7 +3,7 @@ import { findOr404, pojoData, response } from '$lib/serverHelpers.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { standardize, injectLibraryInSelect } from '$lib/helpers.js';
 import { getItemColumns, getTransColumns } from '$lib/columns.js';
-import { parseProperties } from '$lib/validators.js';
+import { validateAndClean } from '$lib/validators.js';
 
 function flatten(records, type) {
 	records.map((rec) => Object.entries(rec[type]).map(([key, value]) => (rec[key] = value)));
@@ -63,7 +63,7 @@ export const actions = {
 			// Ensure DB ID doesn't get updated
 			columns = columns.filter(({ id }) => id !== 'id');
 			const joinedColumns = columns.concat(others[itemType]);
-			let check = parseProperties(requestData, joinedColumns);
+			let check = validateAndClean(requestData, joinedColumns);
 			if (check) return new fail(400, check);
 			let data = {};
 			for (let { id, type } of columns)

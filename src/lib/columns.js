@@ -7,16 +7,7 @@ Handle with care.
 
 import { capitalize } from '$lib/helpers.js';
 
-import {
-	author,
-	category,
-	language,
-	publisher,
-	gender,
-	user,
-	item,
-	subscriptionType
-} from '$lib/db.js';
+import { author, category, language, user, item, subscriptionType, library } from '$lib/db.js';
 
 const CACHE_STRATEGY = { cacheStrategy: { swr: 60, ttl: 60 } };
 
@@ -55,54 +46,67 @@ function normalize(fn) {
 	};
 }
 
-export const getUserColumns = normalize(async function (library_slug) {
-	const genders = await gender.findMany(CACHE_STRATEGY);
-	const subscriptions = await subscriptionType.findMany({
-		...CACHE_STRATEGY,
-		where: { library_slug }
-	});
+function standardize({ name, important, type, columns, ...data }) {
+	if (type === 'object') {
+		return { ...data, name, type, columns: columns.map(standardize) };
+	} else {
+		return {
+			...data,
+			name: name || capitalize(data.id),
+			important: important ?? true,
+			type: type || 'text'
+		};
+	}
+}
+
+export async function getUserColumns(library_slug, opts = false) {
+	const types =
+		opts &&
+		(await subscriptionType.findMany({
+			...CACHE_STRATEGY,
+			where: { library_slug }
+		}));
 	return [
-		{ id: 'id', name: 'ID', type: 'number' },
 		{ id: 'name' },
 		{
 			id: 'gender',
 			type: 'select',
-			important: true,
 			opts: {
+				options: [
+					{ value: 'M', label: 'Male' },
+					{ value: 'F', label: 'Female' }
+				],
 				creatable: false,
-				items: genders.map(({ code, name }) => ({
-					value: code,
-					label: name
-				})),
-				unpacking: {
-					value: 'code',
-					label: 'name'
-				}
+				alias: { value: 'value', label: 'label' }
 			}
 		},
+		{ id: 'email_address', type: 'email' },
+		{ id: 'phone_number', type: 'tel', important: false },
+		{ id: 'date_of_birth', type: 'date', important: false },
+		{ id: 'about', important: false },
 		{
-			id: 'subscriptions',
-			name: 'Subscription',
-			type: 'select',
+			id: 'subscription',
+			type: 'object',
 			important: true,
-			opts: {
-				multiple: true,
-				uiSingle: true,
-				creatable: false,
-				items: subscriptions.map(({ id, name }) => ({
-					value: id,
-					label: name
-				})),
-				unpacking: {
-					value: 'id',
-					label: 'name'
-				}
-			}
-		},
-		{ id: 'details' },
-		{ id: 'email_address', type: 'email' }
-	];
-});
+			columns: [
+				{ id: 'member_id', label: 'Member ID', type: 'number' },
+				{
+					id: 'type',
+					label: 'Subscription Type',
+					type: 'select',
+					opts: {
+						options: opts && types.map(({ id, name }) => ({ value: id, label: name })),
+						alias: { value: 'id', label: 'name' },
+						creatable: false
+					}
+				},
+				{ id: 'purchased_on', type: 'date' },
+				{ id: 'valid_till', type: 'date' },
+				{ id: 'details' }
+			]
+		}
+	].map(standardize);
+}
 
 export const getMarkColumns = normalize(async function () {
 	return [
@@ -110,7 +114,7 @@ export const getMarkColumns = normalize(async function () {
 			id: 'item'
 		},
 		{ id: 'user', type: 'hidden' },
-		{ id: 'borrow_time', name: 'Time Of Pickup', type: 'datetime-local' },
+		{ id: 'borrow_time', label: 'Time Of Pickup', type: 'datetime-local' },
 		{ id: 'comments', type: 'textarea', required: false }
 	];
 });
@@ -118,9 +122,9 @@ export const getMarkColumns = normalize(async function () {
 export const getSubscriptionColumns = normalize(async function () {
 	return [
 		{
-			id: 'name'
+			id: 'label'
 		},
-		{ id: 'no_of_days', name: 'Maximum Number of Borrowing Days', type: 'number' },
+		{ id: 'no_of_days', label: 'Maximum Number of Borrowing Days', type: 'number' },
 		{ id: 'no_of_books', name: 'Maximum Number of Books', type: 'number' },
 		{ id: 'deposit', type: 'number' },
 		{ id: 'annual_price', type: 'number', important: false },
@@ -128,28 +132,33 @@ export const getSubscriptionColumns = normalize(async function () {
 	];
 });
 
-export const getTransColumns = normalize(async function (library_slug) {
-	const users = await user.findMany({
-		...CACHE_STRATEGY,
-		where: { subscriptions: { some: { type: { library_slug } } } }
-	});
-	const items = await item.findMany({
-		...CACHE_STRATEGY,
-		where: { library_slug }
-	});
+export async function getTransColumns(library_slug, opts = false) {
+	const users =
+		opts &&
+		(await user.findMany({
+			...CACHE_STRATEGY,
+			where: { subscriptions: { some: { type: { library_slug } } } }
+		}));
+	const items =
+		opts &&
+		(await item.findMany({
+			...CACHE_STRATEGY,
+			where: { library_slug }
+		}));
 
-	let res = [
+	return [
 		{ id: 'id', type: 'hidden' },
 		{
 			id: 'user',
-			name: 'User',
 			type: 'select',
 			opts: {
-				items: users.map(({ id, name }) => ({
-					value: id,
-					label: name
-				})),
-				unpacking: {
+				options:
+					opts &&
+					users.map(({ id, name }) => ({
+						value: id,
+						label: name
+					})),
+				alias: {
 					value: 'id',
 					label: 'name'
 				},
@@ -160,11 +169,13 @@ export const getTransColumns = normalize(async function (library_slug) {
 			id: 'item',
 			type: 'select',
 			opts: {
-				items: items.map(({ id, title }) => ({
-					value: id,
-					label: title
-				})),
-				unpacking: {
+				options:
+					opts &&
+					items.map(({ id, title }) => ({
+						value: id,
+						label: title
+					})),
+				alias: {
 					value: 'id',
 					label: 'title'
 				},
@@ -176,58 +187,39 @@ export const getTransColumns = normalize(async function (library_slug) {
 		{ id: 'returned_at', type: 'date', hidden: true },
 		{ id: 'price', type: 'number', important: true },
 		{ id: 'comments', type: 'textarea', important: false }
-	];
-	return res;
-});
+	].map(standardize);
+}
 
-export const getItemColumns = normalize(async function (library_slug) {
-	const authors = await author.findMany({
-		...CACHE_STRATEGY,
-		where: { library_slug }
-	});
-	const publishers = await publisher.findMany({
-		...CACHE_STRATEGY,
-		where: { library_slug }
-	});
-	const categories = await category.findMany({
-		...CACHE_STRATEGY,
-		where: { library_slug }
-	});
-	const languages = await language.findMany({
-		...CACHE_STRATEGY,
-		where: { library_slug }
-	});
+export async function getItemColumns(library_slug, opts = false) {
+	let categories, languages;
+	if (opts) {
+		categories = await category.findMany({
+			...CACHE_STRATEGY,
+			where: { library_slug }
+		});
+		languages = await language.findMany({
+			...CACHE_STRATEGY
+		});
+	}
 
-	const columns = [
-		{ id: 'id', name: 'Internal ID', type: 'hidden', important: false },
-		{ id: 'acc_no', name: 'Acc. No.', type: 'number', important: false, required: true },
+	return [
+		{ id: 'acc_no', label: 'Acc. No.', type: 'number', important: false, required: true },
 		{ id: 'call_no', type: 'number', opts: { step: 0.01 } },
 		{ id: 'title' },
-		{ id: 'status', type: 'hidden', opts: { value: 'IN', readOnly: true } },
+		{ id: 'status', opts: { value: 'IN', disabled: true } },
 		{
 			id: 'publisher',
-			type: 'select',
-			opts: {
-				items: publishers.map(({ id, name }) => ({
-					value: id,
-					label: name
-				})),
-				unpacking: {
-					value: 'id',
-					label: 'name'
-				}
-			}
+			type: 'object',
+			important: true,
+			columns: [{ id: 'name' }, { id: 'address', type: 'textarea' }]
 		},
 		{
 			id: 'categories',
 			type: 'select',
 			opts: {
 				multiple: true,
-				items: categories.map(({ id, name }) => ({ value: id, label: name })),
-				unpacking: {
-					value: 'id',
-					label: 'name'
-				}
+				options: opts && categories.map(({ slug, name }) => ({ value: slug, label: name })),
+				alias: { value: 'id', label: 'name' }
 			}
 		},
 		{ id: 'no_of_pages', type: 'number' },
@@ -240,47 +232,54 @@ export const getItemColumns = normalize(async function (library_slug) {
 			type: 'select',
 			opts: {
 				multiple: true,
-				items: languages.map(({ id, name }) => ({ value: id, label: name })),
-				unpacking: {
-					value: 'id',
-					label: 'name'
-				}
+				options: opts && languages.map(({ code, name }) => ({ value: code, label: name })),
+				alias: { value: 'code', label: 'name' }
 			},
 			important: false
 		},
-
 		{ id: 'purchase_details', important: false },
-		{ id: 'image_url', name: 'Image URL', important: false },
+		{ id: 'image_url', label: 'Image URL', important: false },
 		{ id: 'level', important: false },
 		{ id: 'remarks', type: 'textarea', important: false },
 		{ id: 'reference', type: 'checkbox' }
 	];
-	const others = {
-		book: [
-			{
-				id: 'authors',
-				type: 'select',
-				opts: {
-					multiple: true,
-					items: authors.map(({ id, name }) => ({ value: id, label: name })),
-					unpacking: {
-						value: 'id',
-						label: 'name'
-					}
+}
+
+export async function getBookColumns(library_slug, opts) {
+	const authors =
+		opts &&
+		(await author.findMany({
+			...CACHE_STRATEGY,
+			where: { library_slug }
+		}));
+	return [
+		...(await getItemColumns(library_slug, opts)),
+		{
+			id: 'authors',
+			type: 'select',
+			opts: {
+				multiple: true,
+				options: opts && authors.map(({ id, name }) => ({ value: id, label: name })),
+				aliases: {
+					value: 'id',
+					label: 'name'
 				}
-			},
-			{ id: 'isbn', type: 'text', name: 'ISBN' },
-			{ id: 'subtitle', important: false },
-			{ id: 'publication_year', type: 'number', name: 'Year Published', important: false },
-			{ id: 'edition', important: false }
-		],
-		magazine: [
-			{ id: 'issue' },
-			{ id: 'volume' },
-			{ id: 'sc_no', type: 'number' },
-			{ id: 'from', type: 'date' },
-			{ id: 'to', type: 'date' }
-		]
-	};
-	return [columns, others];
-});
+			}
+		},
+		{ id: 'isbn', type: 'text', label: 'ISBN' },
+		{ id: 'subtitle', important: false },
+		{ id: 'publication_year', type: 'number', label: 'Year Published', important: false },
+		{ id: 'edition', important: false }
+	];
+}
+
+export async function getMagazineColumns(library_slug, opts) {
+	return [
+		...(await getItemColumns(library_slug, opts)),
+		{ id: 'issue' },
+		{ id: 'volume' },
+		{ id: 'sc_no', type: 'number' },
+		{ id: 'from', type: 'date' },
+		{ id: 'to', type: 'date' }
+	];
+}

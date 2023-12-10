@@ -4,27 +4,23 @@
 	import Select from 'svelte-select';
 
 	export let id,
-		items = [],
+		options = [],
 		multiple = false,
 		creatable = true,
 		required = true,
 		value = null,
 		disabled = false,
-		uiSingle = false,
 		onChange = () => {};
-	if (uiSingle) {
-		value = value && value[0];
-	}
 	let filterText = '';
 	function handleFilter(e) {
 		if (multiple && value?.find((i) => i.label === filterText)) return;
 		if (e.detail.length === 0 && filterText.length > 0) {
-			const prev = items.filter((i) => !i.created);
-			items = [...prev, { label: filterText, created: true }];
+			const prev = options.filter((i) => !i.created);
+			options = [...prev, { label: filterText, created: true }];
 		}
 	}
 	function handleChange(e) {
-		items = items.map((i) => {
+		options = options.map((i) => {
 			delete i.created;
 			return i;
 		});
@@ -37,8 +33,8 @@
 		bind:filterText
 		bind:value
 		{id}
-		{items}
-		multiple={multiple && !uiSingle}
+		items={options}
+		{multiple}
 		{required}
 		{disabled}
 		name={id}
@@ -54,8 +50,8 @@
 	<Select
 		bind:value
 		{id}
-		{items}
-		multiple={multiple && !uiSingle}
+		items={options}
+		{multiple}
 		{required}
 		{disabled}
 		name={id}

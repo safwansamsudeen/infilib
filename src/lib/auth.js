@@ -28,11 +28,8 @@ export async function getCurrentUser(auth_token) {
 	if (!auth_token) {
 		return null;
 	}
-
 	const passage_id = await getPassageId(auth_token);
-	console.time('User');
 	const user_obj = await user.findUnique({ where: { passage_id } });
-	console.timeEnd('User');
 
 	return user_obj;
 }
@@ -50,11 +47,12 @@ export async function storeUserData(passage_id) {
 		phone_number: phone,
 		passage_id: id,
 		name,
-		gender_code: gender === 'M' ? 'M' : 'F',
+		gender: gender === 'M' ? 'M' : 'F',
 		details,
 		date_of_birth: date(date_of_birth, false)
 	};
-	if (login_count < 10) {
+	console.log(userDetails);
+	if (login_count === 1) {
 		await user.upsert({
 			where: { email_address: email },
 			update: userDetails,

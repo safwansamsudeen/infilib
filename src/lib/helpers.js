@@ -21,26 +21,20 @@ export function findValue(array, key_value, key = 'id') {
 }
 
 export function standardize(records, columns, date_format = 'DD/MM/YYYY') {
-	for (let { id, type, opts } of columns) {
-		if (type === 'select' && !records[0]?.[id]?.label && !records[0]?.[id]?.[0]?.label) {
+	for (let { id, type, opts, columns: subColumns } of columns) {
+		if (type === 'select') {
 			records.map(
 				(record) =>
 					(record[id] =
 						opts.multiple === true
-							? record[id].map((subRecord) => ({
-									value: subRecord[opts.unpacking.value],
-									label: subRecord[opts.unpacking.label]
-							  }))
-							: {
-									value: record[id]?.[opts.unpacking.value],
-									label: record[id]?.[opts.unpacking.label]
-							  })
+							? record[id].map((subRecord) => subRecord[opts.alias.label])
+							: record[id]?.[opts.alias.label])
 			);
-		}
-		if (type === 'date') {
-			records.map((record) => (record[id] = dayjs(record[id]).format(date_format)));
+		} else if (type === 'date') {
+			records.map((record) => (record[id] = date(record[id])));
 		}
 	}
+	return records;
 }
 
 export function setSelectField(id, items, newValue, multi = false) {
@@ -82,7 +76,7 @@ export function setSelectField(id, items, newValue, multi = false) {
 	});
 }
 
-export function date(value, to_str = true, time = false) {
+export function date(value, to_str = true, time = false, format = 'YYYY-MM-DD') {
 	if (!value) {
 		return null;
 	}
@@ -90,7 +84,7 @@ export function date(value, to_str = true, time = false) {
 		if (time) {
 			return dayjs(value).format('YYYY-MM-DD HH:mm');
 		}
-		return dayjs(value).format('YYYY-MM-DD');
+		return dayjs(value).format(format);
 	}
 	return new Date(value);
 }

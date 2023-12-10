@@ -20,7 +20,6 @@ model Library {
   available_subscriptions SubscriptionType[]
   items                   Item[]
   categories              Category[]
-  languages               Language[]
   publishers              Publisher[]
   authors                 Author[]
 }
@@ -46,16 +45,13 @@ model UserSubscription {
   type_id      Int
   user         User             @relation(fields: [user_id], references: [id])
   user_id      Int
+  member_id    Int
   details      String?
   transactions Transaction[]
+  purchased_on DateTime
+  valid_till   DateTime?
 
   @@unique([type_id, user_id])
-}
-
-model Gender {
-  code  String @id
-  name  String @unique
-  users User[]
 }
 
 model User {
@@ -63,9 +59,8 @@ model User {
   passage_id      String?            @unique
   name            String
   email_address   String             @unique
-  gender_code     String
-  gender          Gender             @relation(fields: [gender_code], references: [code])
-  details         String?
+  gender          String
+  about           String?
   phone_number    String?
   date_of_birth   DateTime?          @db.Date
   transactions    Transaction[]
@@ -86,7 +81,7 @@ model Author {
 }
 
 model Category {
-  id           Int     @id @default(autoincrement())
+  slug         String  @id
   name         String
   library      Library @relation(fields: [library_slug], references: [slug])
   library_slug String
@@ -107,13 +102,9 @@ model Publisher {
 }
 
 model Language {
-  id           Int     @id @default(autoincrement())
-  name         String
-  library      Library @relation(fields: [library_slug], references: [slug])
-  library_slug String
-  items        Item[]
-
-  @@unique([library_slug, name])
+  code  String @id
+  name  String
+  items Item[]
 }
 
 model Book {

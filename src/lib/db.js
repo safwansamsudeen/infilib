@@ -16,7 +16,6 @@ const {
 	user,
 	mark,
 	transaction,
-	gender,
 	library,
 	subscriptionType,
 	userSubscription
@@ -31,7 +30,6 @@ export {
 	user,
 	mark,
 	transaction,
-	gender,
 	library,
 	subscriptionType,
 	userSubscription

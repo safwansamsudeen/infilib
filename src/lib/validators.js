@@ -1,6 +1,8 @@
+import { date } from '$lib/helpers.js';
+
 const PROPERTY_VALIDATORS = {
-	select: (val, opts) =>
-		opts.creatable !== false || opts.items.some(({ value }) => value === val.value),
+	// TODO: improve
+	select: (val, opts) => 'TBD',
 	// https://stackoverflow.com/questions/46155/how-can-i-validate-an-email-address-in-javascript
 	email: (val) =>
 		val
@@ -11,12 +13,24 @@ const PROPERTY_VALIDATORS = {
 	// https://stackoverflow.com/questions/175739/how-can-i-check-if-a-string-is-a-valid-number
 	number: (val) => !isNaN(val) && !isNaN(parseFloat(val)),
 	checkbox: (val) => ['on', undefined, true, false].includes(val),
-	isbn: (VAL) => 'TBD'
+	isbn: (val) => 'TBD',
+	tel: (val) => 'TBD'
 };
 
-export function parseProperties(obj, columns, clean = false) {
-	for (let { id, name, type, important, opts } of columns) {
-		if (important && obj[id] === null) {
+export function validateAndClean(obj, columns, clean = false) {
+	for (let { id, name, type, important, opts, columns: subColumns } of columns) {
+		if (type === 'object') {
+			let subObj = {};
+			for (let { id: subId } of subColumns) {
+				subObj[subId] = obj[subId];
+				delete obj[subId];
+			}
+			let check = validateAndClean(subObj, subColumns);
+			if (check) return check;
+			obj[id] = { create: subObj };
+		}
+
+		if (important && !obj[id]) {
 			return { name, missing: true };
 		}
 		if (!important && obj[id]?.length === 0) {
@@ -64,8 +78,8 @@ export function parseProperties(obj, columns, clean = false) {
 						obj[id] = {
 							connect: obj[id].map(({ value, label }) => {
 								return {
-									[opts.unpacking.value]: value || 0,
-									[opts.unpacking.label]: label
+									[opts.alias.value]: value || 0,
+									[opts.alias.label]: label
 								};
 							})
 						};
@@ -74,8 +88,8 @@ export function parseProperties(obj, columns, clean = false) {
 
 						obj[id] = {
 							connect: {
-								[opts.unpacking.value]: value || 0,
-								[opts.unpacking.label]: label
+								[opts.alias.value]: value || 0,
+								[opts.alias.label]: label
 							}
 						};
 					}
@@ -85,7 +99,7 @@ export function parseProperties(obj, columns, clean = false) {
 				obj[id] = obj[id] === 'on';
 			}
 			if (!clean && type === 'date') {
-				obj[id] = new Date(obj[id]);
+				obj[id] = date(obj[id], false);
 			}
 		} catch (error) {
 			return { name, value: obj[id], incorrect: true, error: error.message };

@@ -1,7 +1,7 @@
 <script>
-	import TransactionTable from '$lib/components/TransactionTable.svelte';
-	import AddForm from '$lib/components/Form.svelte';
+	import Form from '$lib/components/Form2.svelte';
 	import { page } from '$app/stores';
+	import TransTable from "$lib/components/TransTable.svelte";
 
 	export let data;
 </script>
@@ -23,7 +23,7 @@
 				action="?/delete"
 				method="POST"
 				on:submit={(e) => {
-					if (!confirm('Are you sure you want to delete this item?')) {
+					if (!confirm('Are you sure you want to remove this user from your library?')) {
 						e.preventDefault();
 					}
 				}}
@@ -33,14 +33,12 @@
 		</div>
 
 		<div class="row">
-			{#if $page.form?.success}
-				<p class="alert alert-success">Successfully updated!</p>
-			{/if}
-			<AddForm action="update" addTogglable={false} columns={data.columns} />
+
+			<Form action="update" addTogglable={false} columns={data.userColumns} message="" />
 
 			<h3 class="text-center">Borrowed</h3>
 			{#key data.transactions}
-				<TransactionTable columns={data.transColumns} data={data.transactions}></TransactionTable>
+				<TransTable columns={data.transColumns} data={data.transactions} />
 			{/key}
 		</div>
 	</div>
