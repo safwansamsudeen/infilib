@@ -1,26 +1,9 @@
 import { transaction, user, userSubscription } from '$lib/db.js';
-import { date, standardize } from '$lib/helpers.js';
+import { addDefaults, prettify } from '$lib/helpers.js';
 import { pojoData, response } from '$lib/serverHelpers.js';
 import { validateAndClean } from '$lib/validators.js';
-import { fail, redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import { getTransColumns, getUserColumns } from '$lib/columns.js';
-
-function addDefaults(obj, { opts, ...data }) {
-	if (data.type !== 'object') {
-		return {
-			...data,
-			opts: {
-				...opts,
-				value: obj[data.id]
-			}
-		};
-	} else {
-		return {
-			...data,
-			columns: data.columns.map((col) => addDefaults(obj[data.id], col))
-		};
-	}
-}
 
 export async function load({ params }) {
 	let user_obj = await user.findUnique({
@@ -30,16 +13,17 @@ export async function load({ params }) {
 		},
 		include: { subscriptions: { include: { type: true } } }
 	});
+
 	// Do member specific stuff
 	const subscription = user_obj.subscriptions.find(
 		({ type }) => type.library_slug === params.library
 	);
 	user_obj = {
 		...user_obj,
-		gender: { value: user_obj.gender, label: user_obj.gender === 'M' ? 'Male' : 'Female' },
+		gender: { id: user_obj.gender, name: user_obj.gender === 'M' ? 'Male' : 'Female' },
 		subscription: {
 			...subscription,
-			type: { value: subscription.type.id, label: subscription.type.name }
+			type: { id: subscription.type.id, name: subscription.type.name }
 		}
 	};
 
@@ -53,8 +37,7 @@ export async function load({ params }) {
 		include: { item: true }
 	});
 
-	standardize(transactions, transColumns);
-	console.log(transactions);
+	prettify(transactions, transColumns);
 
 	return {
 		user: user_obj,
@@ -68,7 +51,7 @@ export const actions = {
 	update: async ({ request, params }) => {
 		const requestData = await pojoData(request);
 
-		const userColumns = await getUserColumns(params.library);
+		const userColumns = await getUserColumns();
 		let check = validateAndClean(requestData, userColumns);
 		if (check) return check;
 

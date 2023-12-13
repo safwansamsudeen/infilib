@@ -1,13 +1,14 @@
 import { item, transaction } from '$lib/db.js';
 import { findOr404, pojoData, response } from '$lib/serverHelpers.js';
 import { fail, redirect } from '@sveltejs/kit';
-import { standardize, injectLibraryInSelect } from '$lib/helpers.js';
-import { getItemColumns, getTransColumns } from '$lib/columns.js';
+import { prettify, injectLibraryInSelect, addDefaults, flatten } from '$lib/helpers.js';
+import {
+	getBookColumns,
+	getItemColumns,
+	getMagazineColumns,
+	getTransColumns
+} from '$lib/columns.js';
 import { validateAndClean } from '$lib/validators.js';
-
-function flatten(records, type) {
-	records.map((rec) => Object.entries(rec[type]).map(([key, value]) => (rec[key] = value)));
-}
 
 export async function load({ params }) {
 	let item_obj = await findOr404(item, {
@@ -20,13 +21,17 @@ export async function load({ params }) {
 			languages: true
 		}
 	});
+
 	const transColumns = (await getTransColumns(params.library)).filter(({ id }) => id !== 'item');
 
-	const [columns, otherColumns] = await getItemColumns(params.library);
+	const columns = await getItemColumns(params.library, true);
 
 	// Find type of item
-	let type;
-	Object.keys(otherColumns).map((id) => (item_obj[id] ? (type = id) : null));
+	const type = item_obj.book ? 'book' : 'magazine';
+	const otherColumns = await (type === 'book' ? getBookColumns : getMagazineColumns)(
+		params.library,
+		true
+	);
 	flatten([item_obj], type);
 
 	const transactions = await transaction.findMany({
@@ -34,23 +39,15 @@ export async function load({ params }) {
 		include: { user: true }
 	});
 
-	standardize(transactions, transColumns);
-	standardize([item_obj], columns.concat(otherColumns[type]), 'YYYY-MM-DD');
+	prettify(transactions, transColumns);
+
 	return {
 		item: item_obj,
 		transactions,
-		itemColumns: columns.map(({ opts, ...data }) => ({
-			...data,
-			opts: { ...opts, value: item_obj[data.id], disabled: data.id === 'id' }
-		})),
-		otherColumns: {
-			[type]: otherColumns[type].map(({ opts, ...data }) => ({
-				...data,
-				opts: { ...opts, value: item_obj[data.id] }
-			}))
-		},
-		transColumns,
-		type
+		columns: [...columns, { id: type, type: 'object', columns: otherColumns }].map((col) =>
+			addDefaults(item_obj, col)
+		),
+		transColumns
 	};
 }
 
@@ -58,28 +55,31 @@ export const actions = {
 	update: async ({ request, params }) => {
 		return await response(async () => {
 			let requestData = await pojoData(request);
-			const itemType = requestData.type;
-			let [columns, others] = await getItemColumns(params.library);
-			// Ensure DB ID doesn't get updated
-			columns = columns.filter(({ id }) => id !== 'id');
-			const joinedColumns = columns.concat(others[itemType]);
-			let check = validateAndClean(requestData, joinedColumns);
+			const type = requestData.type;
+			delete requestData.type;
+			let itemColumns = await getItemColumns();
+			const otherColumns = await (type === 'book' ? getBookColumns : getMagazineColumns)();
+
+			let check = validateAndClean(
+				requestData,
+				[...itemColumns, { id: type, type: 'object', columns: otherColumns }],
+				'update'
+			);
 			if (check) return new fail(400, check);
-			let data = {};
-			for (let { id, type } of columns)
-				data[id] =
-					type === 'select'
-						? injectLibraryInSelect(requestData[id], params.library)
-						: requestData[id];
-			let shootOff = {};
-			for (let { id, type } of others[itemType]) {
-				shootOff[id] =
-					type === 'select'
-						? injectLibraryInSelect(requestData[id], params.library)
-						: requestData[id];
+
+			// Do item specific stuff
+			requestData.library = { connect: { slug: params.library } };
+			requestData.publisher = injectLibraryInSelect(requestData.publisher, params.library);
+			requestData.categories = injectLibraryInSelect(requestData.categories, params.library);
+
+			if (type === 'book') {
+				requestData.book.update.authors = injectLibraryInSelect(
+					requestData.book.update.authors,
+					params.library
+				);
 			}
-			data[itemType] = { update: shootOff };
-			await item.update({ where: { id: +params.id }, data });
+
+			await item.update({ where: { id: +params.id }, data: requestData });
 		}, true);
 	},
 	delete: async ({ params }) => {

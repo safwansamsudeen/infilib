@@ -10,13 +10,16 @@
 		required = true,
 		value = null,
 		disabled = false,
+		label = 'name',
+		itemId = 'id',
 		onChange = () => {};
 	let filterText = '';
+
 	function handleFilter(e) {
-		if (multiple && value?.find((i) => i.label === filterText)) return;
+		if (multiple && value?.find((i) => i[label] === filterText)) return;
 		if (e.detail.length === 0 && filterText.length > 0) {
 			const prev = options.filter((i) => !i.created);
-			options = [...prev, { label: filterText, created: true }];
+			options = [...prev, { [label]: filterText, created: true }];
 		}
 	}
 	function handleChange(e) {
@@ -26,6 +29,7 @@
 		});
 		onChange(value);
 	}
+
 </script>
 
 {#if creatable}
@@ -38,12 +42,14 @@
 		{required}
 		{disabled}
 		name={id}
+		{label}
+		{itemId}
 		on:change={handleChange}
 		on:filter={handleFilter}
 	>
 		<div let:item slot="item">
 			{item.created ? `Add new ${id}: ` : ''}
-			{item.label}
+			{item[label]}
 		</div>
 	</Select>
 {:else}
@@ -54,6 +60,8 @@
 		{multiple}
 		{required}
 		{disabled}
+		{label}
+		{itemId}
 		name={id}
 	/>
 {/if}

@@ -47,6 +47,7 @@
 				<Input {...column} disabled={loading} />
 			{/if}
 		{/each}
+		<slot name="extras" />
 		{#if loading}
 			<em>Please wait...</em>
 		{/if}

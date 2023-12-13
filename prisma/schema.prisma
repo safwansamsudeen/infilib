@@ -81,7 +81,7 @@ model Author {
 }
 
 model Category {
-  slug         String  @id
+  id           Int     @id @default(autoincrement())
   name         String
   library      Library @relation(fields: [library_slug], references: [slug])
   library_slug String
@@ -93,7 +93,6 @@ model Category {
 model Publisher {
   id           Int     @id @default(autoincrement())
   name         String
-  address      String?
   library      Library @relation(fields: [library_slug], references: [slug])
   library_slug String
   items        Item[]
@@ -102,8 +101,8 @@ model Publisher {
 }
 
 model Language {
-  code  String @id
-  name  String
+  id    Int    @id @default(autoincrement())
+  name  String @unique
   items Item[]
 }
 

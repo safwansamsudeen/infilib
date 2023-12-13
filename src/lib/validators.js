@@ -12,12 +12,12 @@ const PROPERTY_VALIDATORS = {
 			),
 	// https://stackoverflow.com/questions/175739/how-can-i-check-if-a-string-is-a-valid-number
 	number: (val) => !isNaN(val) && !isNaN(parseFloat(val)),
-	checkbox: (val) => ['on', undefined, true, false].includes(val),
+	checkbox: (val) => ['on', undefined].includes(val),
 	isbn: (val) => 'TBD',
 	tel: (val) => 'TBD'
 };
 
-export function validateAndClean(obj, columns, clean = false) {
+export function validateAndClean(obj, columns, action = 'create') {
 	for (let { id, name, type, important, opts, columns: subColumns } of columns) {
 		if (type === 'object') {
 			let subObj = {};
@@ -27,10 +27,10 @@ export function validateAndClean(obj, columns, clean = false) {
 			}
 			let check = validateAndClean(subObj, subColumns);
 			if (check) return check;
-			obj[id] = { create: subObj };
+			obj[id] = { [action]: subObj };
 		}
 
-		if (important && !obj[id]) {
+		if (important && !obj[id] && type !== 'checkbox') {
 			return { name, missing: true };
 		}
 		if (!important && obj[id]?.length === 0) {
@@ -38,37 +38,39 @@ export function validateAndClean(obj, columns, clean = false) {
 			continue;
 		}
 		try {
-			if (!clean && ['select', 'number'].includes(type)) {
+			if (['select', 'number'].includes(type)) {
 				obj[id] = JSON.parse(obj[id] || '[]');
 			}
 			if (!(PROPERTY_VALIDATORS[type] || (() => true))(obj[id], opts)) {
 				return { name, value: obj[id], incorrect: true };
 			}
 			if (type === 'select') {
+				const itemId = opts.itemId || 'id';
+				const label = opts.label || 'name';
 				if (opts.creatable !== false) {
 					if (opts.multiple) {
 						obj[id] = {
-							connectOrCreate: obj[id].map(({ label }) => {
+							connectOrCreate: obj[id].map(({ [label]: name }) => {
 								return {
 									where: {
-										[opts.unpacking.label]: label
+										[label]: name
 									},
 									create: {
-										[opts.unpacking.label]: label
+										[label]: name
 									}
 								};
 							})
 						};
 					} else {
-						const { label } = obj[id];
+						const { [label]: name } = obj[id];
 
 						obj[id] = {
 							connectOrCreate: {
 								where: {
-									[opts.unpacking.label]: label
+									[label]: name
 								},
 								create: {
-									[opts.unpacking.label]: label
+									[label]: name
 								}
 							}
 						};
@@ -76,29 +78,29 @@ export function validateAndClean(obj, columns, clean = false) {
 				} else {
 					if (Array.isArray(obj[id])) {
 						obj[id] = {
-							connect: obj[id].map(({ value, label }) => {
+							connect: obj[id].map(({ [itemId]: id, [label]: name }) => {
 								return {
-									[opts.alias.value]: value || 0,
-									[opts.alias.label]: label
+									[itemId]: id || 0,
+									[label]: name
 								};
 							})
 						};
 					} else {
-						const { value, label } = obj[id];
+						const { [itemId]: id, [label]: name } = obj[id];
 
 						obj[id] = {
 							connect: {
-								[opts.alias.value]: value || 0,
-								[opts.alias.label]: label
+								[itemId]: id || 0,
+								[label]: name
 							}
 						};
 					}
 				}
 			}
-			if (!clean && type === 'checkbox') {
+			if (type === 'checkbox') {
 				obj[id] = obj[id] === 'on';
 			}
-			if (!clean && type === 'date') {
+			if (type === 'date') {
 				obj[id] = date(obj[id], false);
 			}
 		} catch (error) {

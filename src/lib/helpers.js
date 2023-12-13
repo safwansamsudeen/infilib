@@ -20,15 +20,15 @@ export function findValue(array, key_value, key = 'id') {
 	}
 }
 
-export function standardize(records, columns, date_format = 'DD/MM/YYYY') {
-	for (let { id, type, opts, columns: subColumns } of columns) {
+export function prettify(records, columns) {
+	for (let { id, type, opts } of columns) {
 		if (type === 'select') {
 			records.map(
 				(record) =>
 					(record[id] =
 						opts.multiple === true
-							? record[id].map((subRecord) => subRecord[opts.alias.label])
-							: record[id]?.[opts.alias.label])
+							? record[id].map((subRecord) => subRecord.name || subRecord[opts.label])
+							: record[id].name || record[id][opts.label])
 			);
 		} else if (type === 'date') {
 			records.map((record) => (record[id] = date(record[id])));
@@ -111,8 +111,8 @@ export async function setBookDetails(isbn, publishers, authors, languages, categ
 	return false;
 }
 
-export function flatten(records, type) {
-	records.map((rec) => Object.entries(rec[type]).map(([key, value]) => (rec[key] = value)));
+export function flatten(records, key) {
+	records.map((rec) => Object.entries(rec[key]).map(([id, value]) => (rec[id] = value)));
 }
 
 export function truncate(text, totalChars = 80, endChars = 20) {
@@ -149,6 +149,23 @@ export function injectLibraryInSelect(data, library_slug) {
 					library_slug
 				}
 			}
+		};
+	}
+}
+
+export function addDefaults(obj, { opts, ...data }) {
+	if (data.type !== 'object') {
+		return {
+			...data,
+			opts: {
+				...opts,
+				value: obj[data.id]
+			}
+		};
+	} else {
+		return {
+			...data,
+			columns: data.columns.map((col) => addDefaults(obj[data.id], col))
 		};
 	}
 }

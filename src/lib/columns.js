@@ -7,7 +7,16 @@ Handle with care.
 
 import { capitalize } from '$lib/helpers.js';
 
-import { author, category, language, user, item, subscriptionType, library } from '$lib/db.js';
+import {
+	author,
+	category,
+	language,
+	user,
+	item,
+	subscriptionType,
+	library,
+	publisher
+} from '$lib/db.js';
 
 const CACHE_STRATEGY = { cacheStrategy: { swr: 60, ttl: 60 } };
 
@@ -29,7 +38,7 @@ function normalize(fn) {
 						name,
 						columns.map((obj) => ({
 							...obj,
-							name: obj.name || capitalize(obj.id),
+							label: obj.name || capitalize(obj.id),
 							important: obj.important ?? true
 						}))
 					])
@@ -46,9 +55,9 @@ function normalize(fn) {
 	};
 }
 
-function standardize({ name, important, type, columns, ...data }) {
+function standardizeColumns({ name, important, type, columns, ...data }) {
 	if (type === 'object') {
-		return { ...data, name, type, columns: columns.map(standardize) };
+		return { ...data, name, type, columns: columns.map(standardizeColumns) };
 	} else {
 		return {
 			...data,
@@ -73,11 +82,10 @@ export async function getUserColumns(library_slug, opts = false) {
 			type: 'select',
 			opts: {
 				options: [
-					{ value: 'M', label: 'Male' },
-					{ value: 'F', label: 'Female' }
+					{ id: 'M', name: 'Male' },
+					{ id: 'F', name: 'Female' }
 				],
-				creatable: false,
-				alias: { value: 'value', label: 'label' }
+				creatable: false
 			}
 		},
 		{ id: 'email_address', type: 'email' },
@@ -95,8 +103,7 @@ export async function getUserColumns(library_slug, opts = false) {
 					label: 'Subscription Type',
 					type: 'select',
 					opts: {
-						options: opts && types.map(({ id, name }) => ({ value: id, label: name })),
-						alias: { value: 'id', label: 'name' },
+						options: types,
 						creatable: false
 					}
 				},
@@ -105,7 +112,7 @@ export async function getUserColumns(library_slug, opts = false) {
 				{ id: 'details' }
 			]
 		}
-	].map(standardize);
+	].map(standardizeColumns);
 }
 
 export const getMarkColumns = normalize(async function () {
@@ -114,8 +121,8 @@ export const getMarkColumns = normalize(async function () {
 			id: 'item'
 		},
 		{ id: 'user', type: 'hidden' },
-		{ id: 'borrow_time', label: 'Time Of Pickup', type: 'datetime-local' },
-		{ id: 'comments', type: 'textarea', required: false }
+		{ id: 'borrow_time', name: 'Time Of Pickup', type: 'datetime-local' },
+		{ id: 'comments', name: 'textarea', required: false }
 	];
 });
 
@@ -124,7 +131,7 @@ export const getSubscriptionColumns = normalize(async function () {
 		{
 			id: 'label'
 		},
-		{ id: 'no_of_days', label: 'Maximum Number of Borrowing Days', type: 'number' },
+		{ id: 'no_of_days', name: 'Maximum Number of Borrowing Days', type: 'number' },
 		{ id: 'no_of_books', name: 'Maximum Number of Books', type: 'number' },
 		{ id: 'deposit', type: 'number' },
 		{ id: 'annual_price', type: 'number', important: false },
@@ -152,16 +159,7 @@ export async function getTransColumns(library_slug, opts = false) {
 			id: 'user',
 			type: 'select',
 			opts: {
-				options:
-					opts &&
-					users.map(({ id, name }) => ({
-						value: id,
-						label: name
-					})),
-				alias: {
-					value: 'id',
-					label: 'name'
-				},
+				options: users,
 				creatable: false
 			}
 		},
@@ -169,16 +167,9 @@ export async function getTransColumns(library_slug, opts = false) {
 			id: 'item',
 			type: 'select',
 			opts: {
-				options:
-					opts &&
-					items.map(({ id, title }) => ({
-						value: id,
-						label: title
-					})),
-				alias: {
-					value: 'id',
-					label: 'title'
-				},
+				options: items,
+				itemId: 'id',
+				label: 'title',
 				creatable: false
 			}
 		},
@@ -187,11 +178,11 @@ export async function getTransColumns(library_slug, opts = false) {
 		{ id: 'returned_at', type: 'date', hidden: true },
 		{ id: 'price', type: 'number', important: true },
 		{ id: 'comments', type: 'textarea', important: false }
-	].map(standardize);
+	].map(standardizeColumns);
 }
 
-export async function getItemColumns(library_slug, opts = false) {
-	let categories, languages;
+export async function getItemColumns(library_slug = null, opts = false) {
+	let categories, languages, publishers;
 	if (opts) {
 		categories = await category.findMany({
 			...CACHE_STRATEGY,
@@ -200,26 +191,30 @@ export async function getItemColumns(library_slug, opts = false) {
 		languages = await language.findMany({
 			...CACHE_STRATEGY
 		});
+		publishers = await publisher.findMany({
+			...CACHE_STRATEGY,
+			where: { library_slug }
+		});
 	}
 
 	return [
-		{ id: 'acc_no', label: 'Acc. No.', type: 'number', important: false, required: true },
-		{ id: 'call_no', type: 'number', opts: { step: 0.01 } },
+		{ id: 'acc_no', name: 'Acc. No.', type: 'number' },
+		{ id: 'call_no', name: 'Call. No.', type: 'number', opts: { step: 0.01 } },
 		{ id: 'title' },
-		{ id: 'status', opts: { value: 'IN', disabled: true } },
+		{ id: 'status', opts: { value: 'IN', readonly: true } },
 		{
 			id: 'publisher',
-			type: 'object',
-			important: true,
-			columns: [{ id: 'name' }, { id: 'address', type: 'textarea' }]
+			type: 'select',
+			opts: {
+				options: publishers
+			}
 		},
 		{
 			id: 'categories',
 			type: 'select',
 			opts: {
 				multiple: true,
-				options: opts && categories.map(({ slug, name }) => ({ value: slug, label: name })),
-				alias: { value: 'id', label: 'name' }
+				options: categories
 			}
 		},
 		{ id: 'no_of_pages', type: 'number' },
@@ -232,17 +227,16 @@ export async function getItemColumns(library_slug, opts = false) {
 			type: 'select',
 			opts: {
 				multiple: true,
-				options: opts && languages.map(({ code, name }) => ({ value: code, label: name })),
-				alias: { value: 'code', label: 'name' }
+				options: languages
 			},
 			important: false
 		},
 		{ id: 'purchase_details', important: false },
-		{ id: 'image_url', label: 'Image URL', important: false },
+		{ id: 'image_url', name: 'Image URL', important: false },
 		{ id: 'level', important: false },
 		{ id: 'remarks', type: 'textarea', important: false },
 		{ id: 'reference', type: 'checkbox' }
-	];
+	].map(standardizeColumns);
 }
 
 export async function getBookColumns(library_slug, opts) {
@@ -253,33 +247,27 @@ export async function getBookColumns(library_slug, opts) {
 			where: { library_slug }
 		}));
 	return [
-		...(await getItemColumns(library_slug, opts)),
 		{
 			id: 'authors',
 			type: 'select',
 			opts: {
 				multiple: true,
-				options: opts && authors.map(({ id, name }) => ({ value: id, label: name })),
-				aliases: {
-					value: 'id',
-					label: 'name'
-				}
+				options: authors
 			}
 		},
-		{ id: 'isbn', type: 'text', label: 'ISBN' },
+		{ id: 'isbn', type: 'text', name: 'ISBN' },
 		{ id: 'subtitle', important: false },
-		{ id: 'publication_year', type: 'number', label: 'Year Published', important: false },
+		{ id: 'publication_year', type: 'number', name: 'Year Published', important: false },
 		{ id: 'edition', important: false }
-	];
+	].map(standardizeColumns);
 }
 
-export async function getMagazineColumns(library_slug, opts) {
+export async function getMagazineColumns() {
 	return [
-		...(await getItemColumns(library_slug, opts)),
 		{ id: 'issue' },
 		{ id: 'volume' },
 		{ id: 'sc_no', type: 'number' },
 		{ id: 'from', type: 'date' },
 		{ id: 'to', type: 'date' }
-	];
+	].map(standardizeColumns);
 }

@@ -51,7 +51,6 @@ export async function storeUserData(passage_id) {
 		details,
 		date_of_birth: date(date_of_birth, false)
 	};
-	console.log(userDetails);
 	if (login_count === 1) {
 		await user.upsert({
 			where: { email_address: email },

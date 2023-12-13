@@ -2,7 +2,7 @@ import { getUserColumns } from '$lib/columns.js';
 import { pojoData } from '$lib/serverHelpers.js';
 import { user } from '$lib/db.js';
 import { validateAndClean } from '$lib/validators.js';
-import { redirect } from '@sveltejs/kit';
+import { redirect, fail } from '@sveltejs/kit';
 import { response } from '$lib/serverHelpers.js';
 
 export async function load({ params }) {
@@ -16,7 +16,7 @@ export const actions = {
 
 		const userColumns = await getUserColumns(params.library);
 		let check = validateAndClean(requestData, userColumns);
-		if (check) return check;
+		if (check) return new fail(400, check);
 
 		// Modifications specific to User model
 		requestData.gender = requestData.gender.connect.value;

@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/stores';
-	import TransactionTable from '$lib/components/TransactionTable.svelte';
-	import Form from '$lib/components/Form.svelte';
+	import TransTable from '$lib/components/TransTable.svelte';
+	import Form from '$lib/components/Form2.svelte';
 	import { capitalize } from '$lib/helpers.js';
 	import Input from '$lib/components/Input.svelte';
 
@@ -10,11 +10,13 @@
 
 <svelte:head>
 	<title>Manage: {data.item.title}</title>
-	<meta content="View all the users, and manage them." name="description" />
+	<meta content="View a specific item" name="description" />
 </svelte:head>
+
 <div class="text-column text-center">
 	<h1>Manage: <em>{data.item.title}</em></h1>
 </div>
+
 <body>
 	<div class="container">
 		<div class="d-grid gap-2 my-4" role="group">
@@ -38,22 +40,11 @@
 		</div>
 
 		<div class="row">
-			{#if $page.form?.success}
-				<p class="alert alert-success">Successfully updated!</p>
-			{/if}
-			<Form action="update" addTogglable={false} columns={data.itemColumns} id="item">
-				<svelte:fragment slot="options-extra-columns">
-					<input class="btn-check" id="type" name="type" type="hidden" value={data.type} />
-					<h3 class="text-center">{capitalize(data.type)}</h3>
-					{#each data.otherColumns[data.type] as column}
-						<Input {...column} />
-					{/each}
-				</svelte:fragment>
-			</Form>
+			<Form action="update" columns={data.columns}><svelte:fragment slot="extras"><input name="type" type="hidden" value = {data.item.book ? 'book' : 'magazine'}></svelte:fragment></Form>
 
 			<h3 class="text-center">Borrowed</h3>
 			{#key data.transactions}
-				<TransactionTable columns={data.transColumns} data={data.transactions}></TransactionTable>
+				<TransTable columns={data.transColumns} data={data.transactions} />
 			{/key}
 		</div>
 	</div>

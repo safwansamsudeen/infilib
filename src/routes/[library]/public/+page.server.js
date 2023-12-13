@@ -1,6 +1,6 @@
 import { item } from '$lib/db.js';
 import { getItemColumns } from '$lib/columns.js';
-import { standardize, flatten } from '$lib/helpers.js';
+import { prettify, flatten } from '$lib/helpers.js';
 
 export async function load({ params }) {
 	let books = await item.findMany({
@@ -15,6 +15,6 @@ export async function load({ params }) {
 	});
 	const [columns, others] = await getItemColumns(params.library);
 	flatten(books, 'book');
-	await standardize(books, columns.concat(others.book));
+	await prettify(books, columns.concat(others.book));
 	return { books };
 }

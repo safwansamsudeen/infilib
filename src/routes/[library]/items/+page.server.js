@@ -1,8 +1,8 @@
 import { item } from '$lib/db.js';
 import { pojoData, response } from '$lib/serverHelpers.js';
 import { fail } from '@sveltejs/kit';
-import { getItemColumns } from '$lib/columns.js';
-import { standardize, flatten, injectLibraryInSelect } from '$lib/helpers.js';
+import { getBookColumns, getMagazineColumns, getItemColumns } from '$lib/columns.js';
+import { prettify, flatten, injectLibraryInSelect } from '$lib/helpers.js';
 import { validateAndClean } from '$lib/validators.js';
 
 export async function load({ url, params }) {
@@ -10,48 +10,41 @@ export async function load({ url, params }) {
 	return {
 		streamed: {
 			items: new Promise(async (res) => {
-				const [columns, otherColumns] = await getItemColumns(library_slug);
+				let columns = await getItemColumns(library_slug);
+
 				// Set up DB params for modification
-				let itemColumns = columns;
 				let where = { library_slug };
 				let include = {
 					publisher: true,
 					categories: true,
 					languages: true
 				};
+
 				// If there's a type specified, add columns and change DB call
 				let type;
 				for (let [key, val] of url.searchParams.entries()) {
-					if (key === 'show') {
-						if (Object.keys(otherColumns).includes(val)) {
-							where[val] = { isNot: null };
-							include[val] = {
-								include: Object.fromEntries(
-									otherColumns[val]
-										.filter(({ type }) => type === 'select')
-										.map(({ id }) => [id, true])
-								)
-							};
-							itemColumns = columns.concat(otherColumns[val]);
-							type = val;
-							break;
-						}
+					if (key === 'show' && ['book', 'magazine'].includes(val)) {
+						type = val;
+						const otherColumns = await (type === 'book' ? getBookColumns : getMagazineColumns)();
+						where[val] = { isNot: null };
+						include[val] = {
+							include: Object.fromEntries(
+								otherColumns.filter(({ type }) => type === 'select').map(({ id }) => [id, true])
+							)
+						};
+						columns = columns.concat(otherColumns);
+						break;
 					}
 				}
-				let items = await item.findMany({
-					include,
-					where,
-					cacheStrategy: { swr: 60, ttl: 60 }
-				});
+				let items = await item.findMany({ include, where, cacheStrategy: { swr: 60, ttl: 60 } });
 
 				// Flatten and standardize items
 				if (type) flatten(items, type);
-				standardize(items, itemColumns);
+				prettify(items, columns);
 
 				res({
-					itemColumns,
 					items,
-					otherColumns
+					columns
 				});
 			})
 		}
