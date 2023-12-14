@@ -50,6 +50,7 @@ model UserSubscription {
   transactions Transaction[]
   purchased_on DateTime
   valid_till   DateTime?
+  active       Boolean          @default(true)
 
   @@unique([type_id, user_id])
 }

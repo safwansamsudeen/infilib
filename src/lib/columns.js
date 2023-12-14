@@ -115,29 +115,29 @@ export async function getUserColumns(library_slug, opts = false) {
 	].map(standardizeColumns);
 }
 
-export const getMarkColumns = normalize(async function () {
+export async function getMarkColumns() {
 	return [
 		{
 			id: 'item'
 		},
 		{ id: 'user', type: 'hidden' },
 		{ id: 'borrow_time', name: 'Time Of Pickup', type: 'datetime-local' },
-		{ id: 'comments', name: 'textarea', required: false }
-	];
-});
+		{ id: 'comments', type: 'textarea', opts: { required: false } }
+	].map(standardizeColumns);
+}
 
-export const getSubscriptionColumns = normalize(async function () {
+export async function getSubscriptionColumns() {
 	return [
 		{
-			id: 'label'
+			id: 'name'
 		},
 		{ id: 'no_of_days', name: 'Maximum Number of Borrowing Days', type: 'number' },
 		{ id: 'no_of_books', name: 'Maximum Number of Books', type: 'number' },
 		{ id: 'deposit', type: 'number' },
 		{ id: 'annual_price', type: 'number', important: false },
 		{ id: 'half_yearly_price', type: 'number', important: false }
-	];
-});
+	].map(standardizeColumns);
+}
 
 export async function getTransColumns(library_slug, opts = false) {
 	const users =
@@ -154,7 +154,7 @@ export async function getTransColumns(library_slug, opts = false) {
 		}));
 
 	return [
-		{ id: 'id', type: 'hidden' },
+		{ id: 'id', name: 'ID', type: 'hidden' },
 		{
 			id: 'user',
 			type: 'select',
@@ -175,9 +175,9 @@ export async function getTransColumns(library_slug, opts = false) {
 		},
 		{ id: 'issued_at', type: 'date' },
 		{ id: 'due_at', type: 'date' },
-		{ id: 'returned_at', type: 'date', hidden: true },
+		{ id: 'returned_at', type: 'date', opts: { formRemoved: true } },
 		{ id: 'price', type: 'number', important: true },
-		{ id: 'comments', type: 'textarea', important: false }
+		{ id: 'comments', type: 'textarea', important: false, opts: { tableVisible: true } }
 	].map(standardizeColumns);
 }
 

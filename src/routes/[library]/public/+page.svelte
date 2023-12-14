@@ -16,7 +16,7 @@
 						<div class="card-body">
 							<h5 class="card-title">{book.title}</h5>
 							<h6 class="card-subtitle mb-2 text-muted">
-								{book.authors.map(({ label }) => label).join(', ')}
+								{book.authors.join(', ')}
 							</h6>
 							<p class="card-text">{truncate(book.remarks)}</p>
 							{#if book.status !== 'IN'}

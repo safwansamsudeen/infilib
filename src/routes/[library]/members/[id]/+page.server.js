@@ -16,7 +16,7 @@ export async function load({ params }) {
 
 	// Do member specific stuff
 	const subscription = user_obj.subscriptions.find(
-		({ type }) => type.library_slug === params.library
+		({ type, active }) => type.library_slug === params.library && active
 	);
 	user_obj = {
 		...user_obj,
@@ -58,16 +58,18 @@ export const actions = {
 		// Modifications specific to User model
 		requestData.gender = requestData.gender.connect.value;
 		requestData.subscriptions = {
-			update: {
+			upsert: {
 				where: {
 					type_id_user_id: {
 						type_id: requestData.subscription.create.type.connect.id,
 						user_id: +params.id
 					}
 				},
-				data: requestData.subscription.create
+				update: { ...requestData.subscription.create, active: true },
+				create: requestData.subscription.create
 			}
 		};
+
 		delete requestData.subscription;
 		return response(async () => {
 			await user.update({

@@ -1,5 +1,5 @@
 import { item } from '$lib/db.js';
-import { getItemColumns } from '$lib/columns.js';
+import { getBookColumns, getItemColumns } from '$lib/columns.js';
 import { prettify, flatten } from '$lib/helpers.js';
 
 export async function load({ params }) {
@@ -13,8 +13,9 @@ export async function load({ params }) {
 			mark: true
 		}
 	});
-	const [columns, others] = await getItemColumns(params.library);
+	const itemColumns = await getItemColumns(params.library);
+	const bookColumns = await getBookColumns(params.library);
 	flatten(books, 'book');
-	await prettify(books, columns.concat(others.book));
+	await prettify(books, itemColumns.concat(bookColumns));
 	return { books };
 }

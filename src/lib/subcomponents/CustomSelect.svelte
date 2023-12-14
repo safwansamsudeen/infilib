@@ -29,7 +29,6 @@
 		});
 		onChange(value);
 	}
-
 </script>
 
 {#if creatable}

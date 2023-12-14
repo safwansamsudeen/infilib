@@ -21,7 +21,6 @@
 					actions={[['Pop', 'circulation/borrow/any?mark=']]}
 					columns={data.columns}
 					data={data.marks}
-					updateUrl="members"
 				/>
 			{/key}
 		</div>

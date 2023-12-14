@@ -3,35 +3,35 @@ import { prettify } from '$lib/helpers.js';
 import { pojoData, response } from '$lib/serverHelpers.js';
 import { getTransColumns } from '$lib/columns.js';
 
-export async function load({ url, params: requestParams }) {
-	let params = { deleted: { not: true } };
+export async function load({ url, params }) {
+	let where = { deleted: { not: true }, item: { is: { library_slug: params.library } } };
 	for (let [key, val] of url.searchParams.entries()) {
 		if (key === 'due') {
 			if (val === 'today') {
-				params.due_at = { lte: new Date() };
-				params.returned_at = { equals: null };
-			} else params['due_at'] = { lte: new Date(), gte: new Date(val) };
+				where.due_at = { lte: new Date() };
+				where.returned_at = { equals: null };
+			} else where['due_at'] = { lte: new Date(), gte: new Date(val) };
 		} else if (val) {
-			params[key] = val;
+			where[key] = val;
 		}
 	}
-	const transColumns = await getTransColumns(requestParams.library);
 
 	return {
-		columns: transColumns,
-		transactions: {
-			data: new Promise(async (fulfil) => {
+		streamed: {
+			transactions: (async () => {
+				const columns = await getTransColumns(params.library);
 				const transactions = await transaction.findMany({
 					include: {
 						item: true,
 						user: true,
 						subscription: true
 					},
-					where: params
+					where
 				});
-				prettify(transactions, transColumns);
-				fulfil(transactions);
-			})
+				prettify(transactions, columns);
+
+				return { transactions, columns };
+			})()
 		}
 	};
 }
@@ -46,10 +46,10 @@ export const actions = {
 	},
 	return: async function ({ request }) {
 		return await response(async () => {
-			const { id, comments } = await pojoData(request);
+			const { id } = await pojoData(request);
 			await transaction.update({
 				where: { id: +id },
-				data: { returned_at: new Date(), comments, item: { update: { status: 'IN' } } }
+				data: { returned_at: new Date(), item: { update: { status: 'IN' } } }
 			});
 		});
 	}

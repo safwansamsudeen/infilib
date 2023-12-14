@@ -1,9 +1,9 @@
 import { item, mark } from '$lib/db.js';
-import { getMarkColumns, getTransColumns } from '$lib/columns.js';
+import { getMarkColumns } from '$lib/columns.js';
 import { pojoData } from '$lib/serverHelpers.js';
 import { getCurrentUser } from '$lib/auth.js';
 import { date } from '$lib/helpers.js';
-import { fail, redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 
 export async function load({ params }) {
 	let item_obj = await item.findUnique({ where: { id: +params.id }, include: { mark: true } });

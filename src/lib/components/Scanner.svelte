@@ -8,7 +8,6 @@
 		categories,
 		onCompleteFunc = (decodedText) =>
 			setBookDetails(decodedText, publishers, authors, languages, categories, scanner);
-
 	let scanner;
 	onMount(() => {
 		scanner = new Html5QrcodeScanner(
@@ -19,7 +18,7 @@
 		scanner.render(onCompleteFunc);
 	});
 	onDestroy(() => {
-		scanner.clear();
+		scanner?.clear();
 		document.getElementById('reader').innerHTML = '';
 	});
 </script>

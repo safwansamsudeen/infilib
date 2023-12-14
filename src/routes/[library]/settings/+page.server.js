@@ -9,7 +9,7 @@ export async function load() {
 }
 
 export const actions = {
-	create_subscription: async ({ request, params }) => {
+	create: async ({ request, params }) => {
 		const requestData = await pojoData(request);
 		const columns = (await getSubscriptionColumns()).filter(
 			({ id }) => !['returned_at', 'id'].includes(id)

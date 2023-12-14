@@ -1,12 +1,12 @@
 <script>
 	export let data;
 	import { page } from '$app/stores';
-	import TransactionTable from '$lib/components/TransactionTable.svelte';
+	import TransTable from '$lib/components/TransTable.svelte';
 </script>
 
 <svelte:head>
 	<title>Status of Borrows</title>
-	<meta content="View users" name="description" />
+	<meta content="View transactions" name="description" />
 </svelte:head>
 
 <body>
@@ -25,9 +25,13 @@
 	</div>
 	<div class="grid px-0 my-3">
 		<div class="row align-items-start">
-			{#key data}
-				<TransactionTable columns={data.columns} promise={data.transactions} />
-			{/key}
+			{#await data.streamed.transactions then { columns, transactions }}
+				{#key data}
+					<TransTable {columns} data={transactions} />
+				{/key}
+			{:catch error}
+				<p>{error.message}</p>
+			{/await}
 		</div>
 	</div>
 </body>

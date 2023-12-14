@@ -1,4 +1,5 @@
 ## Members
+
 - Create member
   - This creates a member if the member doesn't exist.
   - If the member exists, it will add the subscription details to that member.

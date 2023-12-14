@@ -1,9 +1,7 @@
 <script>
 	import { page } from '$app/stores';
 	import TransTable from '$lib/components/TransTable.svelte';
-	import Form from '$lib/components/Form2.svelte';
-	import { capitalize } from '$lib/helpers.js';
-	import Input from '$lib/components/Input.svelte';
+	import Form from '$lib/components/Form.svelte';
 
 	export let data;
 </script>
@@ -40,7 +38,15 @@
 		</div>
 
 		<div class="row">
-			<Form action="update" columns={data.columns}><svelte:fragment slot="extras"><input name="type" type="hidden" value = {data.item.book ? 'book' : 'magazine'}></svelte:fragment></Form>
+			<Form action="update" columns={data.columns} message=""
+				><svelte:fragment slot="extras"
+					><input
+						name="type"
+						type="hidden"
+						value={data.item.book ? 'book' : 'magazine'}
+					/></svelte:fragment
+				></Form
+			>
 
 			<h3 class="text-center">Borrowed</h3>
 			{#key data.transactions}

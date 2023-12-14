@@ -1,16 +1,10 @@
 <script>
-	import Table from '$lib/components/Table2.svelte';
+	import Table from '$lib/components/Table.svelte';
 	import { findValue, setBookDetails } from '$lib/helpers.js';
 	import { page } from '$app/stores';
 	import Scanner from '$lib/components/Scanner.svelte';
 
 	export let data;
-	let scannerVisible = false;
-	function obtainOptions(columns, name) {
-		return findValue(columns, name)?.opts?.items || [];
-	}
-
-	let type = 'book';
 </script>
 
 <svelte:head>
@@ -47,7 +41,7 @@
 						['Details', 'items'],
 						['Borrow', 'circulation/borrow', (row) => row.status !== 'IN' || row.reference]
 					]}
-					columns={columns}
+					{columns}
 					data={items}
 				/>
 			{/key}

@@ -1,6 +1,6 @@
 import { mark } from '$lib/db.js';
 import { getMarkColumns } from '$lib/columns.js';
-import { date, prettify } from '$lib/helpers.js';
+import { date } from '$lib/helpers.js';
 
 export async function load({ params }) {
 	let marks = await mark.findMany({

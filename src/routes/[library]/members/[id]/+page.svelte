@@ -1,7 +1,7 @@
 <script>
-	import Form from '$lib/components/Form2.svelte';
+	import Form from '$lib/components/Form.svelte';
 	import { page } from '$app/stores';
-	import TransTable from "$lib/components/TransTable.svelte";
+	import TransTable from '$lib/components/TransTable.svelte';
 
 	export let data;
 </script>
@@ -33,7 +33,6 @@
 		</div>
 
 		<div class="row">
-
 			<Form action="update" addTogglable={false} columns={data.userColumns} message="" />
 
 			<h3 class="text-center">Borrowed</h3>

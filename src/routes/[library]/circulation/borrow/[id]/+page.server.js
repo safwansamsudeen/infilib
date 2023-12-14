@@ -3,6 +3,7 @@ import { findOr404, pojoData, response } from '$lib/serverHelpers.js';
 import { getTransColumns } from '$lib/columns.js';
 import { validateAndClean } from '$lib/validators.js';
 import { fail, redirect } from '@sveltejs/kit';
+import dayjs from 'dayjs';
 
 export async function load({ params, url }) {
 	let item_obj, user_obj, subscription;
@@ -25,64 +26,35 @@ export async function load({ params, url }) {
 
 	if (user_id) {
 		user_obj = await findOr404(user, {
-			where: { id: +user_id },
+			where: { id: +user_id, subscriptions: { some: { type: { library_slug: params.library } } } },
 			include: { subscriptions: { include: { type: true } } }
 		});
 		subscription = user_obj.subscriptions.find(
-			({ type }) => type.library_slug === params.library
+			({ type, active }) => type.library_slug === params.library && active
 		).type;
 	}
 
-	const transColumns = (await getTransColumns(params.library)).map((column) => {
-		if (item_obj) {
-			if (column.id === 'item') {
-				return {
-					...column,
-					opts: {
-						...column.opts,
-						disabled: true,
-						value: { label: item_obj.title, value: item_obj.id }
-					}
-				};
+	const values = {
+		item: item_obj && { title: item_obj.title, id: item_obj.id },
+		user: user_obj && { name: user_obj.name, id: user_obj.id },
+		price:
+			subscription && subscription.name !== 'Membership'
+				? 0
+				: Math.floor(item_obj?.purchase_price / 10),
+		issued_at: dayjs().format('YYYY-MM-DD'),
+		due_at: dayjs()
+			.add(subscription?.no_of_days || 4, 'day')
+			.format('YYYY-MM-DD')
+	};
+
+	const transColumns = (await getTransColumns(params.library, true)).map((column) => {
+		return {
+			...column,
+			opts: {
+				...column.opts,
+				value: values[column.id]
 			}
-		}
-		if (user_obj) {
-			if (column.id === 'user') {
-				return {
-					...column,
-					opts: {
-						...column.opts,
-						disabled: true,
-						value: { label: user_obj.name, value: user_obj.id }
-					}
-				};
-			} else if (column.id === 'subscription') {
-				return {
-					...column,
-					opts: {
-						...column.opts,
-						disabled: true,
-						value: {
-							label: subscription.name,
-							value: subscription.id
-						}
-					}
-				};
-			}
-		}
-		if (column.id === 'price') {
-			return {
-				...column,
-				opts: {
-					...column.opts,
-					value:
-						subscription && subscription?.name !== 'Membership'
-							? 0
-							: Math.floor(item_obj?.purchase_price / 10)
-				}
-			};
-		}
-		return column;
+		};
 	});
 	return {
 		mark_id,

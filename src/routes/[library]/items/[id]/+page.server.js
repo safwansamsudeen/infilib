@@ -35,7 +35,7 @@ export async function load({ params }) {
 	flatten([item_obj], type);
 
 	const transactions = await transaction.findMany({
-		where: { item_id: +params.id },
+		where: { item_id: +params.id, deleted: { not: true } },
 		include: { user: true }
 	});
 
@@ -53,7 +53,7 @@ export async function load({ params }) {
 
 export const actions = {
 	update: async ({ request, params }) => {
-		return await response(async () => {
+		return response(async () => {
 			let requestData = await pojoData(request);
 			const type = requestData.type;
 			delete requestData.type;
@@ -80,7 +80,7 @@ export const actions = {
 			}
 
 			await item.update({ where: { id: +params.id }, data: requestData });
-		}, true);
+		});
 	},
 	delete: async ({ params }) => {
 		await response(async () => {

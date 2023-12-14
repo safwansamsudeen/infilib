@@ -1,6 +1,6 @@
 <script>
-	import CustomSelect from '$lib/components/CustomSelect.svelte';
-    import {capitalize, date} from "$lib/helpers.js";
+	import CustomSelect from '$lib/subcomponents/CustomSelect.svelte';
+	import { capitalize, date } from '$lib/helpers.js';
 
 	export let id,
 		name = capitalize(id),
@@ -8,7 +8,6 @@
 		important = true,
 		disabled = false,
 		opts = {};
-
 </script>
 
 {#if type === 'hidden'}
@@ -32,13 +31,31 @@
 			</div>
 		{:else if type === 'textarea'}
 			<label for={id}>{name}</label>
-			<textarea class="form-control" {id} name={id} required={important} {disabled} {...opts}></textarea>
+			<textarea class="form-control" {id} name={id} required={important} {disabled} {...opts}
+			></textarea>
 		{:else if type === 'number'}
 			<label for={id}>{name}</label>
-			<input class="form-control" {id} name={id} type="number" min=0 required={important} {disabled} {...opts}>
+			<input
+				class="form-control"
+				{id}
+				name={id}
+				type="number"
+				min="0"
+				required={important}
+				{disabled}
+				{...opts}
+			/>
 		{:else if type === 'date'}
 			<label for={id}>{name}</label>
-			<input class="form-control" {id} name={id} type="date" required={important} {disabled} value={date(opts.value)}>
+			<input
+				class="form-control"
+				{id}
+				name={id}
+				type="date"
+				required={important}
+				{disabled}
+				value={date(opts.value)}
+			/>
 		{:else}
 			<label for={id}>{name}</label>
 			<input class="form-control" {id} name={id} required={important} {type} {disabled} {...opts} />

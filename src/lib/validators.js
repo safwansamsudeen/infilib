@@ -18,7 +18,7 @@ const PROPERTY_VALIDATORS = {
 };
 
 export function validateAndClean(obj, columns, action = 'create') {
-	for (let { id, name, type, important, opts, columns: subColumns } of columns) {
+	for (let { id: columnId, name, type, important, opts, columns: subColumns } of columns) {
 		if (type === 'object') {
 			let subObj = {};
 			for (let { id: subId } of subColumns) {
@@ -27,30 +27,30 @@ export function validateAndClean(obj, columns, action = 'create') {
 			}
 			let check = validateAndClean(subObj, subColumns);
 			if (check) return check;
-			obj[id] = { [action]: subObj };
+			obj[columnId] = { [action]: subObj };
 		}
 
-		if (important && !obj[id] && type !== 'checkbox') {
+		if (important && !obj[columnId] && type !== 'checkbox') {
 			return { name, missing: true };
 		}
-		if (!important && obj[id]?.length === 0) {
-			obj[id] = undefined;
+		if (!important && obj[columnId]?.length === 0) {
+			obj[columnId] = undefined;
 			continue;
 		}
 		try {
 			if (['select', 'number'].includes(type)) {
-				obj[id] = JSON.parse(obj[id] || '[]');
+				obj[columnId] = JSON.parse(obj[columnId] || '[]');
 			}
-			if (!(PROPERTY_VALIDATORS[type] || (() => true))(obj[id], opts)) {
-				return { name, value: obj[id], incorrect: true };
+			if (!(PROPERTY_VALIDATORS[type] || (() => true))(obj[columnId], opts)) {
+				return { name, value: obj[columnId], incorrect: true };
 			}
 			if (type === 'select') {
 				const itemId = opts.itemId || 'id';
 				const label = opts.label || 'name';
 				if (opts.creatable !== false) {
 					if (opts.multiple) {
-						obj[id] = {
-							connectOrCreate: obj[id].map(({ [label]: name }) => {
+						obj[columnId] = {
+							connectOrCreate: obj[columnId].map(({ [label]: name }) => {
 								return {
 									where: {
 										[label]: name
@@ -62,9 +62,9 @@ export function validateAndClean(obj, columns, action = 'create') {
 							})
 						};
 					} else {
-						const { [label]: name } = obj[id];
+						const { [label]: name } = obj[columnId];
 
-						obj[id] = {
+						obj[columnId] = {
 							connectOrCreate: {
 								where: {
 									[label]: name
@@ -76,9 +76,9 @@ export function validateAndClean(obj, columns, action = 'create') {
 						};
 					}
 				} else {
-					if (Array.isArray(obj[id])) {
-						obj[id] = {
-							connect: obj[id].map(({ [itemId]: id, [label]: name }) => {
+					if (Array.isArray(obj[columnId])) {
+						obj[columnId] = {
+							connect: obj[columnId].map(({ [itemId]: id, [label]: name }) => {
 								return {
 									[itemId]: id || 0,
 									[label]: name
@@ -86,9 +86,9 @@ export function validateAndClean(obj, columns, action = 'create') {
 							})
 						};
 					} else {
-						const { [itemId]: id, [label]: name } = obj[id];
+						const { [itemId]: id, [label]: name } = obj[columnId];
 
-						obj[id] = {
+						obj[columnId] = {
 							connect: {
 								[itemId]: id || 0,
 								[label]: name
@@ -98,13 +98,14 @@ export function validateAndClean(obj, columns, action = 'create') {
 				}
 			}
 			if (type === 'checkbox') {
-				obj[id] = obj[id] === 'on';
+				obj[columnId] = obj[columnId] === 'on';
 			}
 			if (type === 'date') {
-				obj[id] = date(obj[id], false);
+				obj[columnId] = date(obj[columnId], false);
 			}
 		} catch (error) {
-			return { name, value: obj[id], incorrect: true, error: error.message };
+			console.log(error);
+			return { name, value: obj[columnId], incorrect: true, error: error.message };
 		}
 	}
 }

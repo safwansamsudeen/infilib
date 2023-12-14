@@ -1,5 +1,5 @@
 <script>
-	import Table from '$lib/components/Table2.svelte';
+	import Table from '$lib/components/Table.svelte';
 
 	export let data;
 </script>
@@ -19,7 +19,14 @@
 			<p>Loading...</p>
 		{:then { columns, users }}
 			{#key data}
-				<Table data={users} {columns} actions={[['Details', 'members'], ['Borrow', 'circulation/borrow/any?user=']]}/>
+				<Table
+					data={users}
+					{columns}
+					actions={[
+						['Details', 'members'],
+						['Borrow', 'circulation/borrow/any?user=']
+					]}
+				/>
 			{/key}
 		{:catch error}
 			<p>{error.message}</p>

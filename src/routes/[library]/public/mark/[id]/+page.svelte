@@ -1,5 +1,5 @@
 <script>
-	import AddForm from '$lib/components/Form.svelte';
+	import Form from '$lib/components/Form.svelte';
 	import { onMount } from 'svelte';
 	import flatpickr from 'flatpickr';
 	import 'flatpickr/dist/themes/airbnb.css';
@@ -24,5 +24,5 @@
 </svelte:head>
 
 <div class="container">
-	<AddForm action="mark" addTogglable={false} columns={data.columns} />
+	<Form action="mark" columns={data.columns} />
 </div>

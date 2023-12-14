@@ -1,4 +1,4 @@
-import Input from '$lib/components/Input.svelte';
+import Input from '$lib/subcomponents/Input.svelte';
 import dayjs from 'dayjs';
 
 export function capitalize(label) {
@@ -8,7 +8,7 @@ export function capitalize(label) {
 		.join(' ');
 }
 
-export function setFormField(id, value) {
+function setFormField(id, value) {
 	document.getElementById(id).value = value || '';
 }
 
@@ -37,7 +37,7 @@ export function prettify(records, columns) {
 	return records;
 }
 
-export function setSelectField(id, items, newValue, multi = false) {
+function setSelectField(id, items, newValue, multi = false) {
 	let value = multi ? [] : {};
 	let foundItems;
 	// Add new value(s) to item list
@@ -45,8 +45,8 @@ export function setSelectField(id, items, newValue, multi = false) {
 		for (let expectedValue of newValue) {
 			foundItems = items.filter(({ value }) => value === expectedValue);
 			if (!foundItems.length) {
-				items.push({ value: expectedValue, label: expectedValue });
-				value.push({ value: expectedValue, label: expectedValue });
+				items.push({ id: expectedValue, name: expectedValue });
+				value.push({ id: expectedValue, name: expectedValue });
 			} else {
 				value.push(foundItems[0]);
 			}
@@ -54,16 +54,16 @@ export function setSelectField(id, items, newValue, multi = false) {
 	} else {
 		foundItems = items.filter(({ value, label }) => value === newValue || label === newValue);
 		if (!foundItems.length) {
-			items.push({ value: newValue, label: newValue });
-			value = { value: newValue, label: newValue };
+			items.push({ id: newValue, name: newValue });
+			value = { id: newValue, name: newValue };
 		} else {
 			value = foundItems[0];
 		}
 	}
 
 	// Empty component
-
 	document.querySelector(`#${id}-div`).innerHTML = '';
+
 	// Rerender component
 	new Input({
 		target: document.querySelector(`#${id}-div`),

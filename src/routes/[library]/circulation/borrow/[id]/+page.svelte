@@ -1,6 +1,6 @@
 <script>
 	export let data;
-	import AddForm from '$lib/components/Form.svelte';
+	import Form from '$lib/components/Form.svelte';
 </script>
 
 <svelte:head>
@@ -13,12 +13,6 @@
 <body>
 	<div class="container">
 		<input form="borrow-form" name="mark_id" type="hidden" value={data.mark_id} />
-		<AddForm action="borrow" addTogglable={false} columns={data.columns} />
+		<Form action="borrow" columns={data.columns} />
 	</div>
-	<script>
-		// Set borrowed date to today
-		document.getElementById('issued_at').valueAsDate = new Date();
-		// Add 7 days to borrowed date
-		document.getElementById('due_at').valueAsDate = new Date(Date.now() + 4 * 24 * 60 * 60 * 1000);
-	</script>
 </body>
