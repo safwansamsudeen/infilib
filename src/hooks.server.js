@@ -30,12 +30,11 @@ export async function handle({ event, resolve }) {
 				slug: event.params.library
 			}
 		});
-		const admin = true;
+		const admin = library_obj.administrator_id === user.id || user.id === 1;
 
 		if (subRoute !== 'public' && !admin) {
 			throw error(403, 'Not Authorized');
 		}
-		console.log(subRoute, admin);
 
 		event.locals.library_name = library_obj.name;
 		user.admin = admin;

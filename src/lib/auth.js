@@ -51,11 +51,10 @@ export async function storeUserData(passage_id) {
 		details,
 		date_of_birth: date(date_of_birth, false)
 	};
-	if (login_count === 1) {
-		await user.upsert({
-			where: { email_address: email },
-			update: userDetails,
-			create: userDetails
-		});
-	}
+	// Weird way to set up passage ID, but until in prod, works.
+	await user.upsert({
+		where: { email_address: email },
+		update: userDetails,
+		create: userDetails
+	});
 }
