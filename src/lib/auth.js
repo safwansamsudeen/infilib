@@ -37,10 +37,9 @@ export async function getCurrentUser(auth_token) {
 export async function storeUserData(passage_id) {
 	const {
 		email,
-		login_count,
 		id,
 		phone,
-		user_metadata: { name, gender, details, date_of_birth }
+		user_metadata: { name, gender, about, date_of_birth }
 	} = await passage.user.get(passage_id);
 	const userDetails = {
 		email_address: email,
@@ -48,7 +47,7 @@ export async function storeUserData(passage_id) {
 		passage_id: id,
 		name,
 		gender: gender === 'M' ? 'M' : 'F',
-		details,
+		about,
 		date_of_birth: date(date_of_birth, false)
 	};
 	// Weird way to set up passage ID, but until in prod, works.
