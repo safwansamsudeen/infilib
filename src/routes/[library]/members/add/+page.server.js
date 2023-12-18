@@ -19,10 +19,9 @@ export const actions = {
 		if (check) return new fail(400, check);
 
 		// Modifications specific to User model
-		requestData.gender = requestData.gender.connect.value;
+		requestData.gender = requestData.gender.connect.id;
 		requestData.subscriptions = requestData.subscription;
 		delete requestData.subscription;
-
 		const res = await response(async () => {
 			await user.upsert({
 				where: { email_address: requestData.email_address },

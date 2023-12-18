@@ -17,7 +17,9 @@
 			}
 			return html + '</div>';
 		};
-	onMount(() => {
+	onMount(async () => {
+		await import('https://code.jquery.com/jquery-3.7.1.min.js');
+		await import('https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js')
 		let $table = jQuery('#table');
 		window.actionsHtml = actionsHtml;
 		window.checkbox = function (value) {
@@ -56,3 +58,7 @@
 	</thead>
 	<tbody></tbody>
 </table>
+
+<style>
+	@import 'https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.css';
+</style>

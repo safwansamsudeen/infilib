@@ -3,7 +3,10 @@
 	import { page } from '$app/stores';
 	import { truncate } from '$lib/helpers';
 </script>
-
+<svelte:head>
+	<title>Public Portal</title>
+	<meta content="Public Portal" name="description" />
+</svelte:head>
 <div class="row">
 	{#each data.books as book}
 		<div class="col-md-4 col-sm-6">

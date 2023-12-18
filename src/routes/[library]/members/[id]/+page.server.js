@@ -1,12 +1,12 @@
 import { transaction, user, userSubscription } from '$lib/db.js';
-import { addDefaults, prettify } from '$lib/helpers.js';
-import { pojoData, response } from '$lib/serverHelpers.js';
+import { addDefaults, getUserSubscription, prettify } from '$lib/helpers.js';
+import { findOr404, pojoData, response } from '$lib/serverHelpers.js';
 import { validateAndClean } from '$lib/validators.js';
 import { redirect } from '@sveltejs/kit';
 import { getTransColumns, getUserColumns } from '$lib/columns.js';
 
 export async function load({ params }) {
-	let user_obj = await user.findUnique({
+	let user_obj = await findOr404(user, {
 		where: {
 			id: +params.id,
 			subscriptions: { some: { type: { library_slug: params.library } } }
@@ -15,9 +15,7 @@ export async function load({ params }) {
 	});
 
 	// Do member specific stuff
-	const subscription = user_obj.subscriptions.find(
-		({ type, active }) => type.library_slug === params.library && active
-	);
+	const subscription = getUserSubscription(user_obj, params.library);
 	user_obj = {
 		...user_obj,
 		gender: { id: user_obj.gender, name: user_obj.gender === 'M' ? 'Male' : 'Female' },
@@ -56,21 +54,21 @@ export const actions = {
 		if (check) return check;
 
 		// Modifications specific to User model
-		requestData.gender = requestData.gender.connect.value;
+		requestData.gender = requestData.gender.connect.id;
+		// delete requestData.subscription.create
 		requestData.subscriptions = {
-			upsert: {
+			update: {
 				where: {
 					type_id_user_id: {
 						type_id: requestData.subscription.create.type.connect.id,
 						user_id: +params.id
 					}
 				},
-				update: { ...requestData.subscription.create, active: true },
-				create: requestData.subscription.create
+				data: requestData.subscription.create
 			}
 		};
-
 		delete requestData.subscription;
+		console.log(requestData);
 		return response(async () => {
 			await user.update({
 				where: { id: +params.id },

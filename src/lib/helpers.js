@@ -116,6 +116,7 @@ export function flatten(records, key) {
 }
 
 export function truncate(text, totalChars = 80, endChars = 20) {
+	if (!text) return '';
 	endChars = Math.min(endChars, totalChars);
 	const start = text.slice(0, totalChars - endChars);
 	const end = endChars > 0 ? text.slice(-endChars) : '';
@@ -168,4 +169,10 @@ export function addDefaults(obj, { opts, ...data }) {
 			columns: data.columns.map((col) => addDefaults(obj[data.id], col))
 		};
 	}
+}
+
+export function getUserSubscription(user_obj, library_slug) {
+	return user_obj.subscriptions.find(
+		({ type, active }) => type.library_slug === library_slug && active
+	);
 }

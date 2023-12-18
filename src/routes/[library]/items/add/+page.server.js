@@ -48,6 +48,6 @@ export const actions = {
 		}, true);
 		if (res) return res;
 
-		throw redirect(303, `/${params.library}/members`);
+		throw redirect(303, `/${params.library}/items`);
 	}
 };

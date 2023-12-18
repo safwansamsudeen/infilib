@@ -4,7 +4,8 @@ const prisma = new PrismaClient();
 const USERS = [
 	['safwansamsudeen@gmail.com', 'Safwan (Superuser)', 'M'],
 	['librarian.ups@unityschool.in', 'Shakii', 'M'],
-	['naqeebkabir@gmal.com', 'Naqeeb Sultana', 'F']
+	['naqeebkabir@gmail.com', 'Naqeeb Sultana', 'F'],
+	['abdullah@gmail.com', 'Abdullah Ibrahim', 'M']
 ];
 
 const LIBRARIES = [
@@ -19,7 +20,13 @@ const LIBRARIES = [
 		'naqeeb-library',
 		"Naqeeb's Library",
 		'Kottivakkam, Chennai, Tamil Nadu, India',
-		'naqeebkabir@gmal.com'
+		'naqeebkabir@gmail.com'
+	],
+	[
+		'sunnyside-library',
+		"Sunnyside's Library",
+		'Kottivakkam, Chennai, Tamil Nadu, India',
+		'abdullah@gmail.com'
 	]
 ];
 
