@@ -5,7 +5,7 @@ const USERS = [
 	['safwansamsudeen@gmail.com', 'Safwan (Superuser)', 'M'],
 	['librarian.ups@unityschool.in', 'Shakii', 'M'],
 	['naqeebkabir@gmail.com', 'Naqeeb Sultana', 'F'],
-	['abdullah@gmail.com', 'Abdullah Ibrahim', 'M']
+	['abdullahidesigns@gmail.com', 'Abdullah Ibrahim', 'M']
 ];
 
 const LIBRARIES = [
@@ -26,7 +26,7 @@ const LIBRARIES = [
 		'sunnyside-library',
 		"Sunnyside's Library",
 		'Kottivakkam, Chennai, Tamil Nadu, India',
-		'abdullah@gmail.com'
+		'abdullahidesigns@gmail.com'
 	]
 ];
 
