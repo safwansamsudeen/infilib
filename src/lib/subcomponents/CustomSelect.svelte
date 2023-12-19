@@ -27,7 +27,7 @@
 			delete i.created;
 			return i;
 		});
-		onChange(value);
+		onChange(e);
 	}
 </script>
 
@@ -61,6 +61,7 @@
 		{disabled}
 		{label}
 		{itemId}
+		on:change={onChange}
 		name={id}
 	/>
 {/if}

@@ -1,6 +1,6 @@
 {
 	"name": "infilib",
-	"version": "0.4.0",
+	"version": "0.4.1",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
@@ -32,6 +32,7 @@
 		"@passageidentity/passage-elements": "^1.16.0",
 		"@passageidentity/passage-node": "^2.6.0",
 		"@prisma/extension-accelerate": "^0.6.2",
+		"@vercel/analytics": "^1.1.1",
 		"@vercel/speed-insights": "^1.0.2",
 		"csv-parser": "^3.0.0",
 		"dayjs": "^1.11.10",

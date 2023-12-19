@@ -4,6 +4,7 @@ import { getTransColumns } from '$lib/columns.js';
 import { validateAndClean } from '$lib/validators.js';
 import { fail, redirect } from '@sveltejs/kit';
 import dayjs from 'dayjs';
+import { getUserSubscription } from '$lib/helpers.js';
 
 export async function load({ params, url }) {
 	let item_obj, user_obj, subscription;
@@ -29,14 +30,13 @@ export async function load({ params, url }) {
 			where: { id: +user_id, subscriptions: { some: { type: { library_slug: params.library } } } },
 			include: { subscriptions: { include: { type: true } } }
 		});
-		subscription = user_obj.subscriptions.find(
-			({ type, active }) => type.library_slug === params.library && active
-		).type;
+		subscription = getUserSubscription(user_obj, params.library).type;
 	}
 
 	const values = {
 		item: item_obj && { title: item_obj.title, id: item_obj.id },
 		user: user_obj && { name: user_obj.name, id: user_obj.id },
+		subscription: subscription && { id: subscription.id, name: subscription.name },
 		price:
 			subscription && subscription.name !== 'Membership'
 				? 0
@@ -77,6 +77,34 @@ export const actions = {
 		if (item_obj.status === 'OUT') {
 			return fail(400, { incorrect: true, name: 'item', value: 'this item is already borrowed.' });
 		}
+
+		const all_transactions = await transaction.findMany({
+			where: {
+				subscription: {
+					user_id: +requestData.user.connect.id,
+					type: { library_slug: params.library }
+				},
+				returned_at: null,
+				deleted: false
+			},
+			include: { subscription: { include: { type: true } } }
+		});
+		if (all_transactions.length >= all_transactions[0].subscription.type.no_of_books) {
+			return fail(400, {
+				incorrect: true,
+				name: 'User',
+				value: 'this user has too many items borrowed'
+			});
+		}
+
+		requestData.subscription = {
+			connect: {
+				type_id_user_id: {
+					type_id: requestData.subscription.connect.id,
+					user_id: +requestData.user.connect.id
+				}
+			}
+		};
 		let data = {};
 		for (let { id } of transColumns) data[id] = requestData[id];
 

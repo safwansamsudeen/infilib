@@ -7,53 +7,9 @@ Handle with care.
 
 import { capitalize } from '$lib/helpers.js';
 
-import {
-	author,
-	category,
-	language,
-	user,
-	item,
-	subscriptionType,
-	library,
-	publisher
-} from '$lib/db.js';
+import { author, category, language, user, item, subscriptionType, publisher } from '$lib/db.js';
 
 const CACHE_STRATEGY = { cacheStrategy: { swr: 60, ttl: 60 } };
-
-function normalize(fn) {
-	// I have next to no idea what this monolith is doing but I'm sure it's crucial
-	return async function (...args) {
-		let res = await fn(...args);
-		if (Array.isArray(res[0])) {
-			return [
-				res[0].map(({ name, important, ...data }) => {
-					return {
-						...data,
-						name: name || capitalize(data.id),
-						important: important ?? true
-					};
-				}),
-				Object.fromEntries(
-					Object.entries(res[1]).map(([name, columns]) => [
-						name,
-						columns.map((obj) => ({
-							...obj,
-							label: obj.name || capitalize(obj.id),
-							important: obj.important ?? true
-						}))
-					])
-				)
-			];
-		}
-		return res.map(({ name, important, ...data }) => {
-			return {
-				...data,
-				name: name || capitalize(data.id),
-				important: important ?? true
-			};
-		});
-	};
-}
 
 function standardizeColumns({ name, important, type, columns, ...data }) {
 	if (type === 'object') {
@@ -146,6 +102,13 @@ export async function getTransColumns(library_slug, opts = false) {
 			...CACHE_STRATEGY,
 			where: { subscriptions: { some: { type: { library_slug } } } }
 		}));
+
+	const types =
+		opts &&
+		(await subscriptionType.findMany({
+			...CACHE_STRATEGY,
+			where: { library_slug }
+		}));
 	const items =
 		opts &&
 		(await item.findMany({
@@ -161,6 +124,15 @@ export async function getTransColumns(library_slug, opts = false) {
 			opts: {
 				options: users,
 				creatable: false
+			}
+		},
+		{
+			id: 'subscription',
+			type: 'select',
+			opts: {
+				options: types,
+				creatable: false,
+				disabled: true
 			}
 		},
 		{
@@ -217,7 +189,7 @@ export async function getItemColumns(library_slug = null, opts = false) {
 				options: categories
 			}
 		},
-		{ id: 'no_of_pages', type: 'number' },
+		{ id: 'no_of_pages', name: 'Number of Pages', type: 'number' },
 		{
 			id: 'purchase_price',
 			type: 'number'

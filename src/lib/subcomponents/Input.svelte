@@ -16,7 +16,7 @@
 	<div class="col-md-{important ? '6' : '3'}" id="{id}-div">
 		{#if type === 'select'}
 			<label for={id}>{name}</label>
-			<CustomSelect {id} required={important} {...opts} {disabled} />
+			<CustomSelect {id} required={important} {disabled} {...opts}  />
 		{:else if type === 'checkbox'}
 			<div class="form-check">
 				<label for={id} class="form-control-check">{name}</label>

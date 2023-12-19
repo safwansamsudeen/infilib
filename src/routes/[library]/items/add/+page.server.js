@@ -4,13 +4,24 @@ import { item, library } from '$lib/db.js';
 import { validateAndClean } from '$lib/validators.js';
 import { redirect, fail } from '@sveltejs/kit';
 import { response } from '$lib/serverHelpers.js';
-import { injectLibraryInSelect } from '$lib/helpers.js';
+import { findValue, injectLibraryInSelect } from '$lib/helpers.js';
 
 export async function load({ params }) {
 	const itemColumns = await getItemColumns(params.library, true);
 	const otherColumns = {
 		book: await getBookColumns(params.library, true),
 		magazine: await getMagazineColumns()
+	};
+	// Autofill accession number
+	findValue(itemColumns, 'acc_no').opts = {
+		value:
+			(
+				await item.findMany({
+					take: 1,
+					where: { library_slug: params.library },
+					orderBy: { acc_no: 'desc' }
+				})
+			)[0].acc_no + 1
 	};
 	return { itemColumns, otherColumns };
 }
