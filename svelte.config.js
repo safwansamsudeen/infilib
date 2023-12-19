@@ -7,9 +7,7 @@ const config = {
 	preprocess: vitePreprocess(),
 
 	kit: {
-		adapter: adapter({
-			runtime: 'experimental-edge'
-		})
+		adapter: adapter()
 	}
 };
 
