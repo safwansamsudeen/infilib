@@ -15,13 +15,13 @@ export async function load({ params }) {
 	// Autofill accession number
 	findValue(itemColumns, 'acc_no').opts = {
 		value:
-			(
+			((
 				await item.findMany({
 					take: 1,
 					where: { library_slug: params.library },
 					orderBy: { acc_no: 'desc' }
 				})
-			)[0].acc_no + 1
+			)[0]?.acc_no || 0) + 1
 	};
 	return { itemColumns, otherColumns };
 }

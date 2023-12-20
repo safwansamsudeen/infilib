@@ -5,7 +5,8 @@ const USERS = [
 	['safwansamsudeen@gmail.com', 'Safwan (Superuser)', 'M'],
 	['librarian.ups@unityschool.in', 'Shakii', 'M'],
 	['naqeebkabir@gmail.com', 'Naqeeb Sultana', 'F'],
-	['abdullahidesigns@gmail.com', 'Abdullah Ibrahim', 'M']
+	['abdullahidesigns@gmail.com', 'Abdullah Ibrahim', 'M'],
+	['apply@ycombinator.com', 'Y Combinator', 'M']
 ];
 
 const LIBRARIES = [
@@ -27,7 +28,8 @@ const LIBRARIES = [
 		"Sunnyside's Library",
 		'Kottivakkam, Chennai, Tamil Nadu, India',
 		'abdullahidesigns@gmail.com'
-	]
+	],
+	['yc-library', 'YC Library', 'United States', 'apply@ycombinator.com']
 ];
 
 async function main() {
