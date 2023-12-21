@@ -176,7 +176,7 @@ const generateFakeTransactions = async () => {
 };
 
 async function main() {
-	// await generateFakeData();
+	await generateFakeData();
 	await generateFakeTransactions();
 }
 

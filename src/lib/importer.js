@@ -1,23 +1,22 @@
-// Import necessary libraries
 import { item } from './db.js';
 import * as fs from 'fs';
 import csv from 'csv-parser';
 
-// Function to read the CSV file and import data into the database
-async function importBooks() {
-	// Specify the path to your CSV file
-	fs.createReadStream('./src/lib/books.csv')
+export async function importItems(file_obj, library_slug) {
+	let c = 0;
+	fs.read(file_obj)
 		.pipe(csv())
 		.on('data', async (row) => {
 			// Process each row and create Prisma records
 			try {
 				// Split values separated by slash and trim whitespace
 				const authors = row['Author'].split('/').map((author) => author.trim());
+				const categories = row['Subject'].split('/').map((category) => category.trim());
 				const languages = row['Medium'].split('/').map((language) => language.trim());
 
 				const item_obj = await item.create({
 					data: {
-						library: { connect: { slug: 'anna-library' } },
+						library: { connect: { slug: library_slug } },
 						status: 'IN',
 						acc_no: parseInt(row['Acc. No.']),
 						title: row['Title of the Book'],
@@ -27,8 +26,8 @@ async function importBooks() {
 						level: row['Level'],
 						publisher: {
 							connectOrCreate: {
-								where: { name: row["Publisher's Name"] },
-								create: { name: row["Publisher's Name"] }
+								where: { library_slug_name: { library_slug, name: row["Publisher's Name"] } },
+								create: { library_slug, name: row["Publisher's Name"] }
 							}
 						},
 						purchase_details: row['Purchase Details'],
@@ -41,17 +40,18 @@ async function importBooks() {
 							}))
 						},
 						categories: {
-							connectOrCreate: [
-								{ where: { name: row['Subject'] }, create: { name: row['Subject'] } }
-							]
+							connectOrCreate: categories.map((name) => ({
+								where: { library_slug_name: { library_slug, name } },
+								create: { library_slug, name }
+							}))
 						},
 						book: {
 							create: {
 								subtitle: row['SubTitle'],
 								authors: {
 									connectOrCreate: authors.map((author) => ({
-										where: { name: author },
-										create: { name: author }
+										where: { library_slug_name: { library_slug, name: author } },
+										create: { library_slug, name: author }
 									}))
 								},
 								edition: row['Edition/Year'],
@@ -60,16 +60,16 @@ async function importBooks() {
 						}
 					}
 				});
-				console.log(`Item created: ${item_obj.id}`);
+				c++;
 			} catch (error) {
-				console.error(`Error creating item: ${error.message}, ABORTING`);
+				console.error(`We couldn't create the item with accession number: ${row['Acc. No.']}.`);
 				return;
 			}
 		})
 		.on('end', () => {
-			console.log('CSV file successfully processed.');
+			console.log(`CSV file successfully processed - with ${c} items added out of .`);
 		});
 }
 
 // Run the import function
-importBooks();
+// importBooks('unity-public');

@@ -89,7 +89,10 @@ export const actions = {
 			},
 			include: { subscription: { include: { type: true } } }
 		});
-		if (all_transactions.length >= all_transactions[0].subscription.type.no_of_books) {
+		if (
+			all_transactions.length &&
+			all_transactions.length >= all_transactions[0].subscription.type.no_of_books
+		) {
 			return fail(400, {
 				incorrect: true,
 				name: 'User',
