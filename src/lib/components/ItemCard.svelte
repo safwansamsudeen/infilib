@@ -1,0 +1,52 @@
+<script>
+	import { truncate, date } from '$lib/helpers.js';
+	import { page } from '$app/stores';
+
+	export let item;
+</script>
+
+<div class="card my-3">
+	<div class="row">
+		<div class="col-md-5 col-sm-6 overflow-scroll img-responsive">
+			<img
+				alt="{item.title} Cover"
+				class="rounded-start h-100"
+				src={item.image_url || 'https://placehold.co/200x300/black/white?text=Cover'}
+			/>
+		</div>
+		<div class="col-md-5 col-sm-6">
+			<div class="card-body">
+				<h5 class="card-title">{truncate(item.title, 40)}</h5>
+				<h6 class="card-subtitle mb-2 text-muted">
+					{#if item.book}
+						{truncate(item.book.authors?.map(({ name }) => name).join(', '), 20, 5)}
+					{:else if item.magazine}
+						{date(item.magazine.from)}, {date(item.magazine.to)}
+					{/if}
+				</h6>
+				<div class="card-body"><p>{truncate(item.remarks)}</p></div>
+				<div class="card-body">
+					<div class="mb-3">
+						{#each item.categories as category}
+							<span class="badge bg-info">{category}</span>
+						{/each}
+					</div>
+					<slot name="actions" prop={item}>
+						{#if item.status !== 'IN'}
+							<p class="card-text">Not Available</p>
+						{:else if item.mark}
+							<em>Already Marked</em>
+							{#if item.mark.user_id === item.user.id}
+								<span class="badge bg-success">You</span>
+							{/if}
+						{:else}
+							<a href="/{$page.params.library}/public/mark/{item.id}" class="btn btn-primary"
+								>Mark</a
+							>
+						{/if}
+					</slot>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

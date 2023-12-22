@@ -74,7 +74,6 @@ export const actions = {
 					message: 'You must provide a file to upload'
 				});
 			}
-			console.log(importFile, typeof importFile);
 			let buffer = new Buffer(await importFile.arrayBuffer());
 			Papa.parse(buffer.toString(), {
 				header: true,
@@ -82,7 +81,6 @@ export const actions = {
 				dynamicTyping: true,
 				step: async function ({ data, errors }, parser) {
 					const created = await importItems(data, params.library);
-					console.log(created);
 					if (errors.length) console.log('Row errors:', errors);
 				}
 			});

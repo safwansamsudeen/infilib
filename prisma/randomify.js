@@ -39,6 +39,8 @@ const generateFakeData = async () => {
 				call_no: faker.number.float({ precision: 0.1 }),
 				no_of_pages: faker.number.int({ max: 1000 }),
 				purchase_price: faker.number.int({ max: 1000 }),
+				purchased_on: faker.date.between({ from: '2000-01-01' }),
+				image_url: faker.image.urlLoremFlickr({ category: 'nature' }),
 				library: { connect: { slug: 'test' } },
 				level: 'Beginner'
 			}
@@ -76,6 +78,8 @@ const generateFakeData = async () => {
 				call_no: faker.number.float({ precision: 0.1 }),
 				no_of_pages: faker.number.int({ max: 1000 }),
 				purchase_price: faker.number.int({ max: 1000 }),
+				purchased_on: faker.date.between({ from: '2000-01-01' }),
+				image_url: faker.image.urlLoremFlickr({ category: 'nature' }),
 				library: { connect: { slug: 'test' } },
 				level: 'Beginner'
 			}

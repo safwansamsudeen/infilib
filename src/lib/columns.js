@@ -192,7 +192,13 @@ export async function getItemColumns(library_slug = null, opts = false) {
 		{ id: 'no_of_pages', name: 'Number of Pages', type: 'number' },
 		{
 			id: 'purchase_price',
-			type: 'number'
+			type: 'number',
+			important: false
+		},
+		{
+			id: 'purchased_on',
+			type: 'date',
+			important: false
 		},
 		{
 			id: 'languages',

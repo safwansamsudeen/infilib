@@ -68,7 +68,6 @@ export const actions = {
 			}
 		};
 		delete requestData.subscription;
-		console.log(requestData);
 		return response(async () => {
 			await user.update({
 				where: { id: +params.id },

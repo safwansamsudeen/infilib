@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/stores';
+
 	export let user, library;
 </script>
 
@@ -28,7 +29,7 @@
 					<button aria-label="Close" class="btn-close" data-bs-dismiss="offcanvas" type="button"
 					></button>
 				</div>
-				<div class="offcanvas-body">
+				<div class="offcanvas-body w-100">
 					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 						<li class="nav-item">
 							<a
@@ -67,6 +68,41 @@
 									href="/{$page.params.library}/stats">Stats</a
 								>
 							</li>
+							<div class=" navbar-nav me-auto">
+								<li class="nav-item dropdown">
+									<a
+										class="nav-link dropdown-toggle"
+										href="#"
+										role="button"
+										data-bs-toggle="dropdown"
+										aria-expanded="false"
+									>
+										Others
+									</a>
+									<ul class="dropdown-menu">
+										<li>
+											<a
+												class="dropdown-item {$page.url.pathname.includes('/public')
+													? 'active'
+													: ''}"
+												href="/{$page.params.library}/public">Public Portal</a
+											>
+										</li>
+										<li>
+											<a
+												class="dropdown-item {$page.url.pathname.includes('/users/settings')
+													? 'active'
+													: ''}"
+												href="/users/settings">User Settings</a
+											>
+										</li>
+										<li><hr class="dropdown-divider" /></li>
+										<li>
+											<a class="dropdown-item" href="/users/logout">Logout</a>
+										</li>
+									</ul>
+								</li>
+							</div>
 						{:else}
 							<li class="nav-item">
 								<a
@@ -80,16 +116,16 @@
 									href="/{$page.params.library}/about">About</a
 								>
 							</li>
+							<li class="nav-item me-auto">
+								<a
+									class="nav-link {$page.url.pathname.includes('/users/settings') ? 'active' : ''}"
+									href="/users/settings">User Settings</a
+								>
+							</li>
+							<li class="nav-item me-auto">
+								<a class="nav-link" href="/users/logout">Logout</a>
+							</li>
 						{/if}
-						<li class="nav-item me-auto">
-							<a
-								class="nav-link {$page.url.pathname.includes('/users/settings') ? 'active' : ''}"
-								href="/users/settings">User Settings</a
-							>
-						</li>
-						<li class="nav-item me-auto">
-							<a class="nav-link" href="/users/logout">Logout</a>
-						</li>
 					</ul>
 				</div>
 			</div>

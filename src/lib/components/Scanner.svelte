@@ -10,7 +10,7 @@
 			setBookDetails(decodedText, publishers, authors, languages, categories, scanner);
 	let scanner;
 	onMount(async () => {
-        const {Html5QrcodeScanner} = await import('html5-qrcode')
+		const { Html5QrcodeScanner } = await import('html5-qrcode');
 
 		scanner = new Html5QrcodeScanner(
 			'reader',

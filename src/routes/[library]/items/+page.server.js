@@ -9,7 +9,7 @@ export async function load({ url, params }) {
 	const library_slug = params.library;
 	return {
 		streamed: {
-			items: new Promise(async (res) => {
+			items: (async () => {
 				let columns = await getItemColumns(library_slug);
 
 				// Set up DB params for modification
@@ -17,7 +17,9 @@ export async function load({ url, params }) {
 				let include = {
 					publisher: true,
 					categories: true,
-					languages: true
+					languages: true,
+					book: { include: { authors: true } },
+					magazine: true
 				};
 
 				// If there's a type specified, add columns and change DB call
@@ -27,26 +29,89 @@ export async function load({ url, params }) {
 						type = val;
 						const otherColumns = await (type === 'book' ? getBookColumns : getMagazineColumns)();
 						where[val] = { isNot: null };
-						include[val] = {
-							include: Object.fromEntries(
-								otherColumns.filter(({ type }) => type === 'select').map(({ id }) => [id, true])
-							)
-						};
 						columns = columns.concat(otherColumns);
 						break;
 					}
 				}
-				let items = await item.findMany({ include, where, cacheStrategy: { swr: 60, ttl: 60 } });
+				let items, newItems, popularItems, searchResults;
+				const search = url.searchParams.get('search');
+				if (url.searchParams.get('all') === 'true') {
+					items = await item.findMany({
+						include,
+						where,
+						cacheStrategy: { swr: 60, ttl: 60 },
+						orderBy: {
+							acc_no: 'asc'
+						}
+					});
+					if (type) flatten(items, type);
+					prettify(items, columns);
+				} else if (search) {
+					searchResults = await item.findMany({
+						take: 3,
+						include,
+						where: {
+							...where,
+							OR: [
+								{ title: { contains: search, mode: 'insensitive' } },
+								{
+									book: {
+										OR: [
+											{ subtitle: { contains: search, mode: 'insensitive' } },
+											{ isbn: { contains: search, mode: 'insensitive' } },
+											{ authors: { some: { name: { contains: search, mode: 'insensitive' } } } }
+										]
+									}
+								},
+								{ publisher: { name: { contains: search, mode: 'insensitive' } } }
+							]
+						}
+					});
+					if (type) flatten(searchResults, type);
+					prettify(searchResults, columns);
+				} else {
+					newItems = await item.findMany({
+						take: 25,
+						include,
+						where,
+						orderBy: {
+							purchased_on: {
+								sort: 'desc'
+							}
+						},
+						cacheStrategy: { swr: 60, ttl: 60 }
+					});
+					popularItems = await item.findMany({
+						take: 25,
+						include: {
+							...include,
+							transactions: true
+						},
+						where,
+						orderBy: {
+							transactions: {
+								_count: 'desc'
+							}
+						},
+						cacheStrategy: { swr: 60, ttl: 60 }
+					});
 
-				// Flatten and standardize items
-				if (type) flatten(items, type);
-				prettify(items, columns);
-
-				res({
+					// Flatten and standardize items
+					if (type) {
+						flatten(newItems, type);
+						flatten(popularItems, type);
+					}
+					prettify(newItems, columns);
+					prettify(popularItems, columns);
+				}
+				return {
 					items,
-					columns
-				});
-			})
+					columns,
+					newItems,
+					popularItems,
+					searchResults
+				};
+			})()
 		}
 	};
 }

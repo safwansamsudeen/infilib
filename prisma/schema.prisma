@@ -7,7 +7,8 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 // People
@@ -142,6 +143,7 @@ model Item {
   no_of_pages      Int
   purchase_price   Int
   purchase_details String?
+  purchased_on     DateTime?     @default(now())
   library_slug     String
   library          Library       @relation(fields: [library_slug], references: [slug])
   level            String?

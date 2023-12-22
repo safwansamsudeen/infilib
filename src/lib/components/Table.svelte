@@ -5,6 +5,7 @@
 	export let data,
 		columns,
 		actions = [],
+		id = 'table',
 		actionsHtml = (_, row) => {
 			let html = '<div class="btn-group btn-group-sm w-100" role="group">';
 			for (let [label, url, condition] of actions) {
@@ -19,8 +20,8 @@
 		};
 	onMount(async () => {
 		await import('https://code.jquery.com/jquery-3.7.1.min.js');
-		await import('https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js')
-		let $table = jQuery('#table');
+		await import('https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js');
+		let $table = jQuery(`#${id}`);
 		window.actionsHtml = actionsHtml;
 		window.checkbox = function (value) {
 			return `<div class=text-center><i class="bi bi-${value ? 'check' : 'x'}"></i></div>`;
@@ -30,17 +31,12 @@
 </script>
 
 <table
-	data-click-to-select="true"
-	data-filter-control
-	data-minimum-count-columns="2"
 	data-pagination="true"
 	data-search="true"
 	data-show-columns="true"
 	data-show-columns-toggle-all="true"
-	data-show-export="true"
 	data-show-fullscreen="true"
-	data-show-toggle="true"
-	id="table"
+	{id}
 >
 	<thead>
 		<tr>

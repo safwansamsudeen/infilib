@@ -1,16 +1,17 @@
 <script>
-	import {onMount} from "svelte";
+	import { onMount } from 'svelte';
 
 	export let data;
 	import Form from '$lib/components/Form.svelte';
-	import {findValue} from "$lib/helpers.js";
-	import {page} from '$app/stores';
+	import { findValue } from '$lib/helpers.js';
+	import { page } from '$app/stores';
 
 	let modifiedColumns = structuredClone(data.columns);
-	findValue(modifiedColumns, 'user').opts.onChange = (e) => window.location.assign(`./${$page.params.id}?user=${e.detail.id}`);
+	findValue(modifiedColumns, 'user').opts.onChange = (e) =>
+		window.location.assign(`./${$page.params.id}?user=${e.detail.id}`);
 	findValue(modifiedColumns, 'item').opts.onChange = (e) => {
-		const userId = new URLSearchParams(window.location.search).get('user')
-		window.location.assign(`./${e.detail.id}${userId && '?user='+ userId}`);
+		const userId = new URLSearchParams(window.location.search).get('user');
+		window.location.assign(`./${e.detail.id}${userId && '?user=' + userId}`);
 	};
 </script>
 

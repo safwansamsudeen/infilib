@@ -19,7 +19,6 @@ const PROPERTY_VALIDATORS = {
 
 export function validateAndClean(obj, columns, action = 'create') {
 	for (let { id: columnId, name, type, important, opts, columns: subColumns } of columns) {
-		console.log(columnId);
 		if (type === 'object') {
 			let subObj = {};
 			for (let { id: subId } of subColumns) {
