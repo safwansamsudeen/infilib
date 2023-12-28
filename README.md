@@ -43,7 +43,25 @@ Enjoy InfiLib!
 
 First off, thank you so much! Please open issues before filing PRs, unless it's something minor (typo, formatting). If you'd like more long term involvement, please [get in touch with us](mailto:hello.infilib@gmail.com).
 
-TBD
+1. Follow this [guide](https://www.prisma.io/dataguide/postgresql/setting-up-a-local-postgresql-database) to set up PostgreSQL on your machine, and then add the following lines to a file called `.env`:
+```dotenv
+DATABASE_URL=postgresql://<user>@localhost:5432/<db-name>
+POSTGRES_URL_NON_POOLING=postgresql://<user>@localhost:5432/<db-name>
+```
+
+2. You also need to set up Passage, and add the following lines to your `.env` (if you're working directly with me, I should have given you these details):
+```dotenv
+PASSAGE_API_KEY=...
+PUBLIC_KEY_PASSAGE=...
+PUBLIC_PASSAGE_APP_ID=...
+```
+
+3. Get the app set up by running the following. If all works, great! If an error is thrown (it happens for some), run `npx prisma generate && node prisma/seed.js`.
+```
+npm i
+```
+
+4. Start InfiLib using `npm run dev`!
 
 ## License
 
