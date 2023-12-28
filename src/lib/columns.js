@@ -193,7 +193,7 @@ export async function getItemColumns(library_slug = null, opts = false) {
 		{
 			id: 'purchase_price',
 			type: 'number',
-			important: false
+			important: true
 		},
 		{
 			id: 'purchased_on',

@@ -6,7 +6,8 @@ const USERS = [
 	['librarian.ups@unityschool.in', 'Shakii', 'M'],
 	['naqeebkabir@gmail.com', 'Naqeeb Sultana', 'F'],
 	['abdullahidesigns@gmail.com', 'Abdullah Ibrahim', 'M'],
-	['apply@ycombinator.com', 'Y Combinator', 'M']
+	['apply@ycombinator.com', 'Y Combinator', 'M'],
+	['anglarmit@hotmail.com', 'Angela Mitchell', 'F']
 ];
 
 const LIBRARIES = [
@@ -29,7 +30,7 @@ const LIBRARIES = [
 		'Kottivakkam, Chennai, Tamil Nadu, India',
 		'abdullahidesigns@gmail.com'
 	],
-	['yc-library', 'YC Library', 'United States', 'apply@ycombinator.com']
+	['yc-library', 'YC Library', 'United States', 'anglarmit@hotmail.com']
 ];
 
 async function main() {
