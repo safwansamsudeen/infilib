@@ -36,7 +36,7 @@ export async function load({ params }) {
 
 	const transactions = await transaction.findMany({
 		where: { item_id: +params.id, deleted: { not: true } },
-		include: { user: true }
+		include: { user: true, subscription: true }
 	});
 
 	prettify(transactions, transColumns);

@@ -32,7 +32,7 @@ export async function load({ params }) {
 		where: {
 			user_id: +params.id
 		},
-		include: { item: true }
+		include: { item: true, subscription: true }
 	});
 
 	prettify(transactions, transColumns);
