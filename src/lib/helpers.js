@@ -225,7 +225,7 @@ export function prettify(records, columns) {
 	return records;
 }
 
-function setSelectField(id, items, newValue, multi = false) {
+function setSelectField(id, items, newValue = [], multi = false) {
 	let value = multi ? [] : {};
 	let foundItems;
 	// Add new value(s) to item list
@@ -258,7 +258,7 @@ function setSelectField(id, items, newValue, multi = false) {
 		props: {
 			id: id,
 			type: 'select',
-			opts: { value, items, multiple: multi },
+			opts: { value, options: items, multiple: multi },
 			important: true
 		}
 	});

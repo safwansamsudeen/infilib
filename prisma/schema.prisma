@@ -139,9 +139,9 @@ model Item {
   languages        Language[]
   categories       Category[]
   reference        Boolean
-  call_no          Float         @db.DoublePrecision
-  no_of_pages      Int
-  purchase_price   Int
+  call_no          Float?        @db.DoublePrecision
+  no_of_pages      Int?
+  purchase_price   Int           @default(0)
   purchase_details String?
   purchased_on     DateTime?     @default(now())
   library_slug     String
