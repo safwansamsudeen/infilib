@@ -27,12 +27,15 @@ export async function load({ params }) {
 }
 
 export const actions = {
-	create: async ({ request, params }) => {
+	create: async ({ request, params, url }) => {
 		const requestData = await pojoData(request);
 		const itemColumns = await getItemColumns(params.library);
 
 		const type = requestData.type;
+		const multiple = requestData.multiple === 'true';
 		delete requestData.type;
+		delete requestData.multiple;
+
 		const otherColumns = await (type === 'book' ? getBookColumns : getMagazineColumns)();
 
 		let check = validateAndClean(requestData, [
@@ -58,7 +61,9 @@ export const actions = {
 			await item.create({ data: requestData });
 		}, true);
 		if (res) return res;
-
+		if (multiple) {
+			throw redirect(303, `/${params.library}/items/add?multiple=true`);
+		}
 		throw redirect(303, `/${params.library}/items`);
 	}
 };

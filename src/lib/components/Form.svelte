@@ -38,7 +38,9 @@
 			};
 		}}
 	>
-		<h1 class="text-center my-3">{message}</h1>
+		{#if message}
+			<h1 class="text-center my-3">{message}</h1>
+		{/if}
 		<div class="row g-3">
 			{#each columns as column}
 				{#if column.type === 'object'}

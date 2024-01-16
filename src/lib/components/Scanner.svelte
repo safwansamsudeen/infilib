@@ -6,8 +6,11 @@
 		authors,
 		languages,
 		categories,
-		onCompleteFunc = (decodedText) =>
-			setBookDetails(decodedText, publishers, authors, languages, categories, scanner);
+		autofilled,
+		onCompleteFunc = async (decodedText) => {
+			await setBookDetails(decodedText, publishers, authors, languages, categories, scanner);
+			autofilled = true;
+		};
 	let scanner;
 	onMount(async () => {
 		const { Html5QrcodeScanner } = await import('html5-qrcode');

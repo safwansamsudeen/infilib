@@ -171,9 +171,7 @@ export async function getItemColumns(library_slug = null, opts = false) {
 
 	return [
 		{ id: 'acc_no', name: 'Acc. No.', type: 'number' },
-		{ id: 'call_no', name: 'Call. No.', type: 'number', opts: { step: 0.01 } },
 		{ id: 'title' },
-		{ id: 'status', opts: { value: 'IN', readonly: true } },
 		{
 			id: 'publisher',
 			type: 'select',
@@ -189,11 +187,13 @@ export async function getItemColumns(library_slug = null, opts = false) {
 				options: categories
 			}
 		},
-		{ id: 'no_of_pages', name: 'Number of Pages', type: 'number' },
+		{ id: 'status', opts: { value: 'IN', readonly: true } },
+		{ id: 'no_of_pages', name: 'Number of Pages', type: 'number', important: false },
+		{ id: 'call_no', name: 'Call. No.', type: 'number', opts: { step: 0.01 }, important: false },
 		{
 			id: 'purchase_price',
 			type: 'number',
-			important: true
+			important: false
 		},
 		{
 			id: 'purchased_on',
