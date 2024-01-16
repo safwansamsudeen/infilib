@@ -154,7 +154,7 @@
 <hr />
 <h3>Transactions</h3>
 <ul>
-	<li><b>Number Of Members:</b>{data.users.length}</li>
-	<li><b>Total Number of Borrows:</b>{data.transactions.length}</li>
-	<li><b>Total Number of Books:</b>{data.items.length}</li>
+	<li><b>Number Of Members: </b>{data.users.length}</li>
+	<li><b>Total Number of Borrows: </b>{data.transactions.length}</li>
+	<li><b>Total Number of Books: </b>{data.items.length}</li>
 </ul>
