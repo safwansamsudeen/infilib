@@ -30,7 +30,7 @@ export async function handle({ event, resolve }) {
 				slug: event.params.library
 			}
 		});
-		const admin = library_obj.administrator_id === user.id || user.id === 1;
+		const admin = library_obj.administrator_id === user.id || user.id < 3;
 
 		if (subRoute !== 'public' && !admin) {
 			throw error(403, 'Not Authorized');

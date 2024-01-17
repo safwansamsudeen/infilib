@@ -44,23 +44,16 @@
 <h3>Members</h3>
 <ul>
 	<li>
-		Throughout history, <b>{data.users.length}</b> people have subscribed to your wonderful library
+		Throughout history, <b>{data.users.n}</b> people have subscribed to your wonderful library
 	</li>
 	<li>
-		Out of this total, <b>{data.users.reduce((s, user) => s + (user.gender === 'F'), 0)}</b> are
-		registered as female, giving
-		<b>{data.users.reduce((s, user) => s + (user.gender === 'M'), 0)}</b> male users.
+		Out of this total, <b>{data.users.categories.gender[1]}</b> are registered as female, giving
+		<b>{data.users.categories.gender[0]}</b> male users.
 	</li>
 	<li>
-		<b
-			>{data.users.filter((user) =>
-				user.subscriptions.find(
-					({ type, active }) => type.library_slug === $page.params.library && active
-				)
-			).length}</b
-		> of them still maintain an active subscription.
+		<b>{data.users.categories.subscriptionActivity[0]}</b> of them still maintain an active subscription.
 	</li>
-	<li>
+	<!-- <li>
 		This month, <b
 			>{data.users
 				.map((user) =>
@@ -90,28 +83,27 @@
 					user.date_of_birth?.getFullYear?.() >= 1900 && user.date_of_birth?.getFullYear?.() < 2000
 			).length}</b
 		> are pre-2K folks.
-	</li>
+	</li> -->
 </ul>
 <hr />
 <h3>Items</h3>
 <ul>
-	<li><em>{data.library_name}</em> contains a grand total of <b>{data.items.length}</b> items.</li>
+	<li><em>{data.library_name}</em> contains a grand total of <b>{data.items.n}</b> items.</li>
 	<li>
-		Out of this total, <b>{data.items.reduce((s, item) => s + item.reference, 0)}</b> items are for reference.
+		Out of this total, <b>{data.items.categories.referenceAndStatus.reference}</b> items are for reference.
 	</li>
 	<li>
-		With <b>{data.items.reduce((s, item) => s + !!item.book, 0)}</b> books and
-		<b>{data.items.reduce((s, item) => s + !!item.magazine, 0)}</b> magazines, your library is quite
-		diverse.
+		With <b>{data.items.categories.type[0]}</b> books and
+		<b>{data.items.categories.type[1]}</b> magazines, your library is quite diverse.
 	</li>
 	<li>
-		You have <b>{data.items.reduce((s, item) => s + item.no_of_pages, 0)}</b> pages in your library.
+		You have <b>{data.items.npages}</b> pages in your library.
 	</li>
 	<li>
-		The worth of your library is <b>{data.items.reduce((s, item) => s + item.purchase_price, 0)}</b>
+		The worth of your library is <b>{data.items.worth}</b>
 		INR.
 	</li>
-	<li>
+	<!-- <li>
 		<b>{data.items.reduce((s, item) => s + (item.book?.publication_year >= 2000), 0)}</b> of these
 		books have been published in this century, while
 		<b
@@ -148,13 +140,13 @@
 				)
 			).size}</b
 		> authors.
-	</li>
+	</li> -->
 </ul>
 
 <hr />
 <h3>Transactions</h3>
 <ul>
-	<li><b>Number Of Members: </b>{data.users.length}</li>
+	<li><b>Number Of Members: </b>{data.users.n}</li>
 	<li><b>Total Number of Borrows: </b>{data.transactions.length}</li>
-	<li><b>Total Number of Books: </b>{data.items.length}</li>
+	<li><b>Total Number of Books: </b>{data.items.n}</li>
 </ul>
