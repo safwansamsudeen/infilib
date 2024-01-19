@@ -83,7 +83,7 @@
 			>
 		</div>
 		{#await data.streamed.items then { columns, newItems, items, popularItems, searchResults }}
-			{#if !$page.url.searchParams.get('search-results')}
+			{#if $page.url.searchParams.has('search-results') && !$page.url.searchParams.get('search-results')}
 				<div class="text-center my-4">
 					<div class="h4 text-warning">No Results Found</div>
 					<a href="./items/search">Go back to Search</a>
