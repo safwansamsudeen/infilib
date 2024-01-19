@@ -1,45 +1,47 @@
 <script>
-	import { onMount } from 'svelte';
-
 	export let data;
-	import { page } from '$app/stores';
-	onMount(() => {
-		const options = [
-			{
-				// Container: HTML Element to hold the chart
-				container: document.getElementById('myChart'),
-				theme: 'ag-vivid',
-				data: data.transactions,
-				series: [
-					{
-						type: 'histogram',
-						xKey: 'issued_at',
-						yKey: 'price',
-						aggregation: 'sum'
-					}
-				],
-				axes: [
-					{
-						type: 'time',
-						position: 'bottom',
-						title: { text: 'Month' }
-					},
-					{
-						type: 'number',
-						position: 'left',
-						title: { text: 'Borrow Price Total (INR)' }
-					}
-				]
-			}
-		];
-		for (let opt of options) {
-			agCharts.AgCharts.create(opt);
+	import PieChart from './PieChart.svelte';
+
+	const ageData = {};
+	for (const pair of Object.entries(data.users.categories.age)) {
+		let label;
+		let bounds = pair[0].split(',');
+		if (bounds[0] == -Infinity) {
+			label = `${bounds[1]} and under`;
+		} else if (bounds[1] == Infinity) {
+			label = `${bounds[0]} and above`;
+		} else {
+			label = `${bounds[0]}-${bounds[1]}`;
 		}
-	});
+		ageData[label] = pair[1];
+	}
 </script>
 
 <h2>Charts</h2>
-<div id="myChart" style="height: 100%"></div>
+<div class="chartsgrid">
+	<PieChart
+		id="gender-chart"
+		title="Members by gender"
+		data={{ Male: data.users.categories.gender[0], Female: data.users.categories.gender[1] }}
+	/>
+	<PieChart id="age-chart" title="Members by age" data={ageData} legend={false} />
+	<PieChart
+		id="item-type-chart"
+		title="Types of items"
+		data={{ Books: data.items.categories.type[0], Magazines: data.items.categories.type[1] }}
+	/>
+	<PieChart
+		id="item-status-chart"
+		title="Statuses of items"
+		data={{
+			'For reference': data.items.categories.status.reference,
+			Borrowed: data.items.categories.status.borrowed,
+			Available: data.items.categories.status.available,
+			'Damaged or lost': data.items.categories.status.damagedLost
+		}}
+		legend={false}
+	/>
+</div>
 <h2>Report</h2>
 <h3>Members</h3>
 <ul>
@@ -53,28 +55,12 @@
 	<li>
 		<b>{data.users.categories.subscriptionActivity[0]}</b> of them still maintain an active subscription.
 	</li>
-	<!-- <li>
-		This month, <b
-			>{data.users
-				.map((user) =>
-					user.subscriptions.find(
-						({ type, active }) => type.library_slug === $page.params.library && active
-					)
-				)
-				.filter((user) => user?.purchased_on > new Date('12/01/2023')).length}</b
-		>
-		people subscribed to your library, and in this year,
-		<b
-			>{data.users
-				.map((user) =>
-					user.subscriptions.find(
-						({ type, active }) => type.library_slug === $page.params.library && active
-					)
-				)
-				.filter((user) => user?.purchased_on > new Date('01/01/2023')).length}</b
-		> did.
-	</li>
 	<li>
+		This month, <b>{data.users.nsubscribed.thisMonth}</b>
+		people subscribed to your library, and in this year,
+		<b>{data.users.nsubscribed.thisYear}</b> did.
+	</li>
+	<!-- <li>
 		<b>{data.users.filter((user) => user.date_of_birth?.getFullYear?.() >= 2000).length}</b> of your
 		subscribers were born in this century, while
 		<b
@@ -90,7 +76,7 @@
 <ul>
 	<li><em>{data.library_name}</em> contains a grand total of <b>{data.items.n}</b> items.</li>
 	<li>
-		Out of this total, <b>{data.items.categories.referenceAndStatus.reference}</b> items are for reference.
+		Out of this total, <b>{data.items.categories.status.reference}</b> items are for reference.
 	</li>
 	<li>
 		With <b>{data.items.categories.type[0]}</b> books and
@@ -113,40 +99,34 @@
 				0
 			)}</b
 		> have been in the previous one.
-	</li>
-	<li>
-		<b>{data.items.reduce((s, item) => s + (item.magazine?.to > new Date()), 0)}</b> of those magazines
-		are still valid.
-	</li>
-	<li>
-		<b>{new Set(data.items.map(({ level }) => level)).size}</b> levels of books are available, and
-		they are arranged over <b>{new Set(data.items.map(({ call_no }) => call_no)).size}</b> call numbers.
-	</li>
-	<li>
-		You have <b
-			>{new Set(
-				data.items.reduce(
-					(all_publishers, { publisher_id }) => [...all_publishers, publisher_id],
-					[]
-				)
-			).size}</b
-		>
-		publishers in your library, and your books have been authored by a whopping
-		<b
-			>{new Set(
-				data.items.reduce(
-					(all_authors, { book }) => [...all_authors, ...(book?.authors.map(({ id }) => id) || [])],
-					[]
-				)
-			).size}</b
-		> authors.
 	</li> -->
+	<li>
+		<b>{data.items.nValidMagazines}</b> of those magazines are still valid.
+	</li>
+	<li>
+		<b>{data.items.nBookLevels}</b> levels of books are available, and they are arranged over
+		<b>{data.items.nCallNums}</b> call numbers.
+	</li>
+	<li>
+		You have <b>{data.items.nPublishers}</b>
+		publishers in your library, and your books have been authored by a whopping
+		<b>{data.items.nAuthors}</b> authors.
+	</li>
 </ul>
 
 <hr />
 <h3>Transactions</h3>
 <ul>
 	<li><b>Number Of Members: </b>{data.users.n}</li>
-	<li><b>Total Number of Borrows: </b>{data.transactions.length}</li>
+	<li><b>Total Number of Borrows: </b>{data.transactions.nborrows}</li>
 	<li><b>Total Number of Books: </b>{data.items.n}</li>
 </ul>
+
+<style>
+	div.chartsgrid {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		flex-wrap: wrap;
+	}
+</style>
