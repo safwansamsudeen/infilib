@@ -1,6 +1,6 @@
 import { item } from '$lib/db.js';
 import { pojoData, response } from '$lib/serverHelpers.js';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { getBookColumns, getMagazineColumns, getItemColumns } from '$lib/columns.js';
 import { prettify, flatten, injectLibraryInSelect } from '$lib/helpers.js';
 import { validateAndClean } from '$lib/validators.js';
@@ -35,6 +35,7 @@ export async function load({ url, params }) {
 				}
 				let items, newItems, popularItems, searchResults;
 				const search = url.searchParams.get('search');
+				const searchResultsGiven = url.searchParams.get('search-results');
 				if (url.searchParams.get('all') === 'true') {
 					items = await item.findMany({
 						include,
@@ -63,8 +64,19 @@ export async function load({ url, params }) {
 										]
 									}
 								},
+								{ categories: { some: { name: { contains: search, mode: 'insensitive' } } } },
 								{ publisher: { name: { contains: search, mode: 'insensitive' } } }
 							]
+						}
+					});
+					if (type) flatten(searchResults, type);
+					prettify(searchResults, columns);
+				} else if (searchResultsGiven) {
+					searchResults = await item.findMany({
+						include,
+						where: {
+							...where,
+							id: { in: searchResultsGiven.split(',').map(Number) }
 						}
 					});
 					if (type) flatten(searchResults, type);
@@ -104,6 +116,7 @@ export async function load({ url, params }) {
 					prettify(newItems, columns);
 					prettify(popularItems, columns);
 				}
+
 				return {
 					items,
 					columns,
@@ -144,5 +157,19 @@ export const actions = {
 			data[itemType] = { create: shootOff };
 			await item.create({ data });
 		}, true);
+	},
+	goto: async function ({ request, params }) {
+		let { data } = await pojoData(request);
+		let item_obj;
+
+		if (data.startsWith('978') || data.length > 10) {
+			item_obj = await item.findFirst({ where: { book: { isbn: data } } });
+		} else {
+			item_obj = await item.findFirst({ where: { acc_no: +data } });
+		}
+		if (!item_obj) {
+			return fail(404, { message: "Doesn't exist" });
+		}
+		throw redirect(303, `/${params.library}/items/${item_obj.id}`);
 	}
 };

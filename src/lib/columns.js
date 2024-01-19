@@ -249,3 +249,16 @@ export async function getMagazineColumns() {
 		{ id: 'to', type: 'date' }
 	].map(standardizeColumns);
 }
+
+export function getSearchColumns() {
+	return [
+		{ id: 'title', name: 'Title (including subtitle)' },
+		{ id: 'publisher' },
+		{ id: 'authors' },
+		{ id: 'categories' },
+		{ id: 'isbn', name: 'ISBN/ISSN' },
+		{ id: 'year_published' },
+		{ id: 'purchase_details' },
+		{ id: 'call_no', name: 'Call Number' }
+	].map((col) => ({ ...col, important: false }));
+}
