@@ -41,7 +41,8 @@ export async function getUserColumns(library_slug, opts = false) {
 					{ id: 'M', name: 'Male' },
 					{ id: 'F', name: 'Female' }
 				],
-				creatable: false
+				creatable: false,
+				goto: false
 			}
 		},
 		{ id: 'email_address', type: 'email' },
@@ -60,7 +61,8 @@ export async function getUserColumns(library_slug, opts = false) {
 					type: 'select',
 					opts: {
 						options: types,
-						creatable: false
+						creatable: false,
+						goto: false
 					}
 				},
 				{ id: 'purchased_on', type: 'date' },
@@ -123,7 +125,8 @@ export async function getTransColumns(library_slug, opts = false) {
 			type: 'select',
 			opts: {
 				options: users,
-				creatable: false
+				creatable: false,
+				goto: 'members/'
 			}
 		},
 		{
@@ -132,7 +135,8 @@ export async function getTransColumns(library_slug, opts = false) {
 			opts: {
 				options: types,
 				creatable: false,
-				disabled: true
+				disabled: true,
+				goto: false
 			}
 		},
 		{
