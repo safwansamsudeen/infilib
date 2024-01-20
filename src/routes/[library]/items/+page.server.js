@@ -2,7 +2,7 @@ import { item } from '$lib/db.js';
 import { pojoData, response } from '$lib/serverHelpers.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { getBookColumns, getMagazineColumns, getItemColumns } from '$lib/columns.js';
-import { prettify, flatten, injectLibraryInSelect } from '$lib/helpers.js';
+import { flatten, injectLibraryInSelect } from '$lib/helpers.js';
 import { validateAndClean } from '$lib/validators.js';
 
 export async function load({ url, params }) {
@@ -46,7 +46,6 @@ export async function load({ url, params }) {
 						}
 					});
 					if (type) flatten(items, type);
-					prettify(items, columns);
 				} else if (search) {
 					searchResults = await item.findMany({
 						take: 3,
@@ -70,7 +69,6 @@ export async function load({ url, params }) {
 						}
 					});
 					if (type) flatten(searchResults, type);
-					prettify(searchResults, columns);
 				} else if (searchResultsGiven) {
 					searchResults = await item.findMany({
 						include,
@@ -80,7 +78,6 @@ export async function load({ url, params }) {
 						}
 					});
 					if (type) flatten(searchResults, type);
-					prettify(searchResults, columns);
 				} else {
 					newItems = await item.findMany({
 						take: 25,
@@ -108,13 +105,10 @@ export async function load({ url, params }) {
 						cacheStrategy: { swr: 60, ttl: 60 }
 					});
 
-					// Flatten and standardize items
 					if (type) {
 						flatten(newItems, type);
 						flatten(popularItems, type);
 					}
-					prettify(newItems, columns);
-					prettify(popularItems, columns);
 				}
 
 				return {

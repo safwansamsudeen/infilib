@@ -3,15 +3,14 @@
 	import { page } from '$app/stores';
 	import ItemCard from '$lib/components/ItemCard.svelte';
 
-	export let data;
-	const tableMode = $page.url.searchParams.get('display') !== 'card';
-	const type = $page.url.searchParams.get('show');
-
 	function updateSearchParam(key, value) {
 		let newUrl = new URL($page.url);
 		newUrl.searchParams.set(key, value);
 		return newUrl.href;
 	}
+	export let data;
+	const tableMode = $page.url.searchParams.get('display') !== 'card';
+	const type = $page.url.searchParams.get('show');
 </script>
 
 <svelte:head>

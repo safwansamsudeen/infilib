@@ -62,7 +62,8 @@ export async function getUserColumns(library_slug, opts = false) {
 					opts: {
 						options: types,
 						creatable: false,
-						goto: false
+						goto: false,
+						tableVisible: false
 					}
 				},
 				{ id: 'purchased_on', type: 'date' },
@@ -136,7 +137,8 @@ export async function getTransColumns(library_slug, opts = false) {
 				options: types,
 				creatable: false,
 				disabled: true,
-				goto: false
+				goto: false,
+				tableVisible: false
 			}
 		},
 		{
@@ -180,7 +182,8 @@ export async function getItemColumns(library_slug = null, opts = false) {
 			id: 'publisher',
 			type: 'select',
 			opts: {
-				options: publishers
+				options: publishers,
+				goto: '?publisher='
 			}
 		},
 		{
@@ -188,7 +191,8 @@ export async function getItemColumns(library_slug = null, opts = false) {
 			type: 'select',
 			opts: {
 				multiple: true,
-				options: categories
+				options: categories,
+				goto: '?categories='
 			}
 		},
 		{ id: 'status', opts: { value: 'IN', readonly: true } },

@@ -208,23 +208,6 @@ export function findValue(array, key_value, key = 'id') {
 	}
 }
 
-export function prettify(records, columns) {
-	for (let { id, type, opts } of columns) {
-		if (type === 'select') {
-			records.map(
-				(record) =>
-					(record[id] =
-						opts.multiple === true
-							? record[id].map((subRecord) => subRecord.name || subRecord[opts.label])
-							: record[id].name || record[id][opts.label])
-			);
-		} else if (type === 'date') {
-			records.map((record) => (record[id] = date(record[id])));
-		}
-	}
-	return records;
-}
-
 function setSelectField(id, items, newValue = [], multi = false) {
 	let value = multi ? [] : {};
 	let foundItems;

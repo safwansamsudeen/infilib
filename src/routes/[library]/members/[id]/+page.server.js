@@ -1,5 +1,5 @@
 import { transaction, user, userSubscription } from '$lib/db.js';
-import { addDefaults, getUserSubscription, prettify } from '$lib/helpers.js';
+import { addDefaults, getUserSubscription } from '$lib/helpers.js';
 import { findOr404, pojoData, response } from '$lib/serverHelpers.js';
 import { validateAndClean } from '$lib/validators.js';
 import { redirect } from '@sveltejs/kit';
@@ -34,8 +34,6 @@ export async function load({ params }) {
 		},
 		include: { item: true, subscription: true }
 	});
-
-	prettify(transactions, transColumns);
 
 	return {
 		user: user_obj,

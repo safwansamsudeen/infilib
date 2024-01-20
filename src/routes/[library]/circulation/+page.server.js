@@ -1,5 +1,4 @@
 import { item, transaction } from '$lib/db.js';
-import { prettify } from '$lib/helpers.js';
 import { pojoData, response } from '$lib/serverHelpers.js';
 import { getTransColumns } from '$lib/columns.js';
 import dayjs from 'dayjs';
@@ -31,11 +30,10 @@ export async function load({ url, params }) {
 					include: {
 						item: true,
 						user: true,
-						subscription: true
+						subscription: { include: { type: true } }
 					},
 					where
 				});
-				prettify(transactions, columns);
 
 				return { transactions, columns };
 			})()
