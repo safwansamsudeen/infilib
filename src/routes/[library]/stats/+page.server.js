@@ -77,44 +77,77 @@ export async function load({ params }) {
   }
   const _items = await item.findMany({
     where: { library_slug: params.library },
-    include: { book: { include: { authors: true } }, magazine: true },
+    include: { book: { include: { authors: true } }, magazine: true, publisher: true, categories: true, languages: true },
   });
-  const nbooks = _items.reduce((c, item) => c + !!item.book, 0);
+  const authorCounts = {};
+  const publisherCounts = {};
+  const categoryCounts = {};
+  const languageCounts = {};
+  let nbooks = 0;
+  let npages = 0;
+  let worth = 0;
+  let reference = 0;
+  let borrowed = 0;
+  let available = 0;
+  let damagedLost = 0;
+  let nValidMagazines = 0;
+  const bookLevels = new Set();
+  const callNums = new Set();
+  for (const item of _items) {
+    nbooks += !!item.book;
+    npages += item.no_of_pages;
+    worth += item.purchase_price;
+    reference += item.reference;
+    borrowed += item.status === "OUT";
+    available += !item.reference && item.status === "IN";
+    damagedLost += item.status === "UNAVAILABLE";
+    nValidMagazines += item.magazine?.to > new Date();
+    bookLevels.add(item.level);
+    callNums.add(item.call_no);
+    for (const { name } of item.book?.authors || []) {
+      if (!authorCounts[name]) {
+        authorCounts[name] = 0;
+      }
+      authorCounts[name]++;
+    } for (const { name } of item.categories || []) {
+      if (!categoryCounts[name]) {
+        categoryCounts[name] = 0;
+      }
+      categoryCounts[name]++;
+    } for (const { name } of item.languages || []) {
+      if (!languageCounts[name]) {
+        languageCounts[name] = 0;
+      }
+      languageCounts[name]++;
+    }
+    const publisher = item.publisher.name;
+    if (!publisherCounts[publisher]) {
+      publisherCounts[publisher] = 0;
+    }
+    publisherCounts[publisher]++;
+  }
   const items = {
     n: _items.length,
-    npages: _items.reduce((c, item) => c + item.no_of_pages, 0),
-    worth: _items.reduce((c, item) => c + item.purchase_price, 0),
+    npages,
+    worth,
     categories: {
       type: [nbooks, _items.length - nbooks],
       status: {
-        reference: _items.reduce((c, item) => c + item.reference, 0),
-        borrowed: _items.reduce((c, item) => c + (item.status === "OUT"), 0),
-        available: _items.reduce(
-          (c, item) => c + (!item.reference && item.status === "IN"),
-          0,
-        ),
-        damagedLost: _items.reduce(
-          (c, item) => c + (item.status === "UNAVAILABLE"),
-          0,
-        ),
+        reference,
+        borrowed,
+        available,
+        damagedLost,
       },
     },
-    nValidMagazines: _items.reduce(
-      (c, item) => c + (item.magazine?.to > new Date()),
-      0,
-    ),
-    nBookLevels: new Set(_items.map(({ level }) => level)).size,
-    nCallNums: new Set(_items.map(({ call_no }) => call_no)).size,
-    nPublishers: new Set(_items.map(({ publisher_id }) => publisher_id)).size,
-    nAuthors: new Set(
-      _items.reduce(
-        (
-          all_authors,
-          { book },
-        ) => [...all_authors, ...(book?.authors.map(({ id }) => id) || [])],
-        [],
-      ),
-    ).size,
+    nValidMagazines,
+    nBookLevels: bookLevels.size,
+    nCallNums: callNums.size,
+    nPublishers: Object.keys(publisherCounts).length,
+    nAuthors: Object.keys(authorCounts).length,
+    authorCounts,
+    publisherCounts,
+    categoryCounts,
+    languageCounts,
   };
   return {
     items,

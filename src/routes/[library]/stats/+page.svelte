@@ -18,27 +18,51 @@
 </script>
 
 <h2>Charts</h2>
+<h3>Members</h3>
 <div class="chartsgrid">
 	<PieChart
-		id="gender-chart"
-		title="Members by gender"
+		id="member-gender-chart"
+		title="Gender"
 		data={{ Male: data.users.categories.gender[0], Female: data.users.categories.gender[1] }}
 	/>
-	<PieChart id="age-chart" title="Members by age" data={ageData} legend={false} />
+	<PieChart id="member-age-chart" title="Age" data={ageData} legend={false} />
+</div>
+<hr />
+<h3>Items</h3>
+<div class="chartsgrid">
 	<PieChart
 		id="item-type-chart"
-		title="Types of items"
+		title="Types"
 		data={{ Books: data.items.categories.type[0], Magazines: data.items.categories.type[1] }}
 	/>
 	<PieChart
 		id="item-status-chart"
-		title="Statuses of items"
+		title="Statuses"
 		data={{
 			'For reference': data.items.categories.status.reference,
 			Borrowed: data.items.categories.status.borrowed,
 			Available: data.items.categories.status.available,
 			'Damaged or lost': data.items.categories.status.damagedLost
 		}}
+		legend={false}
+	/>
+	<PieChart id="item-author-chart" title="Authors" data={data.items.authorCounts} legend={false} />
+	<PieChart
+		id="item-publisher-chart"
+		title="Publishers"
+		data={data.items.publisherCounts}
+		legend={false}
+	/>
+	<PieChart
+		id="item-language-chart"
+		title="Languages"
+		data={data.items.languageCounts}
+		legend={false}
+	/>
+	<PieChart
+		id="item-category-chart"
+		title="Categories"
+		data={data.items.categoryCounts}
 		legend={false}
 	/>
 </div>
