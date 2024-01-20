@@ -44,9 +44,9 @@
 				}
 			} else {
 				if (multiple) {
-					return value.map((val) => val.name || val[label]).join(', ');
+					return value.map((val) => val.name || val[label] || value).join(', ');
 				} else {
-					return value.name || value[label];
+					return value.name || value[label] || value;
 				}
 			}
 		};
