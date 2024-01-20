@@ -5,7 +5,7 @@
 	export let title;
 	export let data;
 	export let id;
-	export let size = '300px';
+	export let size = '350px';
 	export let legend = true;
 
 	onMount(() => {

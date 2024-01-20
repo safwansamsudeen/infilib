@@ -32,19 +32,18 @@
 <div class="chartsgrid">
 	<PieChart
 		id="item-type-chart"
-		title="Types"
+		title="Type"
 		data={{ Books: data.items.categories.type[0], Magazines: data.items.categories.type[1] }}
 	/>
 	<PieChart
 		id="item-status-chart"
-		title="Statuses"
+		title="Status"
 		data={{
 			'For reference': data.items.categories.status.reference,
 			Borrowed: data.items.categories.status.borrowed,
 			Available: data.items.categories.status.available,
 			'Damaged or lost': data.items.categories.status.damagedLost
 		}}
-		legend={false}
 	/>
 	<PieChart id="item-author-chart" title="Authors" data={data.items.authorCounts} legend={false} />
 	<PieChart
@@ -125,7 +124,7 @@
 		> have been in the previous one.
 	</li> -->
 	<li>
-		<b>{data.items.nValidMagazines}</b> of those magazines are still valid.
+		<b>{data.items.nValidMagazines}</b> of your library's magazines are still valid.
 	</li>
 	<li>
 		<b>{data.items.nBookLevels}</b> levels of books are available, and they are arranged over
@@ -149,8 +148,8 @@
 <style>
 	div.chartsgrid {
 		display: flex;
-		flex-direction: row;
-		align-items: flex-start;
+		align-items: center;
+		justify-content: center;
 		flex-wrap: wrap;
 	}
 </style>
