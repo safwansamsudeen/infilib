@@ -2,17 +2,24 @@ import { item, transaction } from '$lib/db.js';
 import { prettify } from '$lib/helpers.js';
 import { pojoData, response } from '$lib/serverHelpers.js';
 import { getTransColumns } from '$lib/columns.js';
+import dayjs from 'dayjs';
 
 export async function load({ url, params }) {
-	let where = { deleted: { not: true }, item: { is: { library_slug: params.library } } };
+	let where = {
+		deleted: { not: true },
+		item: { is: { library_slug: params.library } },
+		issued_at: { gte: dayjs().subtract(1, 'month') }
+	};
 	for (let [key, val] of url.searchParams.entries()) {
 		if (key === 'due') {
 			if (val === 'today') {
 				where.due_at = { lte: new Date() };
 				where.returned_at = { equals: null };
 			} else where['due_at'] = { lte: new Date(), gte: new Date(val) };
-		} else if (val) {
-			where[key] = val;
+		} else if (key === 'since') {
+			where['issued_at'].gte = new Date(val);
+		} else if (key === 'until') {
+			where['issued_at'].lte = new Date(val);
 		}
 	}
 
