@@ -1,4 +1,5 @@
 <script>
+	import LineChart from './LineChart.svelte';
 	export let data;
 	import PieChart from './PieChart.svelte';
 
@@ -65,6 +66,13 @@
 		legend={false}
 	/>
 </div>
+<hr />
+<h3>Transactions</h3>
+<LineChart
+	id="transaction-daily-chart"
+	title="Daily"
+	data={data.transactions.overTimePeriod.daily}
+/>
 <h2>Report</h2>
 <h3>Members</h3>
 <ul>
@@ -141,7 +149,7 @@
 <h3>Transactions</h3>
 <ul>
 	<li><b>Number Of Members: </b>{data.users.n}</li>
-	<li><b>Total Number of Borrows: </b>{data.transactions.nborrows}</li>
+	<li><b>Total Number of Borrows: </b>{data.transactions.n}</li>
 	<li><b>Total Number of Books: </b>{data.items.n}</li>
 </ul>
 
@@ -149,7 +157,7 @@
 	div.chartsgrid {
 		display: flex;
 		align-items: center;
-		justify-content: center;
+		justify-content: space-evenly;
 		flex-wrap: wrap;
 	}
 </style>

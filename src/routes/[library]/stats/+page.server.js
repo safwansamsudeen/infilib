@@ -1,6 +1,7 @@
 import { item, transaction, user } from "$lib/db.js";
 
 export async function load({ params }) {
+  // user stats
   const _users = await user.findMany({
     where: {
       subscriptions: { some: { type: { library_slug: params.library } } },
@@ -75,6 +76,7 @@ export async function load({ params }) {
       }
     }
   }
+  // item stats
   const _items = await item.findMany({
     where: { library_slug: params.library },
     include: { book: { include: { authors: true } }, magazine: true, publisher: true, categories: true, languages: true },
@@ -149,14 +151,24 @@ export async function load({ params }) {
     categoryCounts,
     languageCounts,
   };
+  // transaction stats
+  const _transactions = await transaction.findMany({
+    where: { item: { library_slug: params.library } },
+  });
+
+  const dailyTransactions = {};
+  for (const transaction of _transactions) {
+    const issued_at = transaction.issued_at;
+    const date = new Date(issued_at.getFullYear(), issued_at.getMonth(), issued_at.getDate()).toLocaleDateString();
+    if (!dailyTransactions[date]) {
+      dailyTransactions[date] = 0;
+    }
+    dailyTransactions[date]++;
+  }
+  const transactions = { n: _transactions.length, overTimePeriod: { daily: dailyTransactions } };
   return {
     items,
-    transactions: {
-      nborrows: (await transaction.findMany({
-        where: { item: { library_slug: params.library } },
-      }))
-        .length,
-    },
+    transactions,
     users,
   };
 }
