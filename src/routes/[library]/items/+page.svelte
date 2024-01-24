@@ -3,15 +3,14 @@
 	import { page } from '$app/stores';
 	import ItemCard from '$lib/components/ItemCard.svelte';
 
-	export let data;
-	const tableMode = $page.url.searchParams.get('display') !== 'card';
-	const type = $page.url.searchParams.get('show');
-
 	function updateSearchParam(key, value) {
 		let newUrl = new URL($page.url);
 		newUrl.searchParams.set(key, value);
 		return newUrl.href;
 	}
+	export let data;
+	const tableMode = $page.url.searchParams.get('display') !== 'card';
+	const type = $page.url.searchParams.get('show');
 </script>
 
 <svelte:head>
@@ -41,11 +40,32 @@
 				<form action="items">
 					<div class="input-group mb-2">
 						<div class="input-group-prepend">
-							<div class="input-group-text"><i class="bi bi-search"></i></div>
+							<div
+								class="input-group-text"
+								style="border-bottom-right-radius: 0;
+							border-top-right-radius: 0;"
+							>
+								<i class="bi bi-search"></i>
+							</div>
 						</div>
 						<input class="form-control" name="search" placeholder="Search all items" type="text" />
 					</div>
 				</form>
+				<form action="?/goto" method="POST">
+					<div class="input-group mb-2">
+						<div class="input-group-prepend">
+							<div
+								class="input-group-text"
+								style="border-bottom-right-radius: 0;
+							border-top-right-radius: 0;"
+							>
+								<i class="bi bi-arrow-right"></i>
+							</div>
+						</div>
+						<input class="form-control" name="data" placeholder="Go" type="text" />
+					</div>
+				</form>
+				<a class="small" href="./items/search">Advanced Search</a>
 			</div>
 		</div>
 		<div class="btn-group-vertical w-100 mb-3" role="group">
@@ -62,6 +82,12 @@
 			>
 		</div>
 		{#await data.streamed.items then { columns, newItems, items, popularItems, searchResults }}
+			{#if $page.url.searchParams.has('search-results') && !$page.url.searchParams.get('search-results')}
+				<div class="text-center my-4">
+					<div class="h4 text-warning">No Results Found</div>
+					<a href="./items/search">Go back to Search</a>
+				</div>
+			{/if}
 			{#if items}
 				<h2>All {type || 'item'}s</h2>
 				{#if tableMode}
@@ -93,7 +119,11 @@
 				{/if}
 			{:else if searchResults}
 				<h2>Search Results</h2>
-				<p>You searched for: <b>{$page.url.searchParams.get('search')}</b></p>
+				{#if $page.url.searchParams.get('search')}
+					<p>You searched for: <b>{$page.url.searchParams.get('search')}</b></p>
+				{:else}
+					<p>Your advanced search results:</p>
+				{/if}
 				{#if tableMode}
 					<Table
 						actions={[

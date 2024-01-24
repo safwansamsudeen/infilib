@@ -24,28 +24,24 @@
 						{date(item.magazine.from)}, {date(item.magazine.to)}
 					{/if}
 				</h6>
-				<div class="card-body"><p>{truncate(item.remarks)}</p></div>
-				<div class="card-body">
-					<div class="mb-3">
-						{#each item.categories as category}
-							<span class="badge bg-info">{category}</span>
-						{/each}
-					</div>
-					<slot name="actions" prop={item}>
-						{#if item.status !== 'IN'}
-							<p class="card-text">Not Available</p>
-						{:else if item.mark}
-							<em>Already Marked</em>
-							{#if item.mark.user_id === item.user.id}
-								<span class="badge bg-success">You</span>
-							{/if}
-						{:else}
-							<a href="/{$page.params.library}/public/mark/{item.id}" class="btn btn-primary"
-								>Mark</a
-							>
-						{/if}
-					</slot>
+				<p>{truncate(item.remarks)}</p>
+				<div class="mb-3">
+					{#each item.categories as category}
+						<span class="badge bg-info">{category}</span>
+					{/each}
 				</div>
+				<slot name="actions" prop={item}>
+					{#if item.status !== 'IN'}
+						<p class="card-text">Not Available</p>
+					{:else if item.mark}
+						<em>Already Marked</em>
+						{#if item.mark.user_id === item.user.id}
+							<span class="badge bg-success">You</span>
+						{/if}
+					{:else}
+						<a href="/{$page.params.library}/public/mark/{item.id}" class="btn btn-primary">Mark</a>
+					{/if}
+				</slot>
 			</div>
 		</div>
 	</div>

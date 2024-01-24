@@ -1,7 +1,7 @@
 import { item, transaction } from '$lib/db.js';
 import { findOr404, pojoData, response } from '$lib/serverHelpers.js';
 import { fail, redirect } from '@sveltejs/kit';
-import { prettify, injectLibraryInSelect, addDefaults, flatten } from '$lib/helpers.js';
+import { injectLibraryInSelect, addDefaults, flatten } from '$lib/helpers.js';
 import {
 	getBookColumns,
 	getItemColumns,
@@ -38,8 +38,6 @@ export async function load({ params }) {
 		where: { item_id: +params.id, deleted: { not: true } },
 		include: { user: true, subscription: true }
 	});
-
-	prettify(transactions, transColumns);
 
 	return {
 		item: item_obj,

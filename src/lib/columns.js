@@ -41,7 +41,8 @@ export async function getUserColumns(library_slug, opts = false) {
 					{ id: 'M', name: 'Male' },
 					{ id: 'F', name: 'Female' }
 				],
-				creatable: false
+				creatable: false,
+				goto: false
 			}
 		},
 		{ id: 'email_address', type: 'email' },
@@ -60,7 +61,9 @@ export async function getUserColumns(library_slug, opts = false) {
 					type: 'select',
 					opts: {
 						options: types,
-						creatable: false
+						creatable: false,
+						goto: false,
+						tableVisible: false
 					}
 				},
 				{ id: 'purchased_on', type: 'date' },
@@ -123,7 +126,8 @@ export async function getTransColumns(library_slug, opts = false) {
 			type: 'select',
 			opts: {
 				options: users,
-				creatable: false
+				creatable: false,
+				goto: 'members/'
 			}
 		},
 		{
@@ -132,7 +136,9 @@ export async function getTransColumns(library_slug, opts = false) {
 			opts: {
 				options: types,
 				creatable: false,
-				disabled: true
+				disabled: true,
+				goto: false,
+				tableVisible: false
 			}
 		},
 		{
@@ -176,7 +182,8 @@ export async function getItemColumns(library_slug = null, opts = false) {
 			id: 'publisher',
 			type: 'select',
 			opts: {
-				options: publishers
+				options: publishers,
+				goto: '?publisher='
 			}
 		},
 		{
@@ -184,7 +191,8 @@ export async function getItemColumns(library_slug = null, opts = false) {
 			type: 'select',
 			opts: {
 				multiple: true,
-				options: categories
+				options: categories,
+				goto: '?categories='
 			}
 		},
 		{ id: 'status', opts: { value: 'IN', readonly: true } },
@@ -248,4 +256,17 @@ export async function getMagazineColumns() {
 		{ id: 'from', type: 'date' },
 		{ id: 'to', type: 'date' }
 	].map(standardizeColumns);
+}
+
+export function getSearchColumns() {
+	return [
+		{ id: 'title', name: 'Title (including subtitle)' },
+		{ id: 'publisher' },
+		{ id: 'authors' },
+		{ id: 'categories' },
+		{ id: 'isbn', name: 'ISBN/ISSN' },
+		{ id: 'year_published' },
+		{ id: 'purchase_details' },
+		{ id: 'call_no', name: 'Call Number' }
+	].map((col) => ({ ...col, important: false }));
 }

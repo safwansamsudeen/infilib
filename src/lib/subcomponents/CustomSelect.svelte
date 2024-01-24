@@ -2,6 +2,7 @@
 
 <script>
 	import Select from 'svelte-select';
+	import { page } from '$app/stores';
 
 	export let id,
 		options = [],
@@ -12,6 +13,7 @@
 		disabled = false,
 		label = 'name',
 		itemId = 'id',
+		goto = true,
 		onChange = () => {};
 	let filterText = '';
 
@@ -64,4 +66,7 @@
 		on:change={onChange}
 		name={id}
 	/>
+{/if}
+{#if value && !multiple && goto}
+	<a href="/{$page.params.library}/{goto === true ? id + 's/' : goto}{value.id}">goto</a>
 {/if}
