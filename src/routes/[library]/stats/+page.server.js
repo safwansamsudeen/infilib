@@ -156,7 +156,7 @@ export async function load({ params }) {
     where: { item: { library_slug: params.library } },
   });
 
-  const dailyTransactions = {};
+  let dailyTransactions = {};
   for (const transaction of _transactions) {
     const issued_at = transaction.issued_at;
     const date = new Date(issued_at.getFullYear(), issued_at.getMonth(), issued_at.getDate()).toLocaleDateString();
@@ -165,10 +165,15 @@ export async function load({ params }) {
     }
     dailyTransactions[date]++;
   }
+  dailyTransactions = sorted(dailyTransactions);
   const transactions = { n: _transactions.length, overTimePeriod: { daily: dailyTransactions } };
   return {
     items,
     transactions,
     users,
   };
+}
+
+function sorted(obj) {
+  return Object.keys(obj).sort().reduce((acc, key) => { acc[key] = obj[key]; return acc; }, {});
 }
