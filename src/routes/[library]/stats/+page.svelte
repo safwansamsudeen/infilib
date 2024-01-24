@@ -37,6 +37,14 @@
 		data={{ Books: data.items.categories.type[0], Magazines: data.items.categories.type[1] }}
 	/>
 	<PieChart
+		id="item-borrowed-type-chart"
+		title="Type (borrowed)"
+		data={{
+			Books: data.borrowedItems.categories.type[0],
+			Magazines: data.borrowedItems.categories.type[1]
+		}}
+	/>
+	<PieChart
 		id="item-status-chart"
 		title="Status"
 		data={{

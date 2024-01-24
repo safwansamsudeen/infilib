@@ -17,16 +17,16 @@ export async function load({ params }) {
       ),
     0,
   );
-  const ageCategories = {
-    twelveAndUnder: [-Infinity, 12],
-    thirteenTo18: [13, 18],
-    nineteenTo25: [19, 25],
-    twentySixTo35: [26, 35],
-    thirtySixTo50: [36, 50],
-    fiftyOneTo60: [51, 60],
-    sixtyOneTo70: [61, 70],
-    seventyOneAndAbove: [71, Infinity],
-  };
+  const ageCategories = [
+    [-Infinity, 12],
+    [13, 18],
+    [19, 25],
+    [26, 35],
+    [36, 50],
+    [51, 60],
+    [61, 70],
+    [71, Infinity],
+  ];
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();
@@ -66,7 +66,7 @@ export async function load({ params }) {
   };
   for (const user of _users) {
     const age = new Date(new Date() - user.date_of_birth).getFullYear() - 1970;
-    for (const category of Object.values(ageCategories)) {
+    for (const category of ageCategories) {
       if (category[0] <= age && age <= category[1]) {
         if (!users.categories.age[category]) {
           users.categories.age[category] = 1;
@@ -81,6 +81,40 @@ export async function load({ params }) {
     where: { library_slug: params.library },
     include: { book: { include: { authors: true } }, magazine: true, publisher: true, categories: true, languages: true },
   });
+  const items = makeItemsObject(_items);
+  // transaction stats
+  const _transactions = await transaction.findMany({
+    where: { item: { library_slug: params.library } },
+    include: { item: { include: { book: { include: { authors: true } }, magazine: true, publisher: true, categories: true, languages: true }, } },
+  });
+  const transactionItems = new Set();
+  let dailyTransactions = {};
+  for (const transaction of _transactions) {
+    transactionItems.add(transaction.item);
+    const issued_at = transaction.issued_at;
+    const date = new Date(issued_at.getFullYear(), issued_at.getMonth(), issued_at.getDate());
+    if (!dailyTransactions[date]) {
+      dailyTransactions[date] = 0;
+    }
+    dailyTransactions[date]++;
+  }
+  dailyTransactions = sorted(dailyTransactions);
+  dailyTransactions = Object.keys(dailyTransactions).reduce((acc, key) => { acc[new Date(key).toLocaleDateString()] = dailyTransactions[key]; return acc; }, {});
+  const transactions = { n: _transactions.length, overTimePeriod: { daily: dailyTransactions } };
+  const borrowedItems = makeItemsObject(transactionItems);
+  return {
+    items,
+    borrowedItems,
+    transactions,
+    users,
+  };
+}
+
+function sorted(obj) {
+  return Object.keys(obj).sort().reduce((acc, key) => { acc[key] = obj[key]; return acc; }, {});
+}
+
+function makeItemsObject(_items) {
   const authorCounts = {};
   const publisherCounts = {};
   const categoryCounts = {};
@@ -128,7 +162,7 @@ export async function load({ params }) {
     }
     publisherCounts[publisher]++;
   }
-  const items = {
+  return {
     n: _items.length,
     npages,
     worth,
@@ -151,29 +185,4 @@ export async function load({ params }) {
     categoryCounts,
     languageCounts,
   };
-  // transaction stats
-  const _transactions = await transaction.findMany({
-    where: { item: { library_slug: params.library } },
-  });
-
-  let dailyTransactions = {};
-  for (const transaction of _transactions) {
-    const issued_at = transaction.issued_at;
-    const date = new Date(issued_at.getFullYear(), issued_at.getMonth(), issued_at.getDate()).toLocaleDateString();
-    if (!dailyTransactions[date]) {
-      dailyTransactions[date] = 0;
-    }
-    dailyTransactions[date]++;
-  }
-  dailyTransactions = sorted(dailyTransactions);
-  const transactions = { n: _transactions.length, overTimePeriod: { daily: dailyTransactions } };
-  return {
-    items,
-    transactions,
-    users,
-  };
-}
-
-function sorted(obj) {
-  return Object.keys(obj).sort().reduce((acc, key) => { acc[key] = obj[key]; return acc; }, {});
 }
