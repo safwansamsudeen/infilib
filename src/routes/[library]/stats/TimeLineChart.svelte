@@ -10,7 +10,7 @@
 	export let width = '567px';
 	onMount(() => {
 		new Chart(document.getElementById(id), {
-			type: 'line',
+			type: 'bar',
 			options: {
 				plugins: { legend: { display: false }, title: { display: !!title, text: title } },
 				scales: {
@@ -19,7 +19,11 @@
 						time: { tooltipFormat: 'DD' },
 						title: { display: true, text: 'Date' }
 					},
-					y: { ticks: { stepSize: 5 } }
+					y: {
+						ticks: {
+							stepSize: 1
+						}
+					}
 				}
 			},
 			data: {

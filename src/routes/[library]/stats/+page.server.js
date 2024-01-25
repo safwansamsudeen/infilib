@@ -93,8 +93,10 @@ export async function load({ params }) {
   });
   const items = makeItemsObject(_items);
   // transaction stats
+  const today = new Date();
+  const threeMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 3, today.getDate());
   const _transactions = await transaction.findMany({
-    where: { item: { library_slug: params.library } },
+    where: { item: { library_slug: params.library }, issued_at: { gte: threeMonthsAgo } },
     include: { item: { include: { book: { include: { authors: true } }, magazine: true, publisher: true, categories: true, languages: true }, } },
   });
   const transactionItems = [];
