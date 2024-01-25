@@ -196,7 +196,7 @@ export function capitalize(label) {
 		.join(' ');
 }
 
-function setFormField(id, value) {
+export function setFormField(id, value) {
 	document.getElementById(id).value = value || '';
 }
 
@@ -208,27 +208,28 @@ export function findValue(array, key_value, key = 'id') {
 	}
 }
 
-function setSelectField(id, items, newValue = [], multi = false) {
+export function setSelectField(id, options, new_value = [], multi = false) {
 	let value = multi ? [] : {};
-	let foundItems;
-	// Add new value(s) to item list
+	let existing_options;
+
+	// Add new value(s) to option list
 	if (multi) {
-		for (let expectedValue of newValue) {
-			foundItems = items.filter(({ value }) => value === expectedValue);
-			if (!foundItems.length) {
-				items.push({ id: expectedValue, name: expectedValue });
-				value.push({ id: expectedValue, name: expectedValue });
+		for (let sub_value of new_value) {
+			existing_options = options.filter(({ name }) => name === sub_value);
+			if (!existing_options.length) {
+				options.push({ id: sub_value, name: sub_value });
+				value.push({ id: sub_value, name: sub_value });
 			} else {
-				value.push(foundItems[0]);
+				value.push(existing_options[0]);
 			}
 		}
 	} else {
-		foundItems = items.filter(({ value, label }) => value === newValue || label === newValue);
-		if (!foundItems.length) {
-			items.push({ id: newValue, name: newValue });
-			value = { id: newValue, name: newValue };
+		existing_options = options.filter(({ name }) => name === new_value);
+		if (!existing_options.length) {
+			options.push({ id: new_value, name: new_value });
+			value = { id: new_value, name: new_value };
 		} else {
-			value = foundItems[0];
+			value = existing_options[0];
 		}
 	}
 
@@ -241,7 +242,7 @@ function setSelectField(id, items, newValue = [], multi = false) {
 		props: {
 			id: id,
 			type: 'select',
-			opts: { value, options: items, multiple: multi },
+			opts: { value, options, multiple: multi },
 			important: true
 		}
 	});
