@@ -63,6 +63,7 @@ export async function load({ params }) {
         0,
       ),
     },
+    subscriptionTypes: {},
   };
   for (const user of _users) {
     const age = new Date(new Date() - user.date_of_birth).getFullYear() - 1970;
@@ -74,6 +75,15 @@ export async function load({ params }) {
           users.categories.age[category]++;
         }
       }
+    }
+    const sub = user.subscriptions.find(
+      ({ type, active }) => active && type.library_slug === params.library,
+    );
+    if (!!sub) {
+      if (!users.subscriptionTypes[sub.type.name]) {
+        users.subscriptionTypes[sub.type.name] = 0;
+      }
+      users.subscriptionTypes[sub.type.name]++;
     }
   }
   // item stats
@@ -87,10 +97,12 @@ export async function load({ params }) {
     where: { item: { library_slug: params.library } },
     include: { item: { include: { book: { include: { authors: true } }, magazine: true, publisher: true, categories: true, languages: true }, } },
   });
-  const transactionItems = new Set();
+  const transactionItems = [];
   let dailyTransactions = {};
   for (const transaction of _transactions) {
-    transactionItems.add(transaction.item);
+    if (!transactionItems.find(item => item.id == transaction.item.id)) {
+      transactionItems.push(transaction.item);
+    }
     const issued_at = transaction.issued_at;
     const date = new Date(issued_at.getFullYear(), issued_at.getMonth(), issued_at.getDate());
     if (!dailyTransactions[date]) {
@@ -98,8 +110,7 @@ export async function load({ params }) {
     }
     dailyTransactions[date]++;
   }
-  dailyTransactions = sorted(dailyTransactions);
-  dailyTransactions = Object.keys(dailyTransactions).reduce((acc, key) => { acc[new Date(key).toLocaleDateString()] = dailyTransactions[key]; return acc; }, {});
+  dailyTransactions = Object.keys(dailyTransactions).map(d => new Date(d)).sort((a, b) => b - a).reduce((acc, key) => { acc[0].push(key); acc[1].push(dailyTransactions[key.toString()]); return acc; }, [[], []]);
   const transactions = { n: _transactions.length, overTimePeriod: { daily: dailyTransactions } };
   const borrowedItems = makeItemsObject(transactionItems);
   return {
@@ -108,10 +119,6 @@ export async function load({ params }) {
     transactions,
     users,
   };
-}
-
-function sorted(obj) {
-  return Object.keys(obj).sort().reduce((acc, key) => { acc[key] = obj[key]; return acc; }, {});
 }
 
 function makeItemsObject(_items) {

@@ -1,5 +1,5 @@
 <script>
-	import LineChart from './LineChart.svelte';
+	import TimeLineChart from './TimeLineChart.svelte';
 	export let data;
 	import PieChart from './PieChart.svelte';
 
@@ -27,6 +27,11 @@
 		data={{ Male: data.users.categories.gender[0], Female: data.users.categories.gender[1] }}
 	/>
 	<PieChart id="member-age-chart" title="Age" data={ageData} legend={false} />
+	<PieChart
+		id="member-subscription-type-chart"
+		title="Subscription types"
+		data={data.users.subscriptionTypes}
+	/>
 </div>
 <hr />
 <h3>Items</h3>
@@ -91,7 +96,7 @@
 </div>
 <hr />
 <h3>Transactions</h3>
-<LineChart
+<TimeLineChart
 	id="transaction-daily-chart"
 	title="Daily"
 	data={data.transactions.overTimePeriod.daily}

@@ -35,10 +35,12 @@
 		"@vercel/analytics": "^1.1.1",
 		"@vercel/speed-insights": "^1.0.2",
 		"chart.js": "^4.4.1",
+		"chartjs-adapter-luxon": "^1.3.1",
 		"csv-parser": "^3.0.0",
 		"dayjs": "^1.11.10",
 		"flatpickr": "^4.6.13",
 		"jose": "^5.1.3",
+		"luxon": "^3.4.4",
 		"papaparse": "^5.4.1"
 	}
 }
