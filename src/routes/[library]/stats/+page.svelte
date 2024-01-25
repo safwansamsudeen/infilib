@@ -20,7 +20,7 @@
 
 <h2>Charts</h2>
 <h3>Members</h3>
-<div class="chartsgrid">
+<div class="chart-grid">
 	<PieChart
 		id="member-gender-chart"
 		title="Gender"
@@ -30,20 +30,7 @@
 </div>
 <hr />
 <h3>Items</h3>
-<div class="chartsgrid">
-	<PieChart
-		id="item-type-chart"
-		title="Type"
-		data={{ Books: data.items.categories.type[0], Magazines: data.items.categories.type[1] }}
-	/>
-	<PieChart
-		id="item-borrowed-type-chart"
-		title="Type (borrowed)"
-		data={{
-			Books: data.borrowedItems.categories.type[0],
-			Magazines: data.borrowedItems.categories.type[1]
-		}}
-	/>
+<div class="chart-grid">
 	<PieChart
 		id="item-status-chart"
 		title="Status"
@@ -54,25 +41,53 @@
 			'Damaged or lost': data.items.categories.status.damagedLost
 		}}
 	/>
-	<PieChart id="item-author-chart" title="Authors" data={data.items.authorCounts} legend={false} />
-	<PieChart
-		id="item-publisher-chart"
-		title="Publishers"
-		data={data.items.publisherCounts}
-		legend={false}
-	/>
-	<PieChart
-		id="item-language-chart"
-		title="Languages"
-		data={data.items.languageCounts}
-		legend={false}
-	/>
-	<PieChart
-		id="item-category-chart"
-		title="Categories"
-		data={data.items.categoryCounts}
-		legend={false}
-	/>
+	<div>
+		<h4 class="chart-group-title">Type</h4>
+		<div class="chart-group">
+			<PieChart
+				id="item-unborrowed-type-chart"
+				title="All items"
+				data={{ Books: data.items.categories.type[0], Magazines: data.items.categories.type[1] }}
+			/>
+			<PieChart
+				id="item-borrowed-type-chart"
+				title="Borrowed items"
+				data={{
+					Books: data.borrowedItems.categories.type[0],
+					Magazines: data.borrowedItems.categories.type[1]
+				}}
+			/>
+		</div>
+	</div>
+	<div>
+		<h3 class="chart-group-title">Metadata</h3>
+		<div class="chart-group">
+			<PieChart
+				id="item-author-chart"
+				title="Authors"
+				data={data.items.authorCounts}
+				legend={false}
+			/>
+			<PieChart
+				id="item-publisher-chart"
+				title="Publishers"
+				data={data.items.publisherCounts}
+				legend={false}
+			/>
+			<PieChart
+				id="item-language-chart"
+				title="Languages"
+				data={data.items.languageCounts}
+				legend={false}
+			/>
+			<PieChart
+				id="item-category-chart"
+				title="Categories"
+				data={data.items.categoryCounts}
+				legend={false}
+			/>
+		</div>
+	</div>
 </div>
 <hr />
 <h3>Transactions</h3>
@@ -162,10 +177,26 @@
 </ul>
 
 <style>
-	div.chartsgrid {
+	div.chart-grid {
 		display: flex;
 		align-items: center;
 		justify-content: space-evenly;
 		flex-wrap: wrap;
+		border: 1px double #eee;
+	}
+
+	div.chart-group {
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		flex-wrap: wrap;
+		border: 1px solid #eee;
+		padding: 8px;
+		margin: 8px;
+	}
+
+	.chart-group-title {
+		padding-top: 1rem;
+		margin-left: 8px;
 	}
 </style>
