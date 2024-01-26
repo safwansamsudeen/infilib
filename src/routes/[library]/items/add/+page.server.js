@@ -1,6 +1,6 @@
 import { getBookColumns, getItemColumns, getMagazineColumns } from '$lib/columns.js';
 import { pojoData } from '$lib/serverHelpers.js';
-import { item, library } from '$lib/db.js';
+import { item, librarySubscription } from '$lib/db.js';
 import { validateAndClean } from '$lib/validators.js';
 import { redirect, fail } from '@sveltejs/kit';
 import { response } from '$lib/serverHelpers.js';
@@ -23,7 +23,14 @@ export async function load({ params }) {
 				})
 			)[0]?.acc_no || 0) + 1
 	};
-	return { itemColumns, otherColumns };
+	return {
+		itemColumns,
+		otherColumns,
+		librarySubscriptions: await librarySubscription.findMany({
+			where: { library_slug: params.library },
+			include: { publisher: true, categories: true, languages: true }
+		})
+	};
 }
 
 export const actions = {

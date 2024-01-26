@@ -13,7 +13,9 @@
 <h1 class="text-center">Manage your InfiLib settings</h1>
 <a class=" my-3" href="./settings/import">Import items</a>
 <h3>Add Subscription Type</h3>
-<Form action="create" columns={data.subsColumns} message="" />
+<Form action="create_subscription" columns={data.subsColumns} message="" />
+<h3>Add Library Subscription</h3>
+<Form action="create_library_subscription" columns={data.librarySubsColumns} message="" />
 <h3>Settings</h3>
 <div class="my-3 row">
 	<form
