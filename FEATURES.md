@@ -44,12 +44,14 @@
 - Add a library subscription - little confusing with the same name, but this refers to *you*, the librarian, subscribing for a magazine or periodical. This can be used to autofill magazine details later on when you add them.
 - The actual settings
   - Free Library? If checked, converts your library into a library that is free to borrow from. Useful for school or office libraries.
+
 ## Other nice titbits
 - Quick navigation: you can go to an item or member from any table or form when you select that record.
 - Support for free libraries
 - All tables can be viewed in full screen.
 - Users can view and mark books for borrow at a specific time while sitting in their houses - using the **Public Portal**.
-- Importing is available
+- Importing is available.
+- In the circulation page, you have color marking for items that are due.
 
 
 ## Upcoming

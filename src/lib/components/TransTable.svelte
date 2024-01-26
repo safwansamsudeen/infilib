@@ -1,6 +1,8 @@
 <script>
 	import { page } from '$app/stores';
+	import { date } from '$lib/helpers.js';
 	import { enhance } from '$app/forms';
+	import dayjs from 'dayjs';
 	import Table from '$lib/components/Table.svelte';
 
 	export let data, columns;
@@ -19,7 +21,23 @@
 	}
 </script>
 
-<Table {actionsHtml} {columns} {data} />
+<Table
+	{actionsHtml}
+	{columns}
+	{data}
+	dateFormatter={(v, { due_at, returned_at }) => {
+		let date_str = date(v);
+		const today = dayjs();
+		if (!returned_at && today > due_at) {
+			const overdue = today.diff(due_at, 'days');
+			let color = overdue > 4 ? 'danger' : overdue > 2 ? 'warning' : 'info';
+			return `<div class="text-${color}"">${
+				date_str || 'Overdue by ' + overdue + ' day' + (overdue === 1 ? '' : 's')
+			}</div>`;
+		}
+		return date_str;
+	}}
+/>
 <div id="transaction-table">
 	{#each data as { id, returned_at, comments }}
 		{#if !returned_at}

@@ -20,53 +20,70 @@
 	<div class="text-column text-center">
 		<h1>Status of Borrows</h1>
 	</div>
-	<div class="col-auto">
+	<div class="col-auto mb-3">
+		<button
+			type="button"
+			class="btn btn-outline-primary float-end"
+			data-bs-toggle="modal"
+			data-bs-target="#filterModal"
+		>
+			Filter
+		</button>
 		{#if due || until || since}
-			<a class="d-block" href="circulation">Back to normal view</a>
+			<a class="d-block" href="circulation">Clear all filters</a>
+		{/if}
+		{#if due !== 'today'}
+			<a class="d-block" href="?due=today">Due Today</a>
 		{/if}
 	</div>
-	<div class="btn-group-vertical w-100 my-3" role="group">
-		<a class="btn btn-outline-dark" class:active={due === 'today'} href="?due=today">Due Today</a>
-	</div>
-	<div class="row">
-		<div class="form-check form-switch mb-3">
-			<input
-				bind:checked={filterable}
-				class="form-check-input form-switch me-2"
-				id="scanner-visible"
-				role="switch"
-				type="checkbox"
-			/>
-			<label class="form-check-label" for="scanner-visible">Filter</label>
-		</div>
 
-		{#if filterable}
-			<form action="circulation" class="row mb-3 col-12 col-md-6">
-				<div class="form-group col-5">
-					<label for="since">Since</label>
-					<input
-						class="form-control"
-						name="since"
-						id="since"
-						type="date"
-						value={since || date(dayjs().subtract(1, 'month'))}
-					/>
+	<div
+		class="modal fade"
+		id="filterModal"
+		tabindex="-1"
+		aria-labelledby="filterModallLabel"
+		aria-hidden="true"
+	>
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="filterModalLabel">Filter transactions</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+					></button>
 				</div>
-				<div class="form-group col-5">
-					<label for="since">Until</label>
-					<input class="form-control" name="until" type="date" value={until || date(dayjs())} />
+				<div class="modal-body">
+					<form action="circulation" id="filter-form">
+						<div class="form-group my-3">
+							<label for="since">Since</label>
+							<input
+								class="form-control"
+								name="since"
+								id="since"
+								type="date"
+								value={since || date(dayjs().subtract(1, 'month'))}
+							/>
+						</div>
+						<div class="form-group my-3">
+							<label for="since">Until</label>
+							<input class="form-control" name="until" type="date" value={until || date(dayjs())} />
+						</div>
+					</form>
 				</div>
-				<div class="form-group col-2">
-					<input
-						class="btn btn-outline-dark"
-						type="submit"
-						value="Go!"
-						style="width: 48px;height: 38px;"
-					/>
+				<div class="modal-footer">
+					<div class="d-grid gap-2 my-3 w-100">
+						<input
+							form="filter-form"
+							class="btn btn-outline-success"
+							type="submit"
+							value="Go!"
+							data-bs-dismiss="modal"
+						/>
+					</div>
 				</div>
-			</form>
-		{/if}
+			</div>
+		</div>
 	</div>
+
 	{#if due}
 		Showing all the transactions that are <b>due today</b>.
 	{:else if !since && !until}Showing all the transactions this month.

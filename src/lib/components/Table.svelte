@@ -7,6 +7,7 @@
 		columns,
 		actions = [],
 		id = 'table',
+		dateFormatter = date,
 		actionsHtml = (_, row) => {
 			let html = '<div class="btn-group btn-group-sm w-100" role="group">';
 			for (let [label, url, condition] of actions) {
@@ -51,7 +52,7 @@
 				}
 			}
 		};
-		window.date = (val) => date(val);
+		window.date = dateFormatter;
 		$table.bootstrapTable({ data });
 	});
 </script>
