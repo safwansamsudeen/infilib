@@ -289,7 +289,8 @@ export async function getBookColumns(library_slug, opts) {
 			type: 'select',
 			opts: {
 				multiple: true,
-				options: authors
+				options: authors,
+				goto: '?authors='
 			}
 		},
 		{ id: 'isbn', type: 'text', name: 'ISBN' },

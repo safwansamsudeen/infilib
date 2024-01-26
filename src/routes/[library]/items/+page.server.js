@@ -2,8 +2,9 @@ import { item } from '$lib/db.js';
 import { pojoData, response } from '$lib/serverHelpers.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { getBookColumns, getMagazineColumns, getItemColumns } from '$lib/columns.js';
-import { flatten, injectLibraryInSelect } from '$lib/helpers.js';
+import { flatten, injectLibraryInSelect, date } from '$lib/helpers.js';
 import { validateAndClean } from '$lib/validators.js';
+import dayjs from 'dayjs';
 
 export async function load({ url, params }) {
 	const library_slug = params.library;
@@ -17,22 +18,51 @@ export async function load({ url, params }) {
 				let include = {
 					publisher: true,
 					categories: true,
-					languages: true,
 					book: { include: { authors: true } },
 					magazine: true
 				};
 
 				// If there's a type specified, add columns and change DB call
 				let type;
+				let filters = [];
 				for (let [key, val] of url.searchParams.entries()) {
 					if (key === 'show' && ['book', 'magazine'].includes(val)) {
 						type = val;
 						const otherColumns = await (type === 'book' ? getBookColumns : getMagazineColumns)();
-						where[val] = { isNot: null };
+						where[val] = { ...where[val], isNot: null };
 						columns = columns.concat(otherColumns);
-						break;
+						continue;
+					}
+					// Filters
+					filters.push(key);
+					const ids = val.split(',').map(Number);
+					if (key === 'publisher') {
+						where.publisher_id = ids[0];
+					} else if (key === 'languages' || key === 'categories') {
+						where[key] = { some: { id: { in: ids } } };
+					} else if (key === 'authors') {
+						where.book = { ...where.book, authors: { some: { id: { in: ids } } } };
+					} else {
+						// Numeric fields
+						const [min, max] = ids;
+						if (['price', 'no_pages', 'call_no', 'acc_no'].includes(key)) {
+							where[key] = { gte: min, lte: max };
+						} else if (key === 'publication_year') {
+							where.book = { ...where.book, [key]: { gte: min, lte: max } };
+						} else if (key === 'sc_no') {
+							where.magazine = { ...where.magazine, [key]: { gte: min, lte: max } };
+						} else {
+							// Date fields
+							const [min, max] = val.split(',').map((d) => dayjs(d, 'YYYY-MM-DD').toDate());
+							if (['purchased_on'].includes(key)) {
+								where[key] = { gte: min, lte: max };
+							} else if (['from', 'to'].includes(key)) {
+								where.magazine = { ...where.magazine, [key]: { gte: min, lte: max } };
+							}
+						}
 					}
 				}
+
 				let items, newItems, popularItems, searchResults;
 				const search = url.searchParams.get('search');
 				const searchResultsGiven = url.searchParams.get('search-results');
@@ -156,7 +186,7 @@ export const actions = {
 		let { data } = await pojoData(request);
 		let item_obj;
 
-		if (data.startsWith('978') || data.length > 10) {
+		if (data.startsWith('978') || data.length >= 10) {
 			item_obj = await item.findFirst({ where: { book: { isbn: data } } });
 		} else {
 			item_obj = await item.findFirst({ where: { acc_no: +data } });
