@@ -8,7 +8,7 @@ const prisma = new PrismaClient().$extends(withAccelerate());
 	console.log('Connected');
 })();
 
-const {
+export const {
 	item,
 	publisher,
 	author,
@@ -22,18 +22,3 @@ const {
 	userSubscription,
 	librarySubscription
 } = prisma;
-
-export {
-	item,
-	publisher,
-	author,
-	category,
-	language,
-	user,
-	mark,
-	transaction,
-	library,
-	subscriptionType,
-	userSubscription,
-	librarySubscription
-};

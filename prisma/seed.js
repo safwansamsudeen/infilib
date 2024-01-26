@@ -3,6 +3,7 @@ const prisma = new PrismaClient();
 
 const USERS = [
 	['safwansamsudeen@gmail.com', 'Safwan (Superuser)', 'M'],
+	['pranav.pooruli@gmail.com', 'Pranav (Superuser)', 'M'],
 	['librarian.ups@unityschool.in', 'Shakii', 'M'],
 	['naqeebkabir@gmail.com', 'Naqeeb Sultana', 'F'],
 	['abdullahidesigns@gmail.com', 'Abdullah Ibrahim', 'M'],
