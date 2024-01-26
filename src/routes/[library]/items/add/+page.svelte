@@ -2,7 +2,15 @@
 	import Form from '$lib/components/Form.svelte';
 	import Scanner from '$lib/components/Scanner.svelte';
 	import { page } from '$app/stores';
-	import { capitalize, findValue, setBookDetails } from '$lib/helpers.js';
+	import {
+		capitalize,
+		findValue,
+		setBookDetails,
+		setSelectField,
+		setFormField
+	} from '$lib/helpers.js';
+	import dayjs from 'dayjs';
+	import CustomSelect from '$lib/subcomponents/CustomSelect.svelte';
 	let type = 'book';
 	let scannerVisible = false;
 	let autofilled = false;
@@ -103,7 +111,56 @@
 						{/each}
 					</div>
 				</div>
-
+				{#if type === 'magazine'}
+					<!-- This exists to center the child -->
+					<div>
+						<div class="w-50 mx-auto">
+							<label for="library-subscription" class="w-100 text-center">Autofill: </label>
+							<CustomSelect
+								id="library-subscription"
+								options={data.librarySubscriptions}
+								creatable={false}
+								onChange={(e) => {
+									const {
+										name,
+										recurrence,
+										price,
+										no_of_weeks,
+										publisher,
+										categories,
+										languages,
+										call_no
+									} = e.detail;
+									setFormField('title', Math.round(price / no_of_weeks));
+									setFormField('purchase_price', name);
+									setFormField('call_no', call_no);
+									document.getElementById('from').valueAsDate = new Date();
+									document.getElementById('to').valueAsDate = new Date(
+										dayjs().add(recurrence, 'day')
+									);
+									setSelectField(
+										'publisher',
+										obtainOptions(data.itemColumns, 'publishers'),
+										publisher.name
+									);
+									setSelectField(
+										'categories',
+										obtainOptions(data.itemColumns, 'categories'),
+										categories.map(({ name }) => name),
+										true
+									);
+									setSelectField(
+										'languages',
+										obtainOptions(data.itemColumns, 'languages'),
+										languages.map(({ name }) => name),
+										true
+									);
+								}}
+								goto={false}
+							/>
+						</div>
+					</div>
+				{/if}
 				{#key type}
 					<Form message="" columns={data.otherColumns[type]} nested={true}></Form>
 				{/key}

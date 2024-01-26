@@ -5,12 +5,13 @@
 	export let item;
 </script>
 
-<div class="card my-3">
+<div class="card my-3" style="height: 50vh;">
 	<div class="row">
 		<div class="col-md-5 col-sm-6 overflow-scroll img-responsive">
 			<img
 				alt="{item.title} Cover"
-				class="rounded-start h-100"
+				class="rounded-start"
+				style="height: 50vh;"
 				src={item.image_url || 'https://placehold.co/200x300/black/white?text=Cover'}
 			/>
 		</div>
@@ -27,7 +28,7 @@
 				<p>{truncate(item.remarks)}</p>
 				<div class="mb-3">
 					{#each item.categories as category}
-						<span class="badge bg-info">{category}</span>
+						<span class="badge bg-info">{category.name}</span>
 					{/each}
 				</div>
 				<slot name="actions" prop={item}>

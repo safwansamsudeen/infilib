@@ -27,6 +27,7 @@
 	{/if}
 	<form
 		action="?/{action}"
+		class="my-2"
 		id="{action}-form"
 		method="post"
 		use:enhance={() => {

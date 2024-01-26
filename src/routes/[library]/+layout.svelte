@@ -5,7 +5,7 @@
 </script>
 
 <div class="app">
-	<Header library={data.library_name} user={data.user} />
+	<Header library={data.library.name} user={data.user} />
 	<main style="max-width: 85%;">
 		{#if $navigating}
 			<div class="spinner-border d-flex align-self-center my-5" role="status">

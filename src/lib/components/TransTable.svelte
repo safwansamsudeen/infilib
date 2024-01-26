@@ -4,7 +4,8 @@
 	import Table from '$lib/components/Table.svelte';
 
 	export let data, columns;
-	function actionsHtml(value, row) {
+	if ($page.data.library.settings.is_free) columns = columns.filter(({ id }) => id != 'price');
+	function actionsHtml(_, row) {
 		return `
 				<div class="btn-group btn-group-sm w-100" role="group">
 					${

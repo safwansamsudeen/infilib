@@ -19,5 +19,6 @@ export const {
 	transaction,
 	library,
 	subscriptionType,
-	userSubscription
+	userSubscription,
+	librarySubscription
 } = prisma;

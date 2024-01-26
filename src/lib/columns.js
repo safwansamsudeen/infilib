@@ -98,6 +98,57 @@ export async function getSubscriptionColumns() {
 	].map(standardizeColumns);
 }
 
+export async function getLibrarySubscriptionColumns(library_slug) {
+	const categories = await category.findMany({
+		...CACHE_STRATEGY,
+		where: { library_slug }
+	});
+	const languages = await language.findMany({
+		...CACHE_STRATEGY
+	});
+	const publishers = await publisher.findMany({
+		...CACHE_STRATEGY,
+		where: { library_slug }
+	});
+	return [
+		{
+			id: 'name'
+		},
+		{ id: 'ends_on', type: 'date' },
+		{ id: 'no_of_weeks', name: 'Number of Weeks', type: 'number' },
+		{ id: 'recurrence', type: 'number' },
+		{ id: 'price', name: 'Total Price', type: 'number' },
+		{
+			id: 'publisher',
+			type: 'select',
+			opts: {
+				options: publishers,
+				goto: '?publisher='
+			}
+		},
+		{ id: 'call_no', name: 'Call Number', type: 'number', important: false },
+		{
+			id: 'categories',
+			type: 'select',
+			opts: {
+				multiple: true,
+				options: categories,
+				goto: '?categories='
+			},
+			important: false
+		},
+		{
+			id: 'languages',
+			type: 'select',
+			opts: {
+				multiple: true,
+				options: languages
+			},
+			important: false
+		}
+	].map(standardizeColumns);
+}
+
 export async function getTransColumns(library_slug, opts = false) {
 	const users =
 		opts &&
