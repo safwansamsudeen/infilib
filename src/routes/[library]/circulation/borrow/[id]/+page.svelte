@@ -7,6 +7,8 @@
 	import { page } from '$app/stores';
 
 	let modifiedColumns = structuredClone(data.columns);
+	if (data.library.settings.is_free)
+		modifiedColumns = modifiedColumns.filter(({ id }) => id != 'price');
 	findValue(modifiedColumns, 'user').opts.onChange = (e) =>
 		window.location.assign(`./${$page.params.id}?user=${e.detail.id}`);
 	findValue(modifiedColumns, 'item').opts.onChange = (e) => {

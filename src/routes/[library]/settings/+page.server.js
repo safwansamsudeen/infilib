@@ -3,7 +3,7 @@ import { pojoData, response } from '$lib/serverHelpers.js';
 import { validateAndClean } from '$lib/validators.js';
 import { fail } from '@sveltejs/kit';
 import { injectLibraryInSelect } from '$lib/helpers.js';
-import { subscriptionType, librarySubscription } from '$lib/db.js';
+import { subscriptionType, librarySubscription, library } from '$lib/db.js';
 
 export async function load({ params }) {
 	return {
@@ -26,6 +26,13 @@ export const actions = {
 			await subscriptionType.create({ data });
 		});
 	},
+	update_settings: async ({ request, params }) => {
+		const { is_free } = await pojoData(request);
+		await library.update({
+			where: { slug: params.library },
+			data: { settings: { update: { is_free: is_free ? true : false } } }
+    })
+  },
 	create_library_subscription: async ({ request, params }) => {
 		const requestData = await pojoData(request);
 		const columns = await getLibrarySubscriptionColumns();

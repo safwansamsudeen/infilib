@@ -28,7 +28,8 @@ export async function handle({ event, resolve }) {
 		const library_obj = await findOr404(library, {
 			where: {
 				slug: event.params.library
-			}
+			},
+			include: { settings: true }
 		});
 		const admin = library_obj.administrator_id === user.id || user.id === 1;
 
@@ -36,7 +37,7 @@ export async function handle({ event, resolve }) {
 			throw error(403, 'Not Authorized');
 		}
 
-		event.locals.library_name = library_obj.name;
+		event.locals.library = library_obj;
 		user.admin = admin;
 	}
 	event.locals.user = user;

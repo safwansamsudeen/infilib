@@ -65,14 +65,16 @@ export async function load({ params, url }) {
 }
 
 export const actions = {
-	borrow: async function ({ request, params }) {
+	borrow: async function ({ request, params, locals }) {
 		const { mark_id, ...requestData } = await pojoData(request);
 
 		const transColumns = (await getTransColumns(params.library)).filter(
 			({ id }) => !['returned_at', 'id'].includes(id)
 		);
 		const check = validateAndClean(requestData, transColumns);
-		if (check) return new fail(400, check);
+		if (check && !(locals.library.settings.is_free && check.name === 'Price')) {
+			return new fail(400, check);
+		}
 		const item_obj = await item.findUnique({ where: { id: +requestData.item.connect.id } });
 		if (item_obj.status === 'OUT') {
 			return fail(400, { incorrect: true, name: 'item', value: 'this item is already borrowed.' });
