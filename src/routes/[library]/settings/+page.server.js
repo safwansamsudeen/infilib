@@ -2,7 +2,7 @@ import { getSubscriptionColumns, getTransColumns } from '$lib/columns.js';
 import { pojoData } from '$lib/serverHelpers.js';
 import { validateAndClean } from '$lib/validators.js';
 import { fail } from '@sveltejs/kit';
-import { subscriptionType } from '$lib/db.js';
+import { subscriptionType, library } from '$lib/db.js';
 
 export async function load() {
 	return { subsColumns: await getSubscriptionColumns() };
@@ -19,5 +19,12 @@ export const actions = {
 		let data = { library_slug: params.library };
 		for (let { id } of columns) data[id] = requestData[id];
 		await subscriptionType.create({ data });
+	},
+	update_settings: async ({ request, params }) => {
+		const { is_free } = await pojoData(request);
+		await library.update({
+			where: { slug: params.library },
+			data: { settings: { update: { is_free: is_free ? true : false } } }
+		});
 	}
 };

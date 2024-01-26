@@ -55,6 +55,7 @@ async function main() {
 				name,
 				address,
 				administrator: { connect: { email_address } },
+				settings: { create: { is_free: false } },
 				available_subscriptions: {
 					create: {
 						name: 'Membership',

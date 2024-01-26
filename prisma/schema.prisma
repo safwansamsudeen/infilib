@@ -23,6 +23,14 @@ model Library {
   categories              Category[]
   publishers              Publisher[]
   authors                 Author[]
+  settings_id             Int                @unique
+  settings                Settings           @relation(fields: [settings_id], references: [id])
+}
+
+model Settings {
+  id      Int      @id @default(autoincrement())
+  is_free Boolean  @default(false)
+  Library Library?
 }
 
 model SubscriptionType {

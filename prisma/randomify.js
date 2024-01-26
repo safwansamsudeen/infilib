@@ -142,8 +142,8 @@ const generateFakeTransactions = async () => {
 
 	// Create around 100 fake transactions
 	const transactions = Array.from({ length: 100 }, () => {
-		const userId = faker.number.int({ min: 100, max: totalUsers });
-		const itemId = faker.number.int({ min: 100, max: totalItems });
+		const userId = faker.number.int({ min: 0, max: totalUsers });
+		const itemId = faker.number.int({ min: 0, max: totalItems });
 		const borrowedAt = faker.date.past({ years: 1 });
 		const returnedAt = faker.datatype.boolean()
 			? faker.date.between({ from: borrowedAt, to: new Date() })
@@ -172,7 +172,8 @@ const generateFakeTransactions = async () => {
 				data: trans
 			});
 		} catch (e) {
-			console.log('Collision with', trans.itemId, 'and', trans.userId);
+			console.log(e);
+			console.log('Collision with', trans.item_id, 'and', trans.user_id);
 		}
 	}
 
@@ -180,7 +181,7 @@ const generateFakeTransactions = async () => {
 };
 
 async function main() {
-	await generateFakeData();
+	// await generateFakeData();
 	await generateFakeTransactions();
 }
 

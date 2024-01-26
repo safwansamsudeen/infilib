@@ -95,7 +95,7 @@
 <hr />
 <h3>Items</h3>
 <ul>
-	<li><em>{data.library_name}</em> contains a grand total of <b>{data.items.length}</b> items.</li>
+	<li><em>{data.library.name}</em> contains a grand total of <b>{data.items.length}</b> items.</li>
 	<li>
 		Out of this total, <b>{data.items.reduce((s, item) => s + item.reference, 0)}</b> items are for reference.
 	</li>
