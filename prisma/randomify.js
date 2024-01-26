@@ -172,7 +172,6 @@ const generateFakeTransactions = async () => {
 				data: trans
 			});
 		} catch (e) {
-			console.log(e);
 			console.log('Collision with', trans.item_id, 'and', trans.user_id);
 		}
 	}
@@ -181,7 +180,7 @@ const generateFakeTransactions = async () => {
 };
 
 async function main() {
-	// await generateFakeData();
+	await generateFakeData();
 	await generateFakeTransactions();
 }
 

@@ -47,11 +47,12 @@
 					/></svelte:fragment
 				></Form
 			>
-
-			<h3 class="text-center">Borrowed</h3>
-			{#key data.transactions}
-				<TransTable columns={data.transColumns} data={data.transactions} />
-			{/key}
+			{#if !data.item.reference}
+				<h3 class="text-center">Borrowed</h3>
+				{#key data.transactions}
+					<TransTable columns={data.transColumns} data={data.transactions} />
+				{/key}
+			{/if}
 		</div>
 	</div>
 </body>

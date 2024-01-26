@@ -36,7 +36,7 @@
 				`<a class="text-dark" href="${goto || columnName + '/'}${value.id}">${
 					value.name || value[label]
 				}</a>`;
-			if (goto) {
+			if (goto !== false) {
 				if (multiple) {
 					return value.map(linkWrapper).join(', ');
 				} else {
@@ -46,6 +46,7 @@
 				if (multiple) {
 					return value.map((val) => val.name || val[label] || value).join(', ');
 				} else {
+					// All this stuff because of item title and then gender.
 					return value.name || value[label] || value;
 				}
 			}
@@ -72,9 +73,9 @@
 					{:else if type === 'select'}
 						<th data-field={id} data-formatter="select">{name}</th>
 					{:else if type === 'date'}
-						<th data-field={id} data-formatter="date">{name}</th>
+						<th data-field={id} data-formatter="date" data-sortable="true">{name}</th>
 					{:else}
-						<th data-field={id}>{name}</th>
+						<th data-field={id} data-sortable="true">{name}</th>
 					{/if}
 				{/if}
 			{/each}

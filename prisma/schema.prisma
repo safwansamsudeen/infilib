@@ -23,15 +23,15 @@ model Library {
   categories              Category[]
   publishers              Publisher[]
   authors                 Author[]
-  settings_id             Int                @unique
-  settings                Settings           @relation(fields: [settings_id], references: [id])
+  settings_id             Int                   @unique
+  settings                Settings              @relation(fields: [settings_id], references: [id])
+  library_subscriptions   LibrarySubscription[]
 }
 
 model Settings {
   id      Int      @id @default(autoincrement())
   is_free Boolean  @default(false)
   Library Library?
-  library_subscriptions     LibrarySubscription[]
 }
 
 model SubscriptionType {
@@ -92,34 +92,32 @@ model Author {
 }
 
 model Category {
-  id                    Int                  @id @default(autoincrement())
+  id                    Int                   @id @default(autoincrement())
   name                  String
-  library               Library              @relation(fields: [library_slug], references: [slug])
+  library               Library               @relation(fields: [library_slug], references: [slug])
   library_slug          String
   items                 Item[]
-  LibrarySubscription   LibrarySubscription? @relation(fields: [librarySubscriptionId], references: [id])
-  librarySubscriptionId Int?
+  library_subscriptions LibrarySubscription[]
 
   @@unique([library_slug, name])
 }
 
 model Publisher {
-  id                  Int                   @id @default(autoincrement())
-  name                String
-  library             Library               @relation(fields: [library_slug], references: [slug])
-  library_slug        String
-  items               Item[]
-  LibrarySubscription LibrarySubscription[]
+  id                    Int                   @id @default(autoincrement())
+  name                  String
+  library               Library               @relation(fields: [library_slug], references: [slug])
+  library_slug          String
+  items                 Item[]
+  library_subscriptions LibrarySubscription[]
 
   @@unique([library_slug, name])
 }
 
 model Language {
-  id                    Int                  @id @default(autoincrement())
-  name                  String               @unique
+  id                    Int                   @id @default(autoincrement())
+  name                  String                @unique
   items                 Item[]
-  LibrarySubscription   LibrarySubscription? @relation(fields: [librarySubscriptionId], references: [id])
-  librarySubscriptionId Int?
+  library_subscriptions LibrarySubscription[]
 }
 
 model Book {
