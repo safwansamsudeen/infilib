@@ -34,7 +34,7 @@
 				id: columnName,
 				opts: { multiple, goto, label }
 			} = findValue(columns, this.field);
-			console.log(value);
+
 			const linkWrapper = (value) =>
 				`<a class="text-dark" href="${goto || columnName + '/'}${value.id}">${
 					value.name || value[label]

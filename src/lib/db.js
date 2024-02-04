@@ -20,5 +20,6 @@ export const {
 	library,
 	subscriptionType,
 	userSubscription,
-	librarySubscription
+	librarySubscription,
+	settings
 } = prisma;
