@@ -20,8 +20,8 @@
 		const formData = new FormData(e.target);
 		let filterStr = '';
 		for (let { id, type } of data.itemColumns) {
+			let val = formData.get(id);
 			if (type === 'select') {
-				let val = formData.get(id);
 				if (!val) continue;
 				filterStr += `&${id}=${JSON.parse(val).map(({ id }) => id)}`;
 			} else if (type === 'number' || type === 'date') {
@@ -30,6 +30,11 @@
 				if (!min && !max) continue;
 				filterStr += `&${id}=${min},${max}`;
 			}
+		}
+		const book = formData.get('show-book');
+		const magazine = formData.get('show-magazine');
+		if (book === 'on' || magazine === 'on') {
+			filterStr += '&show=' + (book === 'on' ? 'book' : 'magazine');
 		}
 
 		bootstrap.Modal.getInstance(document.getElementById('filterModal')).hide();
@@ -67,8 +72,19 @@
 					</div>
 					<div class="modal-body">
 						<form action="items" id="filter-form" on:submit={filter}>
-							{#each data.itemColumns as { id, name, type, opts }}
-								<div class="form-group my-2">
+							<div class="form-group mb-3">
+								<div class="label">Type:</div>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" name="show-book" id="book" />
+									<label class="form-check-label" for="book">Book</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" name="show-magazine" id="magazine" />
+									<label class="form-check-label" for="magazine">Magazine</label>
+								</div>
+							</div>
+							{#each data.itemColumns.sort((a, b) => b.type.charCodeAt() - a.type.charCodeAt()) as { id, name, type, opts }}
+								<div class="form-group my-3">
 									{#if ['select', 'date', 'number'].includes(type)}
 										<label for={id}>{name}</label>
 									{/if}
@@ -82,10 +98,7 @@
 													{id}
 													name="{id}-min"
 													type="date"
-													value={dayjs(
-														$page.url.searchParams.get(id)?.split(',')[0],
-														'YYYY-MM-DD'
-													).toDate()}
+													value={$page.url.searchParams.get(id)?.split(',')[0]}
 												/>
 											</div>
 											<div class="col-6 small">
@@ -95,20 +108,32 @@
 													{id}
 													name="{id}-max"
 													type="date"
-													value={dayjs(
-														$page.url.searchParams.get(id)?.split(',')[1],
-														'YYYY-MM-DD'
-													).toDate()}
+													value={$page.url.searchParams.get(id)?.split(',')[1]}
 												/>
 											</div>
 										</div>
 									{:else if type === 'number'}
 										<div class="row">
 											<div class="col-6 small">
-												Minimum: <input class="form-control" {id} name="{id}-min" {...opts} />
+												<input
+													class="form-control"
+													placeholder="Minimum"
+													name="{id}-min"
+													type="number"
+													value={$page.url.searchParams.get(id)?.split(',')[0] || ''}
+													{...opts}
+												/>
 											</div>
 											<div class="col-6 small">
-												Maximum:<input class="form-control" {id} name="{id}-max" {...opts} />
+												<input
+													class="form-control"
+													{id}
+													placeholder="Maximum"
+													name="{id}-max"
+													type="number"
+													value={$page.url.searchParams.get(id)?.split(',')[1] || ''}
+													{...opts}
+												/>
 											</div>
 										</div>
 									{/if}
@@ -235,9 +260,11 @@
 					id="save-shortcut "
 					class="float-end"
 					on:submit={(e) => {
-						document.getElementById('shortcut-name').value = prompt(
-							'What do you want to name this shortcut?'
-						);
+						const name = prompt('What do you want to name this shortcut?');
+						if (!name) {
+							e.preventDefault();
+						}
+						document.getElementById('shortcut-name').value = name;
 					}}
 				>
 					<input type="hidden" name="search_str" value={$page.url.search} />
