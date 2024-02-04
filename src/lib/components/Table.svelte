@@ -14,6 +14,7 @@
 				if (condition && condition(row)) {
 					continue;
 				}
+
 				html += `<a type="button" class="btn btn-outline-primary" href="/${
 					$page.params.library
 				}/${url}${url.endsWith('=') ? '' : '/'}${row.id}">${label}</a>`;
@@ -33,6 +34,7 @@
 				id: columnName,
 				opts: { multiple, goto, label }
 			} = findValue(columns, this.field);
+			console.log(value);
 			const linkWrapper = (value) =>
 				`<a class="text-dark" href="${goto || columnName + '/'}${value.id}">${
 					value.name || value[label]
