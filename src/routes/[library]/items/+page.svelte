@@ -292,7 +292,7 @@
 				{/if}
 			{:else}
 				<div class="p-2 my-2">
-					<h2>Popular Items</h2>
+					<h2>Popular</h2>
 					<p>These {type || 'item'}s are borrowed very frequently at your library.</p>
 					{#if tableMode}
 						<Table

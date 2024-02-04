@@ -6,6 +6,39 @@ import { flatten, injectLibraryInSelect } from '$lib/helpers.js';
 import { validateAndClean } from '$lib/validators.js';
 import dayjs from 'dayjs';
 
+function getFilters(paramEntries) {
+	let filters = {};
+	for (let [key, val] of paramEntries) {
+		const ids = val.split(',').map(Number);
+		if (key === 'publisher') {
+			filters.publisher_id = ids[0];
+		} else if (key === 'languages' || key === 'categories') {
+			filters[key] = { some: { id: { in: ids } } };
+		} else if (key === 'authors') {
+			filters.book = { ...where.book, authors: { some: { id: { in: ids } } } };
+		} else {
+			// Numeric fields
+			const [min, max] = ids;
+			if (['price', 'no_of_pages', 'call_no', 'acc_no'].includes(key)) {
+				filters[key] = { gte: min, lte: max };
+			} else if (key === 'publication_year') {
+				filters.book = { ...where.book, [key]: { gte: min, lte: max } };
+			} else if (key === 'sc_no') {
+				filters.magazine = { ...where.magazine, [key]: { gte: min, lte: max } };
+			} else {
+				// Date fields
+				const [min, max] = val.split(',').map((d) => dayjs(d, 'YYYY-MM-DD').toDate());
+				if (['purchased_on'].includes(key)) {
+					filters[key] = { gte: min, lte: max };
+				} else if (['from', 'to'].includes(key)) {
+					filters.magazine = { ...where.magazine, [key]: { gte: min, lte: max } };
+				}
+			}
+		}
+	}
+	return filters;
+}
+
 export async function load({ url, params }) {
 	const library_slug = params.library;
 	return {
@@ -24,45 +57,14 @@ export async function load({ url, params }) {
 				};
 
 				// If there's a type specified, add columns and change DB call
-				let type;
-				let filters = {};
-				for (let [key, val] of url.searchParams.entries()) {
-					if (key === 'show' && ['book', 'magazine'].includes(val)) {
-						type = val;
-						const otherColumns = await (type === 'book' ? getBookColumns : getMagazineColumns)();
-						filters[val] = { ...where[val], isNot: null };
-						columns = columns.concat(otherColumns);
-						continue;
-					}
-
-					// Filters
-					const ids = val.split(',').map(Number);
-					if (key === 'publisher') {
-						filters.publisher_id = ids[0];
-					} else if (key === 'languages' || key === 'categories') {
-						filters[key] = { some: { id: { in: ids } } };
-					} else if (key === 'authors') {
-						filters.book = { ...where.book, authors: { some: { id: { in: ids } } } };
-					} else {
-						// Numeric fields
-						const [min, max] = ids;
-						if (['price', 'no_of_pages', 'call_no', 'acc_no'].includes(key)) {
-							filters[key] = { gte: min, lte: max };
-						} else if (key === 'publication_year') {
-							filters.book = { ...where.book, [key]: { gte: min, lte: max } };
-						} else if (key === 'sc_no') {
-							filters.magazine = { ...where.magazine, [key]: { gte: min, lte: max } };
-						} else {
-							// Date fields
-							const [min, max] = val.split(',').map((d) => dayjs(d, 'YYYY-MM-DD').toDate());
-							if (['purchased_on'].includes(key)) {
-								filters[key] = { gte: min, lte: max };
-							} else if (['from', 'to'].includes(key)) {
-								filters.magazine = { ...where.magazine, [key]: { gte: min, lte: max } };
-							}
-						}
-					}
+				let type = url.searchParams.get('show');
+				if ('show' && ['book', 'magazine'].includes(type)) {
+					const otherColumns = await (type === 'book' ? getBookColumns : getMagazineColumns)();
+					where[type] = { ...where[type], isNot: null };
+					columns = columns.concat(otherColumns);
 				}
+
+				const filters = getFilters(url.searchParams.entries());
 
 				let items, newItems, popularItems, searchResults, filterResults;
 				const search = url.searchParams.get('search');
