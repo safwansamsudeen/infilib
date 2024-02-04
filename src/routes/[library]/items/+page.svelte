@@ -191,7 +191,7 @@
 				Filter
 			</button>
 		</div>
-		{#await data.streamed.items then { columns, newItems, items, popularItems, searchResults, filterResults }}
+		{#await data.streamed.items then { columns, newItems, items, popularItems, searchResults, filterResults, shortcutResults }}
 			{#if $page.url.searchParams.has('search-results') && !$page.url.searchParams.get('search-results')}
 				<div class="text-center my-4">
 					<div class="h4 text-warning">No Results Found</div>
@@ -228,7 +228,22 @@
 					</div>
 				{/if}
 			{:else if filterResults}
-				<h2>Your items (filtered)</h2>
+				<h2 class="d-inline">Your items (filtered)</h2>
+				<form
+					action="?/saveShortcut"
+					method="POST"
+					id="save-shortcut "
+					class="float-end"
+					on:submit={(e) => {
+						document.getElementById('shortcut-name').value = prompt(
+							'What do you want to name this shortcut?'
+						);
+					}}
+				>
+					<input type="hidden" name="search_str" value={$page.url.search} />
+					<input type="hidden" name="name" id="shortcut-name" />
+					<button type="submit" class="btn btn-outline-dark btn-sm">Save shortcut</button>
+				</form>
 				{#if tableMode}
 					<Table
 						actions={[
@@ -237,7 +252,7 @@
 						]}
 						{columns}
 						data={filterResults}
-						id="new-item-table"
+						id="filtered-table"
 					/>
 				{:else}
 					<div class="row flex-row flex-nowrap overflow-scroll h-100">
@@ -291,6 +306,39 @@
 					</div>
 				{/if}
 			{:else}
+				{#each Object.entries(shortcutResults) as [name, results]}
+					<div class="p-2 my-2">
+						<h2>{name}</h2>
+						{#if tableMode}
+							<Table
+								actions={[
+									['Details', 'items'],
+									['Borrow', 'circulation/borrow', (row) => row.status !== 'IN' || row.reference]
+								]}
+								{columns}
+								data={results}
+								id="shortcut-{name}-table"
+							/>
+						{:else}
+							<div class="row flex-row flex-nowrap overflow-scroll h-100">
+								{#each results as item}
+									<div class="col-md-4 col-sm-6">
+										<ItemCard {item}>
+											<div class="btn-group" role="group" slot="actions" let:prop={item}>
+												<a class="btn btn-outline-dark" href="items/{item.id}/">Edit</a>
+												{#if item.status === 'IN' && item.reference}
+													<a class="btn btn-outline-dark" href="circulation/borrow/{item.id}/"
+														>Borrow</a
+													>
+												{/if}
+											</div>
+										</ItemCard>
+									</div>
+								{/each}
+							</div>
+						{/if}
+					</div>
+				{/each}
 				<div class="p-2 my-2">
 					<h2>Popular</h2>
 					<p>These {type || 'item'}s are borrowed very frequently at your library.</p>

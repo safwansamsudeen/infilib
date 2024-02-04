@@ -1,10 +1,11 @@
-import { item } from '$lib/db.js';
+import { item, settings } from '$lib/db.js';
 import { pojoData, response } from '$lib/serverHelpers.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { getBookColumns, getMagazineColumns, getItemColumns } from '$lib/columns.js';
 import { flatten, injectLibraryInSelect } from '$lib/helpers.js';
 import { validateAndClean } from '$lib/validators.js';
 import dayjs from 'dayjs';
+import { URLSearchParams } from 'url';
 
 function getFilters(paramEntries) {
 	let filters = {};
@@ -39,7 +40,13 @@ function getFilters(paramEntries) {
 	return filters;
 }
 
-export async function load({ url, params }) {
+export async function load({
+	url,
+	params,
+	locals: {
+		library: { settings }
+	}
+}) {
 	const library_slug = params.library;
 	return {
 		itemColumns: await getItemColumns(library_slug, true),
@@ -67,6 +74,7 @@ export async function load({ url, params }) {
 				const filters = getFilters(url.searchParams.entries());
 
 				let items, newItems, popularItems, searchResults, filterResults;
+				let shortcutResults = {};
 				const search = url.searchParams.get('search');
 				const searchResultsGiven = url.searchParams.get('search-results');
 
@@ -122,6 +130,17 @@ export async function load({ url, params }) {
 					});
 					if (type) flatten(searchResults, type);
 				} else {
+					for (let shortcut of settings.item_shortcuts) {
+						let [name, shortcutStr] = shortcut.split('/');
+						shortcutResults[name] = await item.findMany({
+							where: {
+								...where,
+								...getFilters(new URLSearchParams(shortcutStr).entries())
+							},
+							include
+						});
+						if (type) flatten(shortcutResults[name], type);
+					}
 					newItems = await item.findMany({
 						take: 25,
 						include,
@@ -154,14 +173,14 @@ export async function load({ url, params }) {
 					}
 				}
 
-				console.log(filterResults);
 				return {
 					items,
 					columns,
 					newItems,
 					popularItems,
 					searchResults,
-					filterResults
+					filterResults,
+					shortcutResults
 				};
 			})()
 		}
@@ -210,5 +229,17 @@ export const actions = {
 			return fail(404, { message: "Doesn't exist" });
 		}
 		throw redirect(303, `/${params.library}/items/${item_obj.id}`);
+	},
+	saveShortcut: async function ({
+		request,
+		locals: {
+			library: { settings: _settings }
+		}
+	}) {
+		let { search_str, name } = await pojoData(request);
+		await settings.update({
+			where: { id: _settings.id },
+			data: { item_shortcuts: [..._settings.item_shortcuts, name + '/' + search_str.slice(1)] }
+		});
 	}
 };
