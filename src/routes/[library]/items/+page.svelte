@@ -344,7 +344,7 @@
 								]}
 								{columns}
 								data={results}
-								id="shortcut-{name}-table"
+								id="shortcut-{name.replace(' ', '-')}-table"
 							/>
 						{:else}
 							<div class="row flex-row flex-nowrap overflow-scroll h-100">
