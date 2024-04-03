@@ -65,30 +65,69 @@
 		</div>
 	</div>
 	<div>
-		<h3 class="chart-group-title">Metadata</h3>
+		<h4 class="chart-group-title">Authors</h4>
 		<div class="chart-group">
 			<PieChart
-				id="item-author-chart"
-				title="Authors"
+				id="item-unborrowed-author-chart"
+				title="All Items"
 				data={data.items.authorCounts}
 				legend={false}
 			/>
 			<PieChart
-				id="item-publisher-chart"
+				id="item-borrowed-author-chart"
+				title="Borrowed items"
+				data={data.borrowedItems.authorCounts}
+				legend={false}
+			/>
+		</div>
+	</div>
+	<div>
+		<h4 class="chart-group-title">Publishers</h4>
+		<div class="chart-group">
+			<PieChart
+				id="item-unborrowed-publisher-chart"
 				title="Publishers"
 				data={data.items.publisherCounts}
 				legend={false}
 			/>
 			<PieChart
-				id="item-language-chart"
-				title="Languages"
+				id="item-borrowed-publisher-chart"
+				title="Borrowed items"
+				data={data.borrowedItems.publisherCounts}
+				legend={false}
+			/>
+		</div>
+	</div>
+	<div>
+		<h4 class="chart-group-title">Categories</h4>
+		<div class="chart-group">
+			<PieChart
+				id="item-unborrowed-category-chart"
+				title="All items"
+				data={data.items.categoryCounts}
+				legend={false}
+			/>
+			<PieChart
+				id="item-borrowed-category-chart"
+				title="Borrowed items"
+				data={data.borrowedItems.categoryCounts}
+				legend={false}
+			/>
+		</div>
+	</div>
+	<div>
+		<h4 class="chart-group-title">Language</h4>
+		<div class="chart-group">
+			<PieChart
+				id="item-unborrowed-language-chart"
+				title="All items"
 				data={data.items.languageCounts}
 				legend={false}
 			/>
 			<PieChart
-				id="item-category-chart"
-				title="Categories"
-				data={data.items.categoryCounts}
+				id="item-borrowed-language-chart"
+				title="Borrowed items"
+				data={data.borrowedItems.languageCounts}
 				legend={false}
 			/>
 		</div>
