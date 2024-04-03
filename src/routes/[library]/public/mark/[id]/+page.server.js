@@ -8,7 +8,7 @@ import { redirect } from '@sveltejs/kit';
 export async function load({ params }) {
 	let item_obj = await item.findUnique({ where: { id: +params.id }, include: { mark: true } });
 	if (item_obj.mark) {
-		throw redirect(303, `/${params.library}/public/`);
+		redirect(303, `/${params.library}/public/`);
 	}
 	return {
 		item_name: item_obj.title,
@@ -32,6 +32,6 @@ export const actions = {
 				borrow_time: date(borrow_time, false)
 			}
 		});
-		throw redirect(303, `/${params.library}/public/`);
+		redirect(303, `/${params.library}/public/`);
 	}
 };

@@ -84,6 +84,6 @@ export const actions = {
 			});
 		}, true);
 		if (res) throw res;
-		throw redirect(302, `/${params.library}/members`);
+		redirect(302, `/${params.library}/members`);
 	}
 };

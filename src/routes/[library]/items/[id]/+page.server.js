@@ -84,6 +84,6 @@ export const actions = {
 		await response(async () => {
 			await item.delete({ where: { id: +params.id } });
 		});
-		throw redirect(301, `/${params.library}/items`);
+		redirect(301, `/${params.library}/items`);
 	}
 };

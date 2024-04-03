@@ -22,7 +22,7 @@ export async function handle({ event, resolve }) {
 
 	if (event.params.library) {
 		if (!user.signedIn) {
-			throw redirect(302, `/users/login?next=${event.url.toString()}`);
+			redirect(302, `/users/login?next=${event.url.toString()}`);
 		}
 		const subRoute = event.url.pathname.split('/')[2];
 		const library_obj = await findOr404(library, {
@@ -35,7 +35,7 @@ export async function handle({ event, resolve }) {
 
 		if (subRoute !== 'public' && !admin) {
 			console.log(user);
-			throw error(403, 'Not Authorized');
+			error(403, 'Not Authorized');
 		}
 
 		event.locals.library = library_obj;

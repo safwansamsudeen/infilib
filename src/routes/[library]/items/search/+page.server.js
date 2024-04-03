@@ -59,9 +59,9 @@ export const actions = {
 			}
 		});
 
-		throw redirect(
-			303,
-			`/${library_slug}/items/?search-results=${searchResults.map(({ id }) => id).join(',')}`
-		);
+		redirect(
+        			303,
+        			`/${library_slug}/items/?search-results=${searchResults.map(({ id }) => id).join(',')}`
+        		);
 	}
 };

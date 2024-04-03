@@ -69,8 +69,8 @@ export const actions = {
 		}, true);
 		if (res) return res;
 		if (multiple) {
-			throw redirect(303, `/${params.library}/items/add?multiple=true`);
+			redirect(303, `/${params.library}/items/add?multiple=true`);
 		}
-		throw redirect(303, `/${params.library}/items`);
+		redirect(303, `/${params.library}/items`);
 	}
 };

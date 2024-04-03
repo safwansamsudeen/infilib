@@ -30,6 +30,6 @@ export const actions = {
 			});
 		}, true);
 		if (res) return res;
-		throw redirect(303, `/${params.library}/members`);
+		redirect(303, `/${params.library}/members`);
 	}
 };

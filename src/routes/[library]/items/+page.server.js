@@ -228,7 +228,7 @@ export const actions = {
 		if (!item_obj) {
 			return fail(404, { message: "Doesn't exist" });
 		}
-		throw redirect(303, `/${params.library}/items/${item_obj.id}`);
+		redirect(303, `/${params.library}/items/${item_obj.id}`);
 	},
 	saveShortcut: async function ({
 		request,

@@ -34,7 +34,7 @@ export async function serverResponse(func, status_code = 200) {
 export async function findOr404(model, params) {
 	let model_obj = await model.findUnique(params);
 	if (model_obj === null) {
-		throw error(404, 'Not Found');
+		error(404, 'Not Found');
 	}
 	return model_obj;
 }

@@ -21,7 +21,7 @@ export async function load({ params, url }) {
 	if (item_id !== 'any') {
 		item_obj = await findOr404(item, { where: { id: +item_id } });
 		if (item_obj.status === 'OUT') {
-			throw redirect(303, `/${params.library}/circulation/`);
+			redirect(303, `/${params.library}/circulation/`);
 		}
 	}
 
@@ -121,6 +121,6 @@ export const actions = {
 			}
 		}, true);
 		if (res) return res;
-		throw redirect(303, `/${params.library}/circulation/`);
+		redirect(303, `/${params.library}/circulation/`);
 	}
 };
