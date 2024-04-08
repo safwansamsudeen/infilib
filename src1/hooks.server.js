@@ -1,6 +1,6 @@
 import { getCurrentUser } from '$lib/auth.js';
 import { findOr404 } from '$lib/serverHelpers.js';
-import { library } from '$lib/db.js';
+// import { library } from '$lib/db.js';
 import { error, redirect } from '@sveltejs/kit';
 
 export function handleError({ error }) {

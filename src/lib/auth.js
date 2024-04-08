@@ -41,6 +41,7 @@ export async function storeUserData(passage_id) {
 		phone,
 		user_metadata: { name, gender, about, date_of_birth }
 	} = await passage.user.get(passage_id);
+
 	const userDetails = {
 		email_address: email,
 		phone_number: phone,
@@ -50,6 +51,7 @@ export async function storeUserData(passage_id) {
 		about,
 		date_of_birth: date(date_of_birth, false)
 	};
+
 	// Weird way to set up passage ID, but until in prod, works.
 	await user.upsert({
 		where: { email_address: email },

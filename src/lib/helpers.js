@@ -1,5 +1,7 @@
-import Input from '$lib/subcomponents/Input.svelte';
+// import Input from '$lib/subcomponents/Input.svelte';
 import dayjs from 'dayjs';
+import { fail, json, error } from '@sveltejs/kit';
+
 
 // https://stackoverflow.com/questions/13917150/javascript-convert-en-us-and-similar-locale-codes-to-human-readable-strings
 const LANG_MAPPING = {
@@ -347,4 +349,27 @@ export function getUserSubscription(user_obj, library_slug) {
 	return user_obj.subscriptions.find(
 		({ type, active }) => type.library_slug === library_slug && active
 	);
+}
+
+
+export async function findOr404(model, params) {
+	let model_obj = await model.findUnique(params);
+	if (model_obj === null) {
+		error(404, 'Not Found');
+	}
+	return model_obj;
+}
+
+export async function serverResponse(func, status_code = 200) {
+	try {
+		let res = await func();
+		return new json({
+			...res,
+			success: res?.success ?? true,
+			status_code: res?.status_code ?? status_code
+		});
+	} catch (error) {
+		console.log(error);
+		return new json({ success: false, status_code: 500, error });
+	}
 }

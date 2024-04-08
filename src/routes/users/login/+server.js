@@ -1,5 +1,5 @@
 import { getPassageId, storeUserData } from '$lib/auth.js';
-import { serverResponse } from '$lib/serverHelpers.js';
+import { serverResponse } from '$lib/helpers.js';
 
 export async function POST({ request }) {
 	const data = await request.json();
