@@ -1,10 +1,5 @@
 <script>
-	let data = {
-		libraries: [
-			{ slug: 'test', name: 'Test' },
-			{ slug: 'wha-wha', name: 'Wha Wha' }
-		]
-	};
+	export let data;
 </script>
 
 <svelte:head>
