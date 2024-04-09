@@ -37,7 +37,7 @@ export async function handle({ event, resolve }) {
             include: { settings: true },
             cacheStrategy: { swr: 600, ttl: 600 },
         });
-        console.time('finding lib')
+        console.timeEnd('finding lib')
         const admin = library_obj.administrator_id === user.id || user.id === 1 || user.email_address === "pranav.pooruli@gmail.com";
 
         if (subRoute !== 'public' && !admin) {
