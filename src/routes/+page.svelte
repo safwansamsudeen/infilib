@@ -1,10 +1,5 @@
 <script>
-	let data = {
-		libraries: [
-			{ slug: 'test', name: 'Test' },
-			{ slug: 'wha-wha', name: 'Wha Wha' }
-		]
-	};
+	export let data;
 </script>
 
 <svelte:head>
@@ -18,9 +13,13 @@
 	<div class="my-5">
 		<h5>Libraries currently using InfiLib:</h5>
 		<ul>
-			{#each data.libraries as library}
-				<li><a href="/{library.slug}">{library.name}</a></li>
-			{/each}
+			{#await data.libraries}
+				<p>Loading...</p>
+			{:then libraries}
+				{#each libraries as library}
+					<li><a href="/{library.slug}">{library.name}</a></li>
+				{/each}
+			{/await}
 		</ul>
 	</div>
 </section>

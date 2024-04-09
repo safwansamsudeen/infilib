@@ -39,6 +39,7 @@
 		"csv-parser": "^3.0.0",
 		"dayjs": "^1.11.10",
 		"flatpickr": "^4.6.13",
+		"frappe-datatable": "^1.17.15",
 		"jose": "^5.1.3",
 		"luxon": "^3.4.4",
 		"papaparse": "^5.4.1"

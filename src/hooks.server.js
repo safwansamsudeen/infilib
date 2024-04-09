@@ -19,7 +19,6 @@ export async function handle({ event, resolve }) {
         id: user_obj?.id,
         passage_id: user_obj?.passage_id
     };
-    console.log(user_obj)
 
     if (event.params.library) {
         if (!user.signedIn) {
