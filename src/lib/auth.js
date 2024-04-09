@@ -29,7 +29,7 @@ export async function getCurrentUser(auth_token) {
 		return null;
 	}
 	const passage_id = await getPassageId(auth_token);
-	const user_obj = await user.findUnique({ where: { passage_id } });
+	const user_obj = await user.findUnique({ where: { passage_id }, cacheStrategy: { swr: 600, ttl: 600 } });
 
 	return user_obj;
 }

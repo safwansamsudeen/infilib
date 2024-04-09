@@ -12,8 +12,8 @@ export function handleError({ error }) {
 }
 
 export async function handle({ event, resolve }) {
-    console.time('whole')
     console.time('auth')
+    console.time('cookie')
     const user_obj = await getCurrentUser(event.cookies.get('psg_auth_token'));
     const user = {
         signedIn: !!user_obj,
@@ -21,18 +21,23 @@ export async function handle({ event, resolve }) {
         id: user_obj?.id,
         passage_id: user_obj?.passage_id
     };
+    console.timeEnd('cookie')
 
+    console.time('stuff')
     if (event.params.library) {
         if (!user.signedIn) {
             redirect(302, `/users/login?next=${event.url.toString()}`);
         }
         const subRoute = event.url.pathname.split('/')[2];
+        console.time('finding lib')
         const library_obj = await findOr404(library, {
             where: {
                 slug: event.params.library
             },
-            include: { settings: true }
+            include: { settings: true },
+            cacheStrategy: { swr: 600, ttl: 600 },
         });
+        console.time('finding lib')
         const admin = library_obj.administrator_id === user.id || user.id === 1 || user.email_address === "pranav.pooruli@gmail.com";
 
         if (subRoute !== 'public' && !admin) {
@@ -44,11 +49,11 @@ export async function handle({ event, resolve }) {
         user.admin = admin;
     }
     event.locals.user = user;
+    console.timeEnd('stuff')
+
     console.timeEnd('auth')
 
-    console.time('load')
     const response = await resolve(event);
-    console.timeEnd('load')
-    console.timeEnd('whole')
+
     return response;
 }
