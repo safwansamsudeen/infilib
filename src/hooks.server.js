@@ -12,6 +12,8 @@ export function handleError({ error }) {
 }
 
 export async function handle({ event, resolve }) {
+    console.time('whole')
+    console.time('auth')
     const user_obj = await getCurrentUser(event.cookies.get('psg_auth_token'));
     const user = {
         signedIn: !!user_obj,
@@ -42,7 +44,11 @@ export async function handle({ event, resolve }) {
         user.admin = admin;
     }
     event.locals.user = user;
+    console.timeEnd('auth')
 
+    console.time('load')
     const response = await resolve(event);
+    console.timeEnd('load')
+    console.timeEnd('whole')
     return response;
 }

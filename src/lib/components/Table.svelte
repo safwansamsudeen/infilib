@@ -1,7 +1,6 @@
 <script>
 	import { findValue, date } from '$lib/helpers';
 	import { page } from '$app/stores';
-	import DataTable from 'frappe-datatable';
 	import { onMount } from 'svelte';
 
 	export let data,
