@@ -15,6 +15,14 @@
 		itemId = 'id',
 		goto = true,
 		onChange = () => {};
+
+	let optionsConfig = {};
+	if (typeof options.length === 'number') {
+		optionsConfig.items = options;
+	} else {
+		optionsConfig.loadOptions = async () => await options;
+	}
+
 	let filterText = '';
 
 	function handleFilter(e) {
@@ -24,6 +32,7 @@
 			options = [...prev, { [label]: filterText, created: true }];
 		}
 	}
+
 	function handleChange(e) {
 		options = options.map((i) => {
 			delete i.created;
@@ -38,7 +47,7 @@
 		bind:filterText
 		bind:value
 		{id}
-		items={options}
+		{...optionsConfig}
 		{multiple}
 		{required}
 		{disabled}
@@ -57,7 +66,7 @@
 	<Select
 		bind:value
 		{id}
-		items={options}
+		{...optionsConfig}
 		{multiple}
 		{required}
 		{disabled}

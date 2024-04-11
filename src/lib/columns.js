@@ -1,6 +1,11 @@
 
 import { capitalize } from '$lib/helpers.js';
 
+import { author, category, language, user, item, subscriptionType, publisher } from '$lib/db.js';
+
+const CACHE_STRATEGY = { cacheStrategy: { swr: 60, ttl: 60 } };
+
+
 function standardizeColumns({ name, important, type, columns, ...data }) {
     if (type === 'object') {
         return { ...data, name, type, columns: columns.map(standardizeColumns) };

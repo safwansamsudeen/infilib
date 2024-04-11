@@ -360,6 +360,19 @@ export async function findOr404(model, params) {
 	return model_obj;
 }
 
+export async function response(func, return_val = false, status_code = 200) {
+	try {
+		let result = await func();
+		if (return_val === true) {
+			return result;
+		}
+		return return_val || { success: true, status_code };
+	} catch (error) {
+		console.log(error);
+		return fail(500, { success: false, error: error.message });
+	}
+}
+
 export async function serverResponse(func, status_code = 200) {
 	try {
 		let res = await func();
@@ -372,4 +385,9 @@ export async function serverResponse(func, status_code = 200) {
 		console.log(error);
 		return new json({ success: false, status_code: 500, error });
 	}
+}
+
+// Get a request form data as a normal JS object
+export async function pojoData(request) {
+	return Object.fromEntries(await request.formData());
 }

@@ -1,7 +1,7 @@
 <script>
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
-	import Input from '$lib/subcomponents/Input.svelte';
+	import Input from '$lib/components/Input.svelte';
 	import { capitalize } from '$lib/helpers.js';
 
 	export let columns,

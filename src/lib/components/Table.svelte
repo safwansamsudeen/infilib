@@ -75,4 +75,4 @@
 	});
 </script>
 
-<table {id}></table>
+<table {id} style="margin: 10px auto; "></table>

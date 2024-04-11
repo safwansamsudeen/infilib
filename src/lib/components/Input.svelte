@@ -1,5 +1,5 @@
 <script>
-	import CustomSelect from '$lib/subcomponents/CustomSelect.svelte';
+	import CustomSelect from '$lib/components/CustomSelect.svelte';
 	import { capitalize, date } from '$lib/helpers.js';
 
 	export let id,
