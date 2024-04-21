@@ -26,11 +26,11 @@
 	const TYPE_FORMATTERS = {
 		checkbox: (value) =>
 			`<div class=text-center><i class="bi bi-${value ? 'check' : 'x'}"></i></div>`,
-		select: function (value, _, { id: column_id }) {
+		select: function (value, _, { id: column_id }, obj) {
+			value = value || obj[column_id];
 			const {
 				opts: { multiple, goto, label }
 			} = findValue(columns, column_id);
-
 			const linkWrapper = (value) =>
 				`<a class="text-dark" href="${goto || column_id + '/'}${value.id}">${
 					value.name || value[label]
@@ -54,6 +54,7 @@
 	};
 
 	onMount(() => {
+		console.log(data[0]);
 		const datatable = new DataTable('#' + id, {
 			columns: [
 				...columns
@@ -69,7 +70,7 @@
 					})),
 				{ name: 'Actions', format: actionsHtml }
 			],
-			data: data,
+			data,
 			cellHeight: 48
 		});
 	});

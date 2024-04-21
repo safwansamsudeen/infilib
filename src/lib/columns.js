@@ -124,3 +124,98 @@ export function getTransColumns(library_slug) {
     ].map(standardizeColumns);
 }
 
+
+export function getItemColumns(library_slug = null) {
+    let categories = category.findMany({
+        ...CACHE_STRATEGY,
+        where: { library_slug }
+    });
+    let languages = language.findMany({
+        ...CACHE_STRATEGY
+    });
+    let publishers = publisher.findMany({
+        ...CACHE_STRATEGY,
+        where: { library_slug }
+    });
+
+    return [
+        { id: 'acc_no', name: 'Acc. No.', type: 'number' },
+        { id: 'title' },
+        {
+            id: 'publisher',
+            type: 'select',
+            opts: {
+                options: publishers,
+                goto: '?publisher='
+            }
+        },
+        {
+            id: 'categories',
+            type: 'select',
+            opts: {
+                multiple: true,
+                options: categories,
+                goto: '?categories='
+            }
+        },
+        { id: 'status', opts: { value: 'IN', readonly: true } },
+        { id: 'no_of_pages', name: 'Number of Pages', type: 'number', important: false },
+        { id: 'call_no', name: 'Call. No.', type: 'number', opts: { step: 0.01 }, important: false },
+        {
+            id: 'purchase_price',
+            type: 'number',
+            important: false
+        },
+        {
+            id: 'purchased_on',
+            type: 'date',
+            important: false
+        },
+        {
+            id: 'languages',
+            type: 'select',
+            opts: {
+                multiple: true,
+                options: languages
+            },
+            important: false
+        },
+        { id: 'purchase_details', important: false },
+        { id: 'image_url', name: 'Image URL', important: false },
+        { id: 'level', important: false },
+        { id: 'remarks', type: 'textarea', important: false },
+        { id: 'reference', type: 'checkbox' }
+    ].map(standardizeColumns);
+}
+
+export function getMagazineColumns() {
+    return [
+        { id: 'issue' },
+        { id: 'volume' },
+        { id: 'sc_no', type: 'number' },
+        { id: 'from', type: 'date' },
+        { id: 'to', type: 'date' }
+    ].map(standardizeColumns);
+}
+
+export function getBookColumns(library_slug) {
+    const authors = author.findMany({
+        ...CACHE_STRATEGY,
+        where: { library_slug }
+    });
+    return [
+        {
+            id: 'authors',
+            type: 'select',
+            opts: {
+                multiple: true,
+                options: authors,
+                goto: '?authors='
+            }
+        },
+        { id: 'isbn', type: 'text', name: 'ISBN' },
+        { id: 'subtitle', important: false },
+        { id: 'publication_year', type: 'number', name: 'Year Published', important: false },
+        { id: 'edition', important: false }
+    ].map(standardizeColumns);
+}
