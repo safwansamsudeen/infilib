@@ -31,7 +31,10 @@ export async function handle({ event, resolve }) {
 			},
 			include: { settings: true }
 		});
-		const admin = library_obj.administrator_id === user.id || user.id === 1 || user.email_address === "pranav.pooruli@gmail.com";
+		const admin =
+			library_obj.administrator_id === user.id ||
+			user.id === 1 ||
+			user.email_address === 'pranav.pooruli@gmail.com';
 
 		if (subRoute !== 'public' && !admin) {
 			console.log(user);

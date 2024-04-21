@@ -60,8 +60,8 @@ export const actions = {
 		});
 
 		redirect(
-        			303,
-        			`/${library_slug}/items/?search-results=${searchResults.map(({ id }) => id).join(',')}`
-        		);
+			303,
+			`/${library_slug}/items/?search-results=${searchResults.map(({ id }) => id).join(',')}`
+		);
 	}
 };

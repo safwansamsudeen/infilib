@@ -31,8 +31,8 @@ export const actions = {
 		await library.update({
 			where: { slug: params.library },
 			data: { settings: { update: { is_free: is_free ? true : false } } }
-    })
-  },
+		});
+	},
 	create_library_subscription: async ({ request, params }) => {
 		const requestData = await pojoData(request);
 		const columns = await getLibrarySubscriptionColumns();

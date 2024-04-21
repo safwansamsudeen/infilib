@@ -6,8 +6,6 @@ import { validateAndClean } from '$lib/validators.js';
 import dayjs from 'dayjs';
 import { URLSearchParams } from 'url';
 
-
-
 export async function load({
 	url,
 	params,
@@ -16,7 +14,7 @@ export async function load({
 	}
 }) {
 	const library_slug = params.library;
-	let columns = getItemColumns(library_slug)
+	let columns = getItemColumns(library_slug);
 	return {
 		columns,
 		items: (async () => {
@@ -189,7 +187,6 @@ export const actions = {
 		} else {
 			item_obj = await item.findFirst({ where: { acc_no: +data } });
 		}
-		console.log(item_obj)
 		if (!item_obj) {
 			return fail(404, { message: "Doesn't exist" });
 		}

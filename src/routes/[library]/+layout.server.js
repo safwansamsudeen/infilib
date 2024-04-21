@@ -1,6 +1,6 @@
 export function load({ locals }) {
-    return {
-        user: locals.user,
-        library: locals.library
-    };
+	return {
+		user: locals.user,
+		library: locals.library
+	};
 }

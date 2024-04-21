@@ -2,7 +2,7 @@ import { user } from '$lib/db';
 import { getUserColumns } from '$lib/columns';
 
 export async function load({ params }) {
-	console.time('In')
+	console.time('In');
 	let library_slug = params.library;
 	const columns = getUserColumns(library_slug);
 
@@ -11,7 +11,7 @@ export async function load({ params }) {
 		include: { subscriptions: { include: { type: true } } },
 		cacheStrategy: { swr: 60, ttl: 60 }
 	});
-	console.timeEnd('In')
+	console.timeEnd('In');
 
 	return {
 		users,

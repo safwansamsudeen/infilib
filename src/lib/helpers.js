@@ -2,7 +2,6 @@
 import dayjs from 'dayjs';
 import { fail, json, error } from '@sveltejs/kit';
 
-
 // https://stackoverflow.com/questions/13917150/javascript-convert-en-us-and-similar-locale-codes-to-human-readable-strings
 const LANG_MAPPING = {
 	ab: 'Abkhazian',
@@ -350,7 +349,6 @@ export function getUserSubscription(user_obj, library_slug) {
 		({ type, active }) => type.library_slug === library_slug && active
 	);
 }
-
 
 export async function findOr404(model, params) {
 	let model_obj = await model.findUnique(params);
