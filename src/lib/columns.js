@@ -68,3 +68,59 @@ export function getUserColumns(library_slug, opts = false) {
         }
     ].map(standardizeColumns);
 }
+
+export function getTransColumns(library_slug) {
+    const users = user.findMany({
+        ...CACHE_STRATEGY,
+        where: { subscriptions: { some: { type: { library_slug } } } }
+    });
+
+    const types = subscriptionType.findMany({
+        ...CACHE_STRATEGY,
+        where: { library_slug }
+    });
+    const items = item.findMany({
+        ...CACHE_STRATEGY,
+        where: { library_slug }
+    });
+
+    return [
+        { id: 'id', name: 'ID', type: 'hidden' },
+        {
+            id: 'user',
+            type: 'select',
+            opts: {
+                options: users,
+                creatable: false,
+                goto: 'members/'
+            }
+        },
+        {
+            id: 'subscription',
+            type: 'select',
+            opts: {
+                options: types,
+                creatable: false,
+                disabled: true,
+                goto: false,
+                tableVisible: false
+            }
+        },
+        {
+            id: 'item',
+            type: 'select',
+            opts: {
+                options: items,
+                itemId: 'id',
+                label: 'title',
+                creatable: false
+            }
+        },
+        { id: 'issued_at', type: 'date' },
+        { id: 'due_at', type: 'date' },
+        { id: 'returned_at', type: 'date', opts: { formRemoved: true } },
+        { id: 'price', type: 'number', important: true },
+        { id: 'comments', type: 'textarea', important: false, opts: { tableVisible: true } }
+    ].map(standardizeColumns);
+}
+

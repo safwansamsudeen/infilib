@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { date } from '$lib/helpers.js';
+	import { date } from '$lib/helpers';
 	import { enhance } from '$app/forms';
 	import dayjs from 'dayjs';
 	import Table from '$lib/components/Table.svelte';
