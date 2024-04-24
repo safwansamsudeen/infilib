@@ -49,12 +49,16 @@
 					return value.name || value[label] || value;
 				}
 			}
-		},
-		date: dateFormatter
+		}
 	};
+	// Format comment to be a HTML input
+
+	// Fix issue with date formatter
+	for (let { id, type } of columns) {
+		if (type === 'date') data = data.map((rec) => ({ ...rec, [id]: dateFormatter(rec[id], rec) }));
+	}
 
 	onMount(() => {
-		console.log(data[0]);
 		const datatable = new DataTable('#' + id, {
 			columns: [
 				...columns
@@ -66,14 +70,17 @@
 						id,
 						name,
 						format: TYPE_FORMATTERS[type] || ((value) => value),
-						sortable: type !== 'select'
+						sortable: type !== 'select',
+						editable: id === 'comments'
 					})),
 				{ name: 'Actions', format: actionsHtml }
 			],
 			data,
-			cellHeight: 48
+			cellHeight: 48,
+			layout: 'fluid',
+			inlineFilters: true
 		});
 	});
 </script>
 
-<table {id} style="margin: 10px auto; "></table>
+<table {id} style="margin: 10px auto;"></table>

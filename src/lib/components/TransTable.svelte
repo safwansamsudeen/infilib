@@ -7,7 +7,8 @@
 
 	export let data, columns;
 	if ($page.data.library.settings.is_free) columns = columns.filter(({ id }) => id != 'price');
-	function actionsHtml(_, row) {
+	function actionsHtml(_, config) {
+		const row = data[+config[0].content - 1];
 		return `
 				<div class="btn-group btn-group-sm w-100" role="group">
 					${
@@ -25,7 +26,7 @@
 	{actionsHtml}
 	{columns}
 	{data}
-	dateFormatter={(v, { due_at, returned_at }) => {
+	dateFormatter={(v, { returned_at, due_at }) => {
 		let date_str = date(v);
 		const today = dayjs();
 		if (!returned_at && today > due_at) {
@@ -35,7 +36,7 @@
 				date_str || 'Overdue by ' + overdue + ' day' + (overdue === 1 ? '' : 's')
 			}</div>`;
 		}
-		return date_str;
+		return date_str || 'NA';
 	}}
 />
 <div id="transaction-table">
