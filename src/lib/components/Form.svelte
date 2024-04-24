@@ -8,12 +8,13 @@
 		action = 'create',
 		nested = false,
 		message = capitalize(action),
+		form_word = action + 'd',
 		loading = false;
 </script>
 
 {#if !nested}
 	{#if $page.form?.success}
-		<p class="alert alert-success">Successfully {action}d!</p>
+		<p class="alert alert-success">Successfully {form_word}!</p>
 	{:else if $page.form?.missing}<p class="alert alert-danger">
 			The "{$page.form.name}" field is required.
 		</p>

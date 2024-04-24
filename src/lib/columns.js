@@ -216,3 +216,68 @@ export function getBookColumns(library_slug) {
 		{ id: 'edition', important: false }
 	].map(standardizeColumns);
 }
+
+
+export function getSubscriptionColumns() {
+	return [
+		{
+			id: 'name'
+		},
+		{ id: 'no_of_days', name: 'Maximum Number of Borrowing Days', type: 'number' },
+		{ id: 'no_of_books', name: 'Maximum Number of Books', type: 'number' },
+		{ id: 'deposit', type: 'number' },
+		{ id: 'annual_price', type: 'number', important: false },
+		{ id: 'half_yearly_price', type: 'number', important: false }
+	].map(standardizeColumns);
+}
+
+export function getLibrarySubscriptionColumns(library_slug) {
+	const categories = category.findMany({
+		...CACHE_STRATEGY,
+		where: { library_slug }
+	});
+	const languages = language.findMany({
+		...CACHE_STRATEGY
+	});
+	const publishers = publisher.findMany({
+		...CACHE_STRATEGY,
+		where: { library_slug }
+	});
+	return [
+		{
+			id: 'name'
+		},
+		{ id: 'ends_on', type: 'date' },
+		{ id: 'no_of_weeks', name: 'Number of Weeks', type: 'number' },
+		{ id: 'recurrence', type: 'number' },
+		{ id: 'price', name: 'Total Price', type: 'number' },
+		{
+			id: 'publisher',
+			type: 'select',
+			opts: {
+				options: publishers,
+				goto: '?publisher='
+			}
+		},
+		{ id: 'call_no', name: 'Call Number', type: 'number', important: false },
+		{
+			id: 'categories',
+			type: 'select',
+			opts: {
+				multiple: true,
+				options: categories,
+				goto: '?categories='
+			},
+			important: false
+		},
+		{
+			id: 'languages',
+			type: 'select',
+			opts: {
+				multiple: true,
+				options: languages
+			},
+			important: false
+		}
+	].map(standardizeColumns);
+}
