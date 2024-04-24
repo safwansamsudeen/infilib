@@ -143,7 +143,7 @@ export function getItemColumns(library_slug = null) {
 			type: 'select',
 			opts: {
 				options: publishers,
-				goto: '?publisher='
+				goto: 'items/?publisher='
 			}
 		},
 		{
