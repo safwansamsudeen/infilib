@@ -38,8 +38,10 @@ export function validateAndClean(obj, columns, action = 'create') {
 			continue;
 		}
 		try {
-			if (['select', 'number'].includes(type)) {
+			if (type === 'select') {
 				obj[columnId] = JSON.parse(obj[columnId] || '[]');
+			} else if (type === 'number') {
+				obj[columnId] = obj[columnId] ? +obj[columnId] : null
 			}
 			if (!(PROPERTY_VALIDATORS[type] || (() => true))(obj[columnId], opts)) {
 				return { name, value: obj[columnId], incorrect: true };

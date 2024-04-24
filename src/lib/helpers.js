@@ -1,9 +1,9 @@
-// import Input from '$lib/subcomponents/Input.svelte';
+import Input from '$lib/components/Input.svelte';
 import dayjs from 'dayjs';
 import { fail, json, error } from '@sveltejs/kit';
 
 // https://stackoverflow.com/questions/13917150/javascript-convert-en-us-and-similar-locale-codes-to-human-readable-strings
-const LANG_MAPPING = {
+export const LANG_MAPPING = {
 	ab: 'Abkhazian',
 	aa: 'Afar',
 	af: 'Afrikaans',
@@ -209,9 +209,10 @@ export function findValue(array, key_value, key = 'id') {
 	}
 }
 
-export function setSelectField(id, options, new_value = [], multi = false) {
+export async function setSelectField(id, optionsPromise, new_value = [], multi = false) {
 	let value = multi ? [] : {};
 	let existing_options;
+	let options = await optionsPromise;
 
 	// Add new value(s) to option list
 	if (multi) {
@@ -243,10 +244,14 @@ export function setSelectField(id, options, new_value = [], multi = false) {
 		props: {
 			id: id,
 			type: 'select',
-			opts: { value, options, multiple: multi },
+			opts: { value, options: optionsPromise, multiple: multi },
 			important: true
 		}
 	});
+
+	// Hack to reset width 
+	let [parent, child] = document.querySelectorAll(`#${id}-div`)
+	parent.innerHTML = child.innerHTML
 }
 
 export function date(value, to_str = true, time = false, format = 'YYYY-MM-DD') {
@@ -262,11 +267,17 @@ export function date(value, to_str = true, time = false, format = 'YYYY-MM-DD') 
 	return new Date(value);
 }
 
-export async function setBookDetails(isbn, publishers, authors, languages, categories, scanner) {
-	scanner?.pause?.();
+export async function getBookDetails(isbn) {
 	let res = await fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:' + isbn);
 	let item = (await res.json()).items[0];
+	return item;
+}
+
+export async function setBookDetails(isbn, publishers, authors, languages, categories, scanner) {
+	scanner?.pause?.();
+	let item = await getBookDetails(isbn)
 	let volumeInfo = item.volumeInfo;
+
 	//   Populate form fields with request data
 	setFormField('title', volumeInfo.title);
 	setFormField('subtitle', volumeInfo.subtitle);
@@ -281,6 +292,7 @@ export async function setBookDetails(isbn, publishers, authors, languages, categ
 	setSelectField('authors', authors, volumeInfo.authors, true);
 	setSelectField('languages', languages, [LANG_MAPPING[volumeInfo.language]], true);
 	setSelectField('categories', categories, volumeInfo.categories, true);
+
 	return false;
 }
 
