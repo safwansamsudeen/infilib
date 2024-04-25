@@ -25,7 +25,7 @@
 <Table
 	{actionsHtml}
 	{columns}
-	{data}
+	data={data.map((rec) => ({ ...rec, comments: rec.comments ? rec.comments : '' }))}
 	dateFormatter={(v, { returned_at, due_at }) => {
 		let date_str = date(v);
 		const today = dayjs();

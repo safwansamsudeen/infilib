@@ -77,7 +77,6 @@
 			],
 			data,
 			cellHeight: 48,
-			layout: 'fluid',
 			inlineFilters: true
 		});
 	});
