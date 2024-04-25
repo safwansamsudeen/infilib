@@ -281,3 +281,14 @@ export function getLibrarySubscriptionColumns(library_slug) {
 		}
 	].map(standardizeColumns);
 }
+
+export function getMarkColumns() {
+	return [
+		{
+			id: 'item'
+		},
+		{ id: 'user', type: 'hidden' },
+		{ id: 'borrow_time', name: 'Time Of Pickup', type: 'datetime-local' },
+		{ id: 'comments', type: 'textarea', opts: { required: false } }
+	].map(standardizeColumns);
+}

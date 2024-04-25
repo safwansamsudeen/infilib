@@ -2,7 +2,7 @@
 	import { truncate, date } from '$lib/helpers.js';
 	import { page } from '$app/stores';
 
-	export let item;
+	export let item, user_id;
 </script>
 
 <div class="card my-3" style="height: 50vh;">
@@ -36,7 +36,7 @@
 						<p class="card-text">Not Available</p>
 					{:else if item.mark}
 						<em>Already Marked</em>
-						{#if item.mark.user_id === item.user.id}
+						{#if item.mark.user_id === user_id}
 							<span class="badge bg-success">You</span>
 						{/if}
 					{:else}

@@ -298,6 +298,7 @@ export async function setBookDetails(isbn, publishers, authors, languages, categ
 
 export function flatten(records, key) {
 	records.map((rec) => Object.entries(rec[key]).map(([id, value]) => (rec[id] = value)));
+	return records
 }
 
 export function truncate(text, totalChars = 80, endChars = 20) {
