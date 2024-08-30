@@ -83,7 +83,6 @@
 			method: 'POST',
 			body: data_
 		});
-		console.log(await res.json());
 	}
 	export let data;
 </script>
@@ -128,11 +127,15 @@
 		<input bind:value={type} form="create-form" name="type" type="hidden" />
 		{#if scannerVisible}
 			<Scanner
-				publishers={obtainOptions(data.itemColumns, 'publishers')}
-				authors={obtainOptions(data.itemColumns, 'authors')}
-				categories={obtainOptions(data.itemColumns, 'categories')}
-				languages={obtainOptions(data.itemColumns, 'languages')}
-				bind:autofilled
+				onComplete={async (decodedText, scanner) => {
+					await setBookDetails(decodedText, 
+						obtainOptions(data.itemColumns, 'publishers'), 
+						obtainOptions(data.itemColumns, 'authors'), 
+						obtainOptions(data.itemColumns, 'languages'), 
+						obtainOptions(data.itemColumns, 'languages'), 
+					scanner);
+					autofilled = true;
+				}}
 			/>
 			{#if autofilled}
 				<button class="btn btn-success my-3 mx-auto" type="submit" form="create-form"

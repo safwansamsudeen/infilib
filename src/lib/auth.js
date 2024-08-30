@@ -25,12 +25,12 @@ export async function getPassageId(auth_token) {
 }
 
 export async function getCurrentUser(auth_token) {
-	if (!auth_token) {
-		return null;
-	}
-	const passage_id = await getPassageId(auth_token);
+	// if (!auth_token) {
+	// 	return null;
+	// }
+	// const passage_id = await getPassageId(auth_token);
 	const user_obj = await user.findUnique({
-		where: { passage_id },
+		where: { id: 1 },
 		cacheStrategy: { swr: 6000, ttl: 6000 }
 	});
 

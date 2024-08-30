@@ -14,8 +14,6 @@
 		const userId = new URLSearchParams(window.location.search).get('user');
 		window.location.assign(`./${e.detail.id}${userId && '?user=' + userId}`);
 	};
-
-	console.log(columnsCopy);
 </script>
 
 <svelte:head>
