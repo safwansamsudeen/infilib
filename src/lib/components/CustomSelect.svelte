@@ -34,48 +34,58 @@
 	}
 
 	function handleChange(e) {
-		options = options.map((i) => {
-			delete i.created;
-			return i;
-		});
-		onChange(e);
+		if(!options.length) {
+			optionsConfig.loadOptions().then((opts) => {
+				options = opts.map((i) => {
+					delete i.created;
+					return i;
+				});
+				onChange(e);
+			})
+		} else {
+			options = options.map((i) => {
+				delete i.created;
+				return i;
+			});
+			onChange(e);
+		}
 	}
 </script>
-
 {#if creatable}
-	<Select
-		bind:filterText
-		bind:value
-		{id}
-		{...optionsConfig}
-		{multiple}
-		{required}
-		{disabled}
-		name={id}
-		{label}
-		{itemId}
-		on:change={handleChange}
-		on:filter={handleFilter}
-	>
-		<div let:item slot="item">
-			{item.created ? `Add new ${id}: ` : ''}
-			{item[label]}
-		</div>
-	</Select>
+<Select
+	bind:filterText
+	bind:value
+	{id}
+	{...optionsConfig}
+	{multiple}
+	{required}
+	{disabled}
+	name={id}
+	{label}
+	{itemId}
+	on:change={handleChange}
+	on:filter={handleFilter}
+>
+	<div let:item slot="item">
+		{item.created ? `Add new ${id}: ` : ''}
+		{item[label]}
+	</div>
+</Select>
 {:else}
-	<Select
-		bind:value
-		{id}
-		{...optionsConfig}
-		{multiple}
-		{required}
-		{disabled}
-		{label}
-		{itemId}
-		on:change={onChange}
-		name={id}
-	/>
+<Select
+	bind:value
+	{id}
+	{...optionsConfig}
+	{multiple}
+	{required}
+	{disabled}
+	{label}
+	{itemId}
+	on:change={onChange}
+	name={id}
+/>
 {/if}
 {#if value && !multiple && goto}
-	<a href="/{$page.params.library}/{goto === true ? id + 's/' : goto}{value.id}">goto</a>
+<a href="/{$page.params.library}/{goto === true ? id + 's/' : goto}{value.id}">goto</a>
 {/if}
+

@@ -90,7 +90,7 @@
 										<label for={id}>{name}</label>
 									{/if}
 									{#if type === 'select'}
-										<CustomSelect {id} {...{ ...opts, multiple: true, required: false }} />
+										<CustomSelect {id}  options={opts} multiple="true" required={false} {...opts} />
 									{:else if type === 'date'}
 										<div class="row">
 											<div class="col-6 small">
