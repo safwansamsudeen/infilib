@@ -3,13 +3,12 @@ import { response } from '$lib/helpers.js';
 import Papa from 'papaparse';
 import { item } from '$lib/db.js';
 
-async function importItems(row, library_slug) {
-	let created = [];
+async function importItem(row, library_slug) {
 	try {
 		// Split values separated by slash and trim whitespace
-		const authors = row['Author'].split('/').map((author) => author.trim());
-		const categories = row['Subject'].split('/').map((category) => category.trim());
-		const languages = row['Medium'].split('/').map((language) => language.trim());
+		const authors = row['Author']?.split('/')?.map((author) => author.trim()) || [];
+		const categories = row['Subject']?.split('/')?.map((category) => category.trim())|| [];
+		const languages = row['Medium']?.split('/')?.map((language) => language.trim())|| [];
 
 		await item.create({
 			data: {
@@ -20,16 +19,16 @@ async function importItems(row, library_slug) {
 				reference: row['Ref'] === 'Ref', // Assuming 'Ref' is a boolean field
 				no_of_pages: +row['Pages'],
 				call_no: +row['Call no.'],
-				level: row['Level'],
+				level: "" + row['Level'],
 				publisher: {
 					connectOrCreate: {
 						where: { library_slug_name: { library_slug, name: row["Publisher's Name"] } },
 						create: { library_slug, name: row["Publisher's Name"] }
 					}
 				},
-				purchase_details: row['Purchase Details'],
-				purchase_price: +row['Price'],
-				remarks: row['Remarks'],
+				purchase_details: "" + row['Purchase Details'],
+				purchase_price: +row['Price'] || 0,
+				remarks: "" + row['Remarks'],
 				languages: {
 					connectOrCreate: languages.map((lang) => ({
 						where: { name: lang },
@@ -44,27 +43,29 @@ async function importItems(row, library_slug) {
 				},
 				book: {
 					create: {
-						subtitle: row['SubTitle'],
+						subtitle: "" + row['SubTitle'],
 						authors: {
 							connectOrCreate: authors.map((author) => ({
 								where: { library_slug_name: { library_slug, name: author } },
 								create: { library_slug, name: author }
 							}))
 						},
-						edition: row['Edition/Year'],
-						isbn: `${row['ISBN No.']}`
+						edition: "" + row['Edition/Year'],
+						isbn: "" + row['ISBN No.']
 					}
 				}
 			}
 		});
 		created.push(+row['Acc. No.']);
 	} catch (error) {
-		console.error(`We couldn't create the item with accession number: ${row['Acc. No.']}.`);
+		return false
 	}
-	return created;
+
+	return true;
 }
+
 export const actions = {
-	default: async ({ request, params }) => {
+	test: async ({ request, params }) => {
 		return response(async () => {
 			const { importFile } = Object.fromEntries(await request.formData());
 
@@ -75,15 +76,18 @@ export const actions = {
 				});
 			}
 			let buffer = new Buffer(await importFile.arrayBuffer());
+			let failures = [];
 			Papa.parse(buffer.toString(), {
 				header: true,
 				transformHeader: (str) => str.trim(),
 				dynamicTyping: true,
-				step: async function ({ data, errors }, parser) {
-					const created = await importItems(data, params.library);
-					if (errors.length) console.log('Row errors:', errors);
+				step: async function ({ data }, parser) {
+					const created = await importItem(data, params.library);
+					if (!created) failures.push(data['Acc. No.'])
 				}
 			});
-		});
+			console.log(failures)
+			return {failures}
+		}, true);
 	}
 };
