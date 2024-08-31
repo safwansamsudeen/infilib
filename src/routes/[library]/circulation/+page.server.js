@@ -45,10 +45,10 @@ export const actions = {
 	},
 	return: async function ({ request }) {
 		return await response(async () => {
-			const { id } = await pojoData(request);
+			const { id, comments } = await pojoData(request);
 			await transaction.update({
 				where: { id: +id },
-				data: { returned_at: new Date(), item: { update: { status: 'IN' } } }
+				data: { returned_at: new Date(), comments, item: { update: { status: 'IN' } } }
 			});
 		});
 	}

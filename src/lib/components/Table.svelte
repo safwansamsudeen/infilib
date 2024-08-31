@@ -8,6 +8,7 @@
 		actions = [],
 		id = 'table',
 		dateFormatter = date,
+		getEditor =	null,
 		actionsHtml = (_, config) => {
 			const row = data[+config[0].content - 1];
 			let html = '<div class="btn-group btn-group-sm w-100" role="group">';
@@ -32,7 +33,7 @@
 				opts: { multiple, goto, label }
 			} = findValue(columns, column_id);
 			const linkWrapper = (value) =>
-				`<a class="text-dark" href="${goto || column_id + '/'}${value.id}">${
+				`<a class="text-dark" href="${goto || column_id + 's/'}${value.id}">${
 					value.name || value[label]
 				}</a>`;
 			if (goto !== false) {
@@ -59,22 +60,7 @@
 	}
 
 	onMount(() => {
-		console.log( [
-				...columns
-					.filter(
-						({ important, opts }) =>
-							(important || opts?.tableVisible) && opts?.tableVisible !== false
-					)
-					.map(({ id, name, type }) => ({
-						id,
-						name,
-						format: TYPE_FORMATTERS[type] || ((value) => value),
-						sortable: type !== 'select',
-						editable: id === 'comments',
-					align: 'left'
-					})),
-				{ name: 'Actions', format: actionsHtml }
-			])
+		console.log(columns)
 		new DataTable('#' + id, {
 			columns: [
 				...columns
@@ -82,19 +68,20 @@
 						({ important, opts }) =>
 							(important || opts?.tableVisible) && opts?.tableVisible !== false
 					)
-					.map(({ id, name, type }) => ({
+					.map(({ id, name, type, returned_at }) => ({
 						id,
 						name,
 						format: TYPE_FORMATTERS[type] || ((value) => value),
 						sortable: type !== 'select',
 						editable: id === 'comments',
-					align: 'left'
+						align: 'left'
 					})),
-				{ name: 'Actions', format: actionsHtml }
+				{ name: 'Actions', format: actionsHtml, editable: false }
 			],
 			data,
 			cellHeight: 48,
 			inlineFilters: true,
+			getEditor
 		});
 
 		// Show borders

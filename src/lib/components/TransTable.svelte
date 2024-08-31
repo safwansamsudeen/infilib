@@ -25,6 +25,20 @@
 <Table
 	{actionsHtml}
 	{columns}
+	getEditor={(_, rowIndex, value, parent) => {
+        const input = document.createElement('input');
+		const col = data[rowIndex];
+		input.className = 'dt-input'
+		input.value = value
+        parent.appendChild(input);
+		if(col.returned_at) input.disabled = true
+
+        return {
+			setValue(value) { document.getElementById('comment-' + col.id).value = value },
+            initValue(value) {},
+            getValue() {return input.value }
+        }
+	}}
 	data={data.map((rec) => ({ ...rec, comments: rec.comments ? rec.comments : '' }))}
 	dateFormatter={(v, { returned_at, due_at }) => {
 		let date_str = date(v);
@@ -40,7 +54,7 @@
 	}}
 />
 <div id="transaction-table">
-	{#each data as { id, returned_at, comments }}
+	{#each data as { id, returned_at }}
 		{#if !returned_at}
 			<form
 				action="/{$page.params.library}/circulation?/return"
@@ -49,7 +63,8 @@
 				id="{id}-return-form"
 				use:enhance
 			>
-				<input name="id" type="hidden" value={id} />
+				<input name="id" value={id} />
+				<input name="comments" id="comment-{id}">
 			</form>
 		{/if}
 		<form
