@@ -4,12 +4,14 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import ItemCard from '$lib/components/ItemCard.svelte';
+	import {date} from '$lib/helpers.js';
 
 	function updateSearchParam(key, value) {
 		let newUrl = new URL($page.url);
 		newUrl.searchParams.set(key, value);
 		return newUrl.href;
 	}
+	
 	export let data;
 	const tableMode = $page.url.searchParams.get('display') !== 'card';
 	const type = $page.url.searchParams.get('show');
@@ -241,7 +243,7 @@
 								<ItemCard {item}>
 									<div class="btn-group" role="group" slot="actions" let:prop={item}>
 										<a class="btn btn-outline-dark" href="items/{item.id}/">Edit</a>
-										{#if item.status === 'IN' && item.reference}
+										{#if item.status === 'IN' && !item.reference}
 											<a class="btn btn-outline-dark" href="circulation/borrow/{item.id}/">Borrow</a
 											>
 										{/if}
@@ -287,7 +289,7 @@
 								<ItemCard {item}>
 									<div class="btn-group" role="group" slot="actions" let:prop={item}>
 										<a class="btn btn-outline-dark" href="items/{item.id}/">Edit</a>
-										{#if item.status === 'IN' && item.reference}
+										{#if item.status === 'IN' && !item.reference}
 											<a class="btn btn-outline-dark" href="circulation/borrow/{item.id}/">Borrow</a
 											>
 										{/if}
@@ -321,7 +323,7 @@
 								<ItemCard {item}>
 									<div class="btn-group" role="group" slot="actions" let:prop={item}>
 										<a class="btn btn-outline-dark" href="items/{item.id}/">Edit</a>
-										{#if item.status === 'IN' && item.reference}
+										{#if item.status === 'IN' && !item.reference}
 											<a class="btn btn-outline-dark" href="circulation/borrow/{item.id}/">Borrow</a
 											>
 										{/if}
@@ -352,7 +354,7 @@
 										<ItemCard {item}>
 											<div class="btn-group" role="group" slot="actions" let:prop={item}>
 												<a class="btn btn-outline-dark" href="items/{item.id}/">Edit</a>
-												{#if item.status === 'IN' && item.reference}
+												{#if item.status === 'IN' && !item.reference}
 													<a class="btn btn-outline-dark" href="circulation/borrow/{item.id}/"
 														>Borrow</a
 													>
@@ -383,11 +385,11 @@
 							{#each popularItems as item}
 								<div class="col-md-4 col-sm-6">
 									<ItemCard {item}>
+										<div class="my-2 px-1 card-text small" slot="details">{item.transactions.length} borrow{item.transactions.length  === 1 ? '' : 's'}</div>
 										<div slot="actions">
-											<div class="card-text small">{item.transactions.length} borrows</div>
 											<div class="btn-group" role="group" let:prop={item}>
 												<a class="btn btn-outline-dark" href="items/{item.id}/">Edit</a>
-												{#if item.status === 'IN' && item.reference}
+												{#if item.status === 'IN' && !item.reference}
 													<a class="btn btn-outline-dark" href="circulation/borrow/{item.id}/"
 														>Borrow</a
 													>
@@ -418,11 +420,11 @@
 							{#each newItems as item}
 								<div class="col-md-4 col-sm-6">
 									<ItemCard {item}>
+										<div class="my-2 px-1 card-text small" slot="details">{date(item.purchased_on, true, true)}</div>
 										<div slot="actions">
-											<div class="card-text small">{item.purchased_on}</div>
 											<div class="btn-group" role="group" let:prop={item}>
 												<a class="btn btn-outline-dark" href="items/{item.id}/">Edit</a>
-												{#if item.status === 'IN' && item.reference}
+												{#if item.status === 'IN' && !item.reference}
 													<a class="btn btn-outline-dark" href="circulation/borrow/{item.id}/"
 														>Borrow</a
 													>

@@ -260,7 +260,7 @@ export function date(value, to_str = true, time = false, format = 'YYYY-MM-DD') 
 	}
 	if (to_str) {
 		if (time) {
-			return dayjs(value).format('YYYY-MM-DD HH:mm');
+			return dayjs(value).format(' HH:mm, YYYY-MM-DD');
 		}
 		return dayjs(value).format(format);
 	}
