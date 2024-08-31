@@ -21,6 +21,7 @@
 	let scannerVisible = false;
 	let autofilled = false;
 	let quickadd = false;
+	let called;
 
 	if (browser) quickadd = localStorage.getItem('quickadd') || false;
 
@@ -45,12 +46,17 @@
 
 		return JSON.stringify(result);
 	}
-
+	$: 	console.log(called)
 	async function quickAdd(e) {
 		e.preventDefault();
+		if (called) {
+			return
+		}
+		
+		called = true
 		let isbn = +e.target.previousElementSibling.value.replaceAll('-', '');
-
 		let item = await getBookDetails(isbn);
+		setTimeout(() => called = false, 2000)
 		let volumeInfo = item.volumeInfo;
 
 		const data_ = new FormData();

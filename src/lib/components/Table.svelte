@@ -59,7 +59,23 @@
 	}
 
 	onMount(() => {
-		const datatable = new DataTable('#' + id, {
+		console.log( [
+				...columns
+					.filter(
+						({ important, opts }) =>
+							(important || opts?.tableVisible) && opts?.tableVisible !== false
+					)
+					.map(({ id, name, type }) => ({
+						id,
+						name,
+						format: TYPE_FORMATTERS[type] || ((value) => value),
+						sortable: type !== 'select',
+						editable: id === 'comments',
+					align: 'left'
+					})),
+				{ name: 'Actions', format: actionsHtml }
+			])
+		new DataTable('#' + id, {
 			columns: [
 				...columns
 					.filter(
@@ -71,14 +87,19 @@
 						name,
 						format: TYPE_FORMATTERS[type] || ((value) => value),
 						sortable: type !== 'select',
-						editable: id === 'comments'
+						editable: id === 'comments',
+					align: 'left'
 					})),
 				{ name: 'Actions', format: actionsHtml }
 			],
 			data,
 			cellHeight: 48,
-			inlineFilters: true
+			inlineFilters: true,
 		});
+
+		// Show borders
+		const table = document.querySelector('.dt-scrollable')
+		table.style.height = table.offsetHeight + 5 + 'px'
 	});
 </script>
 

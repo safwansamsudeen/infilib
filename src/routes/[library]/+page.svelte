@@ -35,10 +35,9 @@
 					scanner.pause()
 					const body = new FormData()
 					body.append(data, decodedText)
-					console.log(data.library)
 					fetch(`${data.library}/items/?/goto/`, {
-					method: 'POST',
-					body
+						method: 'POST',
+						body
 					})
 				}}
 			/>
