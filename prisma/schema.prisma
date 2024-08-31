@@ -132,14 +132,16 @@ model Book {
 }
 
 model Magazine {
-  id     Int      @id
-  sc_no  Int
-  issn   String?
-  volume String
-  issue  String
-  from   DateTime
-  to     DateTime
-  item   Item     @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id                    Int                 @id
+  sc_no                 Int
+  issn                  String?
+  volume                String
+  issue                 String
+  from                  DateTime
+  to                    DateTime
+  subscription_id       Int?
+  subscription          LibrarySubscription? @relation(fields: [subscription_id], references: [id])
+  item                  Item                @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Item {
@@ -199,17 +201,21 @@ model Mark {
 }
 
 model LibrarySubscription {
-  id           Int        @id @default(autoincrement())
-  library_slug String
-  library      Library    @relation(fields: [library_slug], references: [slug])
-  recurrence   Int
-  name         String
-  ends_on      DateTime   @db.Date()
-  no_of_weeks  Int?       @default(52)
-  price        Int?       @default(0)
-  call_no      Float?     @db.DoublePrecision
-  publisher_id Int
-  publisher    Publisher  @relation(fields: [publisher_id], references: [id])
-  categories   Category[]
-  languages    Language[]
+  id                Int        @id @default(autoincrement())
+  library_slug      String
+  library           Library    @relation(fields: [library_slug], references: [slug])
+  recurrence        Int
+  name              String
+  issues_per_volume Int?
+  reference         Boolean
+  ends_on           DateTime   @db.Date()
+  no_of_weeks       Int?       @default(52)
+  purchase_details  String?
+  purchase_price    Int?       @default(0)
+  call_no           Float?     @db.DoublePrecision
+  publisher_id      Int
+  publisher         Publisher  @relation(fields: [publisher_id], references: [id])
+  categories        Category[]
+  languages         Language[]
+  Magazine          Magazine[]
 }

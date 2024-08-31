@@ -26,10 +26,21 @@
 	let filterText = '';
 
 	function handleFilter(e) {
-		if (multiple && value?.find((i) => i[label] === filterText)) return;
+		if(!options.length) {
+			optionsConfig.loadOptions().then((opts) => {
+				if (multiple && value?.find((i) => i[label] === filterText)) return;
 		if (e.detail.length === 0 && filterText.length > 0) {
 			const prev = options.filter((i) => !i.created);
 			options = [...prev, { [label]: filterText, created: true }];
+		}
+			})
+		}
+		else {
+			if (multiple && value?.find((i) => i[label] === filterText)) return;
+			if (e.detail.length === 0 && filterText.length > 0) {
+				const prev = options.filter((i) => !i.created);
+				options = [...prev, { [label]: filterText, created: true }];
+			}
 		}
 	}
 

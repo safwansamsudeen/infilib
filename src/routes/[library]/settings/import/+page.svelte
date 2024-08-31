@@ -1,16 +1,6 @@
 <script>
 	import { enhance } from '$app/forms.js';
 	import { page } from '$app/stores';
-
-	function submitFunc() {
-		var xhr = new XMLHttpRequest();
-		xhr.open("POST", "?/test"); 
-		xhr.onload = function(event){ 
-			console.log("Success, server responded with: " + event.target.response); // raw response
-		}; 
-		var formData = new FormData(document.getElementById("import-form")); 
-		xhr.send(formData);
-	}
 </script>
 
 <form id="import-form" enctype="multipart/form-data" method="POST" use:enhance>
@@ -24,5 +14,5 @@
 		<input accept=".csv" id="importFile" name="importFile" required type="file" />
 	</div>
 
-	<button on:click={submitFunc}>Import</button>
+	<button type="submit">Import</button>
 </form>

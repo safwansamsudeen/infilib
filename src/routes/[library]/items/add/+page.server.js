@@ -33,7 +33,7 @@ export async function load({ params }) {
 }
 
 export const actions = {
-	create: async ({ request, params, url }) => {
+	create: async ({ request, params }) => {
 		const requestData = await pojoData(request);
 
 		const itemColumns = await getItemColumns(params.library);
@@ -49,10 +49,10 @@ export const actions = {
 			...itemColumns,
 			{ id: type, type: 'object', columns: otherColumns }
 		]);
-		console.log(check)
-		if (check) return new fail(400, check);
+		console.log()
+		if(check) return new fail(400, check);
 
-		// Modifications specific to Item model
+		// Modifications specific to types
 		// Adding library fields
 		requestData.library = { connect: { slug: params.library } };
 		requestData.publisher = injectLibraryInSelect(requestData.publisher, params.library);
@@ -63,7 +63,11 @@ export const actions = {
 				requestData.book.create.authors,
 				params.library
 			);
+		} else {
+			requestData.magazine.create.subscription_id = JSON.parse(requestData.library_subscription).id
+			delete requestData.library_subscription;
 		}
+		console.log(requestData)
 
 		const res = await response(async () => {
 			await item.create({ data: requestData });

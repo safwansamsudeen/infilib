@@ -205,24 +205,26 @@
 					<!-- This exists to center the child -->
 					<div>
 						<div class="w-50 mx-auto">
-							<label for="library-subscription" class="w-100 text-center">Autofill: </label>
+							<label for="library-subscription" class="w-100 text-center">Subscription: </label>
 							<CustomSelect
-								id="library-subscription"
+								id="library_subscription"
 								options={data.librarySubscriptions}
 								creatable={false}
 								onChange={(e) => {
 									const {
 										name,
 										recurrence,
-										price,
+										purchase_details,
+										purchase_price,
 										no_of_weeks,
 										publisher,
 										categories,
 										languages,
 										call_no
 									} = e.detail;
-									setFormField('title', Math.round(price / no_of_weeks));
-									setFormField('purchase_price', name);
+									setFormField('title', name);
+									setFormField('purchase_details', purchase_details);
+									setFormField('purchase_price', Math.round(purchase_price / no_of_weeks));
 									setFormField('call_no', call_no);
 									document.getElementById('from').valueAsDate = new Date();
 									document.getElementById('to').valueAsDate = new Date(

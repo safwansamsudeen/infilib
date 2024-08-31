@@ -189,7 +189,7 @@ export function getMagazineColumns() {
 	return [
 		{ id: 'issue' },
 		{ id: 'volume' },
-		{ id: 'sc_no', type: 'number' },
+		{ id: 'sc_no', name: 'Serial Number', type: 'number' },
 		{ id: 'from', type: 'date' },
 		{ id: 'to', type: 'date' }
 	].map(standardizeColumns);
@@ -247,10 +247,10 @@ export function getLibrarySubscriptionColumns(library_slug) {
 		{
 			id: 'name'
 		},
-		{ id: 'ends_on', type: 'date' },
+		{ id: 'recurrence', name: "Recurrance (in days)", type: 'number' },
 		{ id: 'no_of_weeks', name: 'Number of Weeks', type: 'number' },
-		{ id: 'recurrence', type: 'number' },
-		{ id: 'price', name: 'Total Price', type: 'number' },
+		{ id: 'ends_on', type: 'date' },
+		{ id: 'purchase_price', name: 'Total Price', type: 'number' },
 		{
 			id: 'publisher',
 			type: 'select',
@@ -260,6 +260,8 @@ export function getLibrarySubscriptionColumns(library_slug) {
 			}
 		},
 		{ id: 'call_no', name: 'Call Number', type: 'number', important: false },
+		{ id: 'issues_per_volume', type: 'number', important: false },
+		{ id: 'purchase_details', important: false },
 		{
 			id: 'categories',
 			type: 'select',
@@ -278,7 +280,8 @@ export function getLibrarySubscriptionColumns(library_slug) {
 				options: languages
 			},
 			important: false
-		}
+		},
+		{id:'reference', type: 'checkbox'}
 	].map(standardizeColumns);
 }
 
